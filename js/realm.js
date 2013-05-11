@@ -25,8 +25,10 @@ lj.realm = (function () {
 
 	// Generate a new room with doors according to doors array and fill with 
 	function makeRoom(room) {
-		var y,
-			x,
+		var x,
+			y,
+			dx,
+			dy,
 			height,
 			width;
 
@@ -46,6 +48,74 @@ lj.realm = (function () {
 		// Save height and width of room
 		width = rooms[room].length;
 		height = rooms[room][0].length;
+
+		// Draw wall at edge of room and a grid (making a "bomberman" wall layout)
+		for (y = 0; y < height; y += 1) {
+			for (x = 0; x < width; x += 1) {
+				if (y === 0 || x === 0 || y === (height - 1) || x === (width - 1) || (y % 2 === 0 && x % 2 === 0)) {
+					rooms[room][x][y] = '#';
+				}
+			}
+		}
+
+		// Loop through the leftmost column of pillars
+		for (y = 2; y < height - 1; y += 2) {
+			dx = 2;
+			dy = y;
+
+			// Pick a direction at random
+			switch (Math.floor(Math.random() * 4)) {
+			case 0:
+				dx += 1;
+				break;
+			case 1:
+				dx -= 1;
+				break;
+			case 2:
+				dy += 1;
+				break;
+			case 3:
+				dy -= 1;
+				break;
+			}
+
+			// If the tile in the direction chosen is empty, make wall
+			if (rooms[room][dx][dy] === ' ') {
+				rooms[room][dx][dy] = '#';
+			} else {
+				// If the tile was already a wall, move iterator back and try again
+				y -= 2;
+			}
+		}
+
+		// Loop through all but leftmost column of pillars
+		for (x = 4; x < (width - 1); x += 2) {
+			for (y = 2; y < height - 1; y += 2) {
+				dx = x;
+				dy = y;
+
+				// Pick a direction at random (but not to the left!)
+				switch (Math.floor(Math.random() * 3)) {
+				case 0:
+					dx += 1;
+					break;
+				case 1:
+					dy += 1;
+					break;
+				case 2:
+					dy -= 1;
+					break;
+				}
+
+				// If the tile in the direction chosen is empty, make wall
+				if (rooms[room][dx][dy] === ' ') {
+					rooms[room][dx][dy] = '#';
+				} else {
+					// If the tile was already a wall, move iterator back to try again
+					y -= 2;
+				}
+			}
+		}
 	}
 
 	// Place boss in one of the top rooms
@@ -123,6 +193,16 @@ lj.realm = (function () {
 	function clearTile(x, y) {}
 
 	return {
+		// temporarily expose everything to test
+		getRoomNumberFromPosition : getRoomNumberFromPosition,
+		randomDoorPosition : randomDoorPosition,
+		getRoom : getRoom,
+		spawnChestsAndMonsters : spawnChestsAndMonsters,
+		makeRoom : makeRoom,
+		placeBoss : placeBoss,
+		placeDoors : placeDoors,
+
+		// These should stay exposed after testing
 		makeRealm : makeRealm, // Call to initialize
 		prepareNextRoom : prepareNextRoom,
 		copyRoom : copyRoom,
