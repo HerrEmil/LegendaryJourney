@@ -1,3 +1,26 @@
+/*
+Room structure legend:
+' ' = Path
+'#' = Wall
+
+'L' = Door leading Left
+'U' = Door leading Up
+'R' = Door leading Right
+'D' = Door leading Down
+
+'a' = Monster type a
+'b' = Monster type b
+'c' = Monster type c
+[...]
+'z' = Monster type z
+
+'1' = Chest type 1
+'2' = Chest type 2
+'3' = Chest type 3
+[...]
+'9' = Chest type 9
+*/
+
 window.lj = lj || {};
 
 lj.realm = (function () {
