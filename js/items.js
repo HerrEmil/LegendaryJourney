@@ -19,28 +19,84 @@
 		"ring" : [],
 		"weapon" : []
 	};
+	iItems.qualities = {
+		"poor" : 		{"mod" :0.5, 	"chance":10},
+		"normal" : 		{"mod" :1, 		"chance":74},
+		"rare" : 		{"mod" :1.5, 	"chance":10},
+		"epic" : 		{"mod" :2.5,	"chance":4},
+		"legendary" : 	{"mod" :4, 		"chance":2},
+		get : function(){
+			var total = this.poor.chance + this.normal.chance + this.rare.chance + this.epic.chance + this.legendary.chance,
+				roll = window.util.randomInterval(1,total),
+				rolling = true;
+			// console.log("total: "+total+"\nroll: "+roll);
+			total -= this.legendary.chance;
+			if(total < roll){
+				return "legendary";
+			}
+			total -= this.epic.chance
+			if(total < roll){
+				return "epic";
+			}
+			total -= this.rare.chance
+			if(total < roll){
+				return "rare";
+			}
+			total -= this.normal.chance
+			if(total < roll){
+				return "normal";
+			}
+			return "poor";
+		}
+	};
 
-	iItems.item = function (slot, type, prefix, suffix) {
+	iItems.item = function (slot, type, prefix, suffix, quality) {
 		'use strict';
 		this.slot = slot;
 		this.type = type;
-		this.prefix = prefix;
-		this.suffix = suffix;
-		this.name = prefix.name +' '+type.name+' '+suffix.name;
-		//Set the stats of the item based on type, prefix and affix
+		if(Math.floor((Math.random()*10)+1)<=3){
+			this.prefix = prefix;
+		} else {
+			this.prefix = [0,0,0,0,0,0,0,0,0];
+			this.prefix.name = "";
+		}
+		if(Math.floor((Math.random()*10)+1)<=3){
+			this.suffix = suffix;
+		} else {
+			this.suffix = [0,0,0,0,0,0,0,0,0];
+			this.suffix.name = "";
+		}
+		
+		if(!quality){
+			this.quality = window.items.qualities.get();
+		} else {
+			this.quality = quality;
+		}
+
+		//Set the stats of the item based on type, prefix, affix and apply the quality multiplier
 		window.stats.init(this);
-		this.strength = this.prefix[0] + this.type[0] + this.suffix[0];
-		this.agility = this.prefix[1] + this.type[1] + this.suffix[1];
-		this.luck = this.prefix[2] + this.type[2] + this.suffix[2];
-		this.hp = this.prefix[3] + this.type[3] + this.suffix[3];
-		this.hit = this.prefix[4] + this.type[4] + this.suffix[4];
-		this.crit = this.prefix[5] + this.type[5] + this.suffix[5];
-		this.armor = this.prefix[6] + this.type[6] + this.suffix[6];
-		this.defense = this.prefix[7] + this.type[7] + this.suffix[7];
-		this.magicfind = this.prefix[8] + this.type[8] + this.suffix[8];
+		this.strength = Math.round((this.prefix[0] + this.type[0] + this.suffix[0])*items.qualities[this.quality].mod);
+		this.agility = Math.round((this.prefix[1] + this.type[1] + this.suffix[1])*items.qualities[this.quality].mod);
+		this.luck = Math.round((this.prefix[2] + this.type[2] + this.suffix[2])*items.qualities[this.quality].mod);
+		this.hp = Math.round((this.prefix[3] + this.type[3] + this.suffix[3])*items.qualities[this.quality].mod);
+		this.hit = Math.round((this.prefix[4] + this.type[4] + this.suffix[4])*items.qualities[this.quality].mod);
+		this.crit = Math.round((this.prefix[5] + this.type[5] + this.suffix[5])*items.qualities[this.quality].mod);
+		this.armor = Math.round((this.prefix[6] + this.type[6] + this.suffix[6])*items.qualities[this.quality].mod);
+		this.defense = Math.round((this.prefix[7] + this.type[7] + this.suffix[7])*items.qualities[this.quality].mod);
+		this.magicfind = Math.round((this.prefix[8] + this.type[8] + this.suffix[8])*items.qualities[this.quality].mod);
+
+
+		//Finally, give it a pretty name
+		this.name = this.prefix.name +' '+type.name+' '+this.suffix.name;
+		this.name = this.name.trim();
+		if(this.quality != "normal"){
+			this.name = window.util.capitaliseFirstLetter(this.quality) +' '+ this.name;
+		}
+		
+		// console.log(this.name);
 
 	};
-	iItems.makeItem = function(level,slot){
+	iItems.makeItem = function(level,slot, quality){
 		var rng = window.util.randomInterval,
 			itemSlot,
 			itemType,
@@ -50,7 +106,8 @@
 			slotIndex,
 			typeArray,
 			typeIndex,
-			ilvl;
+			ilvl,
+			quality;
 		if(!level){
 			this.ilvl = 1;
 		} else {
@@ -64,8 +121,11 @@
 		} else {
 			this.itemSlot = slot;
 		}
-		//console.log(this.itemSlot);
-		
+		if(quality){
+			this.quality = quality;
+		} else {
+			this.quality = null;
+		}
 		//Based on the slot picked, get a random type
 		this.itemType = items.types.get(ilvl,this.itemSlot);
 		// console.log(this.itemType.name);
@@ -79,7 +139,7 @@
 		// console.log(this.itemSuffix);
 
 		//console.log(window.stats.prefixes[this.itemPrefix].name + ' ' +this.itemType.name+' '+window.stats.suffixes[this.itemSuffix].name);
-		return new iItems.item(this.itemSlot,this.itemType,this.itemPrefix,this.itemSuffix);
+		return new iItems.item(this.itemSlot,this.itemType,this.itemPrefix,this.itemSuffix,this.quality);
 	};
 
 	//------------
@@ -196,3 +256,10 @@
 		return statArray;
 	};
 }());
+var tonsofitems = function(num){
+	var num, i,obj;
+	for(i=0;i<num;i++){
+		obj = items.makeItem();
+		console.log(obj.name);
+	}
+}

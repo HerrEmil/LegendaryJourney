@@ -1,3 +1,26 @@
+/*
+Room structure legend:
+' ' = Path
+'#' = Wall
+
+'L' = Door leading Left
+'U' = Door leading Up
+'R' = Door leading Right
+'D' = Door leading Down
+
+'a' = Monster type a
+'b' = Monster type b
+'c' = Monster type c
+[...]
+'z' = Monster type z
+
+'1' = Chest type 1
+'2' = Chest type 2
+'3' = Chest type 3
+[...]
+'9' = Chest type 9
+*/
+
 window.lj = lj || {};
 
 lj.realm = (function () {
@@ -8,7 +31,7 @@ lj.realm = (function () {
 		y,
 		i,
 		doors = [],
-		currentRoom,
+		currentRoom = 90,
 		bossRoom;
 
 	function getRoomNumberFromPosition(x, y) {
@@ -23,13 +46,31 @@ lj.realm = (function () {
 	function getRoom(room) {
 		var copy = [],
 			x,
-			length = rooms[0].length;
+			length = rooms[currentRoom].length;
 		for (x = 0; x < length; x += 1) {
 			copy[x] = rooms[room][x].slice(0);
 		}
+		console.log(copy);
 		return copy;
 	}
-	function spawnChestsAndMonsters() {}
+	function spawnChestsAndMonsters(room) {
+		// Create a map of all possible spawns
+		var spawnPoints = [],
+			enemies = Math.floor(Math.random() * 6 + 1) + 8, // Between 8 and 12 enemies
+			chests = Math.floor(Math.random() * 2 + 1) + 4; // Between 4 and 6 chests
+		// Pick a number of enemies
+		// Pick a number of chests
+
+		// Loop through enemies
+			// Pick a random spawn point
+			// If the spawn point is unused, place monster in room
+			// else, try again
+
+		// Loop through chests
+			// Pick a random spawn point
+			// If spawn point is unused, place chest in room
+			// else, try again
+	}
 
 	// Generate a new room with doors according to doors array and fill with 
 	function makeRoom(room) {
@@ -127,6 +168,8 @@ lj.realm = (function () {
 
 		// Place doors in room
 		// If left, place 'L' in x0 at y where doors says y should be
+		// console.log('in makeRoom room: ' + room);
+		// console.log('doors[room]: ' + doors[room]);
 		if (doors[room].L) {
 			// console.log('Placing left door in room ' + room + ' at position 0, ' + doors[room].L);
 			rooms[room][0][doors[room].L] = 'L';
@@ -144,7 +187,7 @@ lj.realm = (function () {
 			rooms[room][doors[room].D][height - 1] = 'D';
 		}
 
-		// Place enemies
+		spawnChestsAndMonsters();
 
 		// If boss room, replace one enemy with boss
 	}
@@ -205,18 +248,25 @@ lj.realm = (function () {
 
 	}
 
-	function makeRealm(size) {
+	function getCurrentRoom() {
+		return currentRoom;
+	}
+
+	function makeRealm(realmSize) {
+		var i,
+			roomNumber;
 		// Clear previous realm
 		rooms.length = 0;
-
+		size = realmSize;
 
 		// Make new realm of specified size
 		for (x = 0; x < size; x += 1) {
-			rooms[x] = [];
 			for (y = 0; y < size; y += 1) {
-				rooms[x][y] = [];
+				roomNumber = getRoomNumberFromPosition(x, y);
+				rooms[roomNumber] = [];
 			}
 		}
+
 		// set door positions
 		placeDoors();
 
@@ -224,15 +274,13 @@ lj.realm = (function () {
 		placeBoss();
 
 		// Start in one of the bottom rooms
-		currentRoom = rooms.length - Math.floor(Math.random() * size);
+		currentRoom = (rooms.length - 1) - Math.floor(Math.random() * size);
+		// console.log('In makeRealm, currentRoom: ' + currentRoom);
 
 		// Make first room
 		makeRoom(currentRoom);
 	}
 	function prepareNextRoom(room) {}
-	function copyRoom() {}
-	function copyRealm() {}
-	function getChestsAndMonsters() {}
 	function clearTile(x, y) {}
 	// Should be superseeded by copyRoom later
 	function printRoom(room) {
@@ -257,8 +305,7 @@ lj.realm = (function () {
 		// temporarily expose everything to test
 		getRoomNumberFromPosition : getRoomNumberFromPosition,
 		randomDoorPosition : randomDoorPosition,
-		getRoom : getRoom,
-		spawnChestsAndMonsters : spawnChestsAndMonsters,
+		spawnChestsAndMonsters : spawnChestsAndMonsters, // To do
 		makeRoom : makeRoom,
 		placeBoss : placeBoss,
 		placeDoors : placeDoors,
@@ -268,12 +315,11 @@ lj.realm = (function () {
 		rooms : rooms,
 
 		// These should stay exposed after testing
-		makeRealm : makeRealm, // Call to initialize
-		prepareNextRoom : prepareNextRoom,
-		copyRoom : copyRoom,
-		copyRealm : copyRealm,
-		getChestsAndMonsters : getChestsAndMonsters,
-		clearTile : clearTile,
-		checkTile : checkTile
+		makeRealm : makeRealm,
+		prepareNextRoom : prepareNextRoom, // To do
+		clearTile : clearTile, // To do
+		checkTile : checkTile, // To do
+		getRoom : getRoom,
+		getCurrentRoom : getCurrentRoom
 	};
 }());
