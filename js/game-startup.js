@@ -15,12 +15,18 @@
 
 	function startGame() {
 
+		window.lj = new Game(config);
+		lj.room = new Room(config);
+
+		loadImages();
+
+	}
+
+	function loadImages() {
 		var progress = intro.querySelector('#progress'),
 			progressBar = progress.querySelector('.progress-bar'),
 			images,
 			interval;
-
-		window.lj = new Game(config);
 
 		start.style.display = 'none';
 		progress.style.display = 'block';
@@ -55,7 +61,6 @@
 					},500);
 				},1000);
 			}
-			console.log(completed);
 		},16);
 	}
 
