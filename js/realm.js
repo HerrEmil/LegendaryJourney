@@ -32,6 +32,9 @@ lj.realm = (function () {
 	}
 	function spawnChestsAndMonsters(room) {
 		// Create a map of all possible spawns
+		var spawnPoints = [],
+			enemies = Math.floor(Math.random() * 6 + 1) + 8, // Between 8 and 12 enemies
+			chests = Math.floor(Math.random() * 2 + 1) + 4; // Between 4 and 6 chests
 		// Pick a number of enemies
 		// Pick a number of chests
 
@@ -255,9 +258,6 @@ lj.realm = (function () {
 		makeRoom(currentRoom);
 	}
 	function prepareNextRoom(room) {}
-	function copyRoom() {}
-	function copyRealm() {}
-	function getChestsAndMonsters() {}
 	function clearTile(x, y) {}
 	// Should be superseeded by copyRoom later
 	function printRoom(room) {
@@ -282,8 +282,7 @@ lj.realm = (function () {
 		// temporarily expose everything to test
 		getRoomNumberFromPosition : getRoomNumberFromPosition,
 		randomDoorPosition : randomDoorPosition,
-		getRoom : getRoom,
-		spawnChestsAndMonsters : spawnChestsAndMonsters,
+		spawnChestsAndMonsters : spawnChestsAndMonsters, // To do
 		makeRoom : makeRoom,
 		placeBoss : placeBoss,
 		placeDoors : placeDoors,
@@ -293,13 +292,11 @@ lj.realm = (function () {
 		rooms : rooms,
 
 		// These should stay exposed after testing
-		makeRealm : makeRealm, // Call to initialize
-		prepareNextRoom : prepareNextRoom,
-		copyRoom : copyRoom,
-		copyRealm : copyRealm,
-		getChestsAndMonsters : getChestsAndMonsters,
-		clearTile : clearTile,
-		checkTile : checkTile,
+		makeRealm : makeRealm,
+		prepareNextRoom : prepareNextRoom, // To do
+		clearTile : clearTile, // To do
+		checkTile : checkTile, // To do
+		getRoom : getRoom,
 		getCurrentRoom : getCurrentRoom
 	};
 }());
