@@ -12,11 +12,11 @@
 	}
 
 	var intro = document.getElementById('gameIntro'),
-		start = intro.querySelector('.btn-start');
+		startBtn = intro.querySelector('.btn-start');
 
-	start.addEventListener('click', startGame);
+	startBtn.addEventListener('click', loadGame);
 
-	function startGame() {
+	function loadGame() {
 
 		loadImages();
 
@@ -28,7 +28,7 @@
 			images,
 			interval;
 
-		start.style.display = 'none';
+		startBtn.style.display = 'none';
 		progress.style.display = 'block';
 
 		images = [
@@ -56,12 +56,18 @@
 				clearInterval(interval);
 				setTimeout(function() {
 					intro.setAttribute('class', 'faded');
+					startGame();
 					setTimeout(function() {
 						intro.style.display = 'none';
 					},500);
 				},1000);
 			}
 		},16);
+	}
+
+	function startGame() {
+		lj.realm.makeRealm(1);
+		lj.hero.enter();
 	}
 
 }());

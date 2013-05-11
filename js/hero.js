@@ -13,11 +13,17 @@ lj.hero = (function() {
 		down: [1, 0]
 	}
 
-	function init() {
-		// Get the starting tile from realm.js
+	// The hero enters the room...
+	function enter(door) {
+		// Get the starting tile from realm.js (get door tile)
 		var tile = [0, 0];
 		place(tile);
 		setupListeners();
+	}
+
+	// The hero exits the room...
+	function exit() {
+
 	}
 
 	function setupListeners() {
@@ -55,7 +61,7 @@ lj.hero = (function() {
 		col = currentTile[1] + stepModifiers[dir][1];
 		currentTile = [row, col];
 
-		console.log('Hero moved to:', currentTile);
+		console.log('Hero moved to:', currentTile, currentDir);
 	}
 
 	// Turn the hero into the direction
@@ -66,7 +72,8 @@ lj.hero = (function() {
 
 	// Public API
 	return {
-		init: init,
-		step: step
+		enter: enter,
+		step: step,
+		exit: exit
 	}
 }());
