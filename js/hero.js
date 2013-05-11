@@ -38,15 +38,9 @@ lj.hero = (function() {
 		lj.addKeyListener('down arrow', function() { step('down') });
 	}
 
-	// Is step in dir restriced
-	function isRestricted(dir) {
-		// Need room info from realm.js
-
-		return false;
-	}
-
-	// PRIVATE: place the hero in the room
+	// PRIVATE: place the hero on a tile
 	function place(tile) {
+		lj.context.restore();
 		var spriteImage = lj.getImage('dungeon-sprite.png');
 		// Figure out in what direction to face based on tile #
 		currentTile = tile;
@@ -61,10 +55,8 @@ lj.hero = (function() {
 		switch (type) {
 			case '#': return; break;
 			case ' ':
-				currentTile = tile;
 				console.log('Hero moved to:', currentTile, currentDir);
-				lj.context.drawImage(
-					spriteImage, 4*32, 2*32,32,32,tile[0]*32,tile[1]*32,32,32);
+				place(tile);
 				break;
 			case 'D':
 				currentTile[1] = 0;

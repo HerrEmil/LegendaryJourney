@@ -67,6 +67,8 @@ lj.scene = (function() {
 			}
 		}
 
+		lj.context.save();
+
 		// Animate hero entering from door
 		lj.hero.enter(door);
 	}
@@ -77,7 +79,7 @@ lj.scene = (function() {
 
 		currentRoom = currentRoom + roomModifier[door];
 		console.log(currentRoom);
-		lj.realm.makeRoom(currentRoom);
+		lj.realm.enterRoom(currentRoom);
 
 		lj.hero.exit();
 
