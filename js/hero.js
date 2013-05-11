@@ -40,12 +40,8 @@ lj.hero = (function() {
 
 	// PRIVATE: place the hero on a tile
 	function place(tile) {
-		lj.context.restore();
-		var spriteImage = lj.getImage('dungeon-sprite.png');
-		// Figure out in what direction to face based on tile #
 		currentTile = tile;
-		lj.context.drawImage(
-			spriteImage, 4*32, 2*32,32,32,tile[0]*32,tile[1]*32,32,32);
+		lj.scene.paint(tile);
 	}
 
 	function move(tile) {
