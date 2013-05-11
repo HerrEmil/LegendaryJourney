@@ -1,13 +1,86 @@
 body {
 	background-color: #0a080d;
-	background-image: url('assets/page-bg.jpg');
-	background-repeat: no-repeat;
 	color: #37649b;
 	font-family: 'Palatino', 'arial', 'sans-serif';
 }
 
+#gameIntro {
+	background-image: url('assets/page-bg.jpg');
+	background-repeat: no-repeat;
+	position: fixed;
+	top:0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	-webkit-transition: 0.5s;
+	   -moz-transition: 0.5s;
+	    -ms-transition: 0.5s;
+	     -o-transition: 0.5s;
+		    transition: 0.5s;
+}
+
+	.btn {
+		border: 1px solid #37649b;
+		color: #fff;
+		cursor: pointer;
+		display: inline-block;
+		font-family: 'helvetica', 'arial', 'sans-serif';
+		font-size: 0.9em;
+		padding:4px 10px;
+		text-transform: uppercase;
+	}
+	.btn-start {
+		position: absolute;
+		top:280px;
+		left:280px;
+	}
+	.progress {
+		border: 1px solid #37649b;
+		color:#fff;
+		display: none;
+		font-size: 0.8em;
+		position: absolute;
+		top:280px;
+		left:210px;
+		width:200px;
+		height: 24px;
+	}
+		.progress-bar {
+			background-color: #37649b;
+			position: absolute;
+			top: 0;
+			width: 0;
+			height: 24px;
+			-webkit-transition: 0.1s;
+		       -moz-transition: 0.1s;
+		        -ms-transition: 0.1s;
+		         -o-transition: 0.1s;
+			        transition: 0.1s;
+		}
+		.loading-text {
+			position: absolute;
+			top: 0;
+			width: 200px;
+			height: 24px;
+			padding-top: 4px;
+			text-align: center;
+		}
+
+.faded {
+	opacity: 0;
+}
+
 h1 {
 	font-size: 3em;
-	margin:50px 0 0 75px;
-	opacity:0.2;
+	position: absolute;
+	opacity:0.3;
+	top:40px;
+	left:75px;
+}
+
+#game {
+	background-color: #333;
+	position: absolute;
+	top:150px;
+	left:75px;
 }

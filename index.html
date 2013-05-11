@@ -5,10 +5,21 @@
 		<link rel="stylesheet" type="text/css" href="theme.css">
 	</head>
 	<body>
-		<h1>Legendary Journey</h1>
+
 		<canvas id="game" width="800" height="500">
 			No game for you! Browser need to support canvas.
 		</canvas>
+
+		<div id="gameIntro">
+			<div class="btn btn-start">Start</div>
+			<div id="progress" class="progress">
+				<div class="progress-bar"></div>
+				<div class="loading-text">Loading images...</div>
+			</div>
+		</div>
+
+		<h1>Legendary Journey</h1>
+
 		<script src="lib/game.js"></script>
 		<script src="js/game-startup.js"></script>
 	</body>
