@@ -120,7 +120,7 @@ lj.hero.attack = function (enemy){
 	//Perform an attack, evaluate the damage and return the results
 	var rng = lj.util.randomInterval,
 		friend = lj.hero.stats.get(),
-		netHit = friend["hit"]-enemy["defense"]+rng(1,1000),
+		netHit = friend["hit"] - enemy["defense"]+rng(1,1000),
 		damage,
 		result = {};
 
