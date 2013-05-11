@@ -1,6 +1,7 @@
+window.lj = lj || {};
 (function(){
-	window.stats = {};
-	var iStats = window.stats;
+	lj.stats = {};
+	var iStats = lj.stats;
 	iStats.raw = {
 		"strength" : 0, // 0
 		"agility" : 0,  // 1
@@ -14,11 +15,11 @@
 	};
 	iStats.init = function (obj) {
 		'use strict';
-		_.extend(obj, window.stats.raw);
+		_.extend(obj, lj.stats.raw);
 	};
 	iStats.fix = function (iStats, name, level) {
 		this.name = name;
-		window.stats.init(this);
+		lj.stats.init(this);
 		this.strength = iStats[0];
 		this.agility = iStats[1];
 		this.luck = iStats[2];
@@ -30,7 +31,7 @@
 		this.magicfind = iStats[8];
 	};
 	iStats.vary = function (value, level) {
-		var rng = window.util.randomInterval,
+		var rng = lj.util.randomInterval,
 			lowerBound,
 			upperBound;
 		lowerBound = value * level;
@@ -90,16 +91,16 @@
 	pre.get = function(id, level){
 		var ilvl,
 			prefix,
-			rng = window.util.randomInterval,
+			rng = lj.util.randomInterval,
 			statArray = [],
-			vary = window.stats.vary;
+			vary = lj.stats.vary;
 		if(!level){
 			this.ilvl = 1
 		} else{
 			this.ilvl = level;
 		}
 		if(!id){
-			this.prefix = rng(0,window.stats.prefixes.length-1);
+			this.prefix = rng(0,lj.stats.prefixes.length-1);
 		} else {
 			this.prefix = id;
 		}
@@ -121,16 +122,16 @@
 	suf.get = function(id, level){
 		var ilvl,
 			suffix,
-			rng = window.util.randomInterval,
+			rng = lj.util.randomInterval,
 			statArray = [],
-			vary = window.stats.vary;
+			vary = lj.stats.vary;
 		if(!level){
 			this.ilvl = 1
 		} else{
 			this.ilvl = level;
 		}
 		if(!id){
-			this.suffix = rng(0,window.stats.suffixes.length-1);
+			this.suffix = rng(0,lj.stats.suffixes.length-1);
 		} else {
 			this.suffix = id;
 		}

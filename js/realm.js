@@ -8,6 +8,8 @@ Room structure legend:
 'R' = Door leading Right
 'D' = Door leading Down
 
+'B' = Boss
+
 'a' = Monster type a
 'b' = Monster type b
 'c' = Monster type c
@@ -26,6 +28,7 @@ window.lj = lj || {};
 lj.realm = (function () {
 	"use strict";
 	var rooms = [],
+		chestsAndMonsters = [],
 		size,
 		x,
 		y,
@@ -50,26 +53,79 @@ lj.realm = (function () {
 		for (x = 0; x < length; x += 1) {
 			copy[x] = rooms[room][x].slice(0);
 		}
-		console.log(copy);
 		return copy;
 	}
 	function spawnChestsAndMonsters(room) {
-		// Create a map of all possible spawns
 		var spawnPoints = [],
+			x,
+			y,
+			i,
+			length,
+			randomPosition,
+			numberOfSpawns,
+			roomX,
+			roomY,
+			// Pick a semi-random number or enemies and chests
 			enemies = Math.floor(Math.random() * 6 + 1) + 8, // Between 8 and 12 enemies
 			chests = Math.floor(Math.random() * 2 + 1) + 4; // Between 4 and 6 chests
-		// Pick a number of enemies
-		// Pick a number of chests
 
+		// Create a map of all possible spawn points
+		length = rooms.length;
+		for (x = 1; x <= length; x += 1) {
+			for (y = 1; y <= length; y += 1) {
+				if (rooms[room][x][y] === ' ') {
+					spawnPoints.push({x : x, y : y});
+				}
+			}
+		}
+
+		chestsAndMonsters[room] =  [['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+									['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+									['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+									['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+									['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+									['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+									['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+									['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+									['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+									['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+									['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']];
+
+		numberOfSpawns = spawnPoints.length;
 		// Loop through enemies
-			// Pick a random spawn point
-			// If the spawn point is unused, place monster in room
-			// else, try again
+		for (i = 0; i < enemies; i += 1) {
+			// Pick a random spawn point and grab its x and y values
+			randomPosition = Math.floor(Math.random() * numberOfSpawns);
+			roomX = spawnPoints[randomPosition].x;
+			roomY = spawnPoints[randomPosition].y;
 
-		// Loop through chests
-			// Pick a random spawn point
-			// If spawn point is unused, place chest in room
-			// else, try again
+			// Add an enemy in chest and monster structure, as long as it's not in the character's spawn point
+			if (roomX !== 5 || roomY !== 9) {
+				chestsAndMonsters[room][roomX][roomY] = 'E';
+			}
+
+			// If boss room, replace last placed enemy with boss
+			if ((room === bossRoom) && (i === enemies - 1)) {
+				console.log('Creating boss room!');
+				console.log('Boss room before placing boss:');
+				printChestsAndMonsters(room);
+				chestsAndMonsters[room][roomX][roomY] = 'B';
+				console.log('Boss room after placing boss:');
+				printChestsAndMonsters(room);
+			}
+		}
+
+		for (i = 0; i < chests; i += 1) {
+			// Pick a random spawn point and grab its x and y values
+			randomPosition = Math.floor(Math.random() * numberOfSpawns);
+			roomX = spawnPoints[randomPosition].x;
+			roomY = spawnPoints[randomPosition].y;
+
+			// Add an chest in chest and monster structure, as long as it's not in the character's spawn point
+			if (roomX !== 5 || roomY !== 9) {
+				chestsAndMonsters[room][roomX][roomY] = 'C';
+			}
+		}
 	}
 
 	// Generate a new room with doors according to doors array and fill with 
@@ -79,7 +135,8 @@ lj.realm = (function () {
 			dx,
 			dy,
 			height,
-			width;
+			width,
+			enemyPosition = 0;
 
 		// Add empty room
 		rooms[room] =  [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -187,9 +244,7 @@ lj.realm = (function () {
 			rooms[room][doors[room].D][height - 1] = 'D';
 		}
 
-		spawnChestsAndMonsters();
-
-		// If boss room, replace one enemy with boss
+		spawnChestsAndMonsters(room);
 	}
 
 	// Place boss in one of the top rooms
@@ -264,6 +319,7 @@ lj.realm = (function () {
 			for (y = 0; y < size; y += 1) {
 				roomNumber = getRoomNumberFromPosition(x, y);
 				rooms[roomNumber] = [];
+				chestsAndMonsters[roomNumber] = [];
 			}
 		}
 
@@ -282,12 +338,25 @@ lj.realm = (function () {
 	}
 	function prepareNextRoom(room) {}
 	function clearTile(x, y) {}
-	// Should be superseeded by copyRoom later
+
+
 	function printRoom(room) {
 		var str = "";
 		for (y = 0; y < rooms[room][0].length; y += 1) {
 			for (x = 0; x < rooms[room].length; x += 1) {
 				str += rooms[room][x][y] + " ";
+			}
+			str += "\r\n";
+		}
+		console.log(str);
+	}
+
+	function printChestsAndMonsters(room) {
+		var str = "";
+		console.log(chestsAndMonsters);
+		for (y = 0; y < chestsAndMonsters[room][0].length; y += 1) {
+			for (x = 0; x < chestsAndMonsters[room].length; x += 1) {
+				str += chestsAndMonsters[room][x][y] + " ";
 			}
 			str += "\r\n";
 		}
@@ -301,11 +370,22 @@ lj.realm = (function () {
 
 	function checkTile() {}
 
+	function getChestsAndMonstersArray() {
+		return chestsAndMonsters;
+	}
+
+	function enterRoom(room) {
+		currentRoom = room;
+		if (!rooms[currentRoom].length) {
+			makeRoom(room);
+		}
+	}
+
 	return {
 		// temporarily expose everything to test
 		getRoomNumberFromPosition : getRoomNumberFromPosition,
 		randomDoorPosition : randomDoorPosition,
-		spawnChestsAndMonsters : spawnChestsAndMonsters, // To do
+		spawnChestsAndMonsters : spawnChestsAndMonsters,
 		makeRoom : makeRoom,
 		placeBoss : placeBoss,
 		placeDoors : placeDoors,
@@ -313,6 +393,11 @@ lj.realm = (function () {
 		setSize : setSize,
 		doors : doors,
 		rooms : rooms,
+		getChestsAndMonstersArray : getChestsAndMonstersArray,
+		printChestsAndMonsters : printChestsAndMonsters,
+		chestsAndMonsters : chestsAndMonsters,
+		bossRoom : bossRoom,
+		enterRoom : enterRoom,
 
 		// These should stay exposed after testing
 		makeRealm : makeRealm,
