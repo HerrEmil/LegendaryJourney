@@ -5,6 +5,7 @@
 		nrOfRows: 11,
 		nrOfCols: 11,
 		tileSize: 32,
+		realmSize: 2,
 		assetsPath: 'assets/'
 	}
 
@@ -16,7 +17,7 @@
 	function startGame() {
 
 		window.lj = new Game(config);
-		lj.room = new Room(config);
+		lj.realm = new Realm(config);
 
 		loadImages();
 
