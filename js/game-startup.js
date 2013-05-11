@@ -1,28 +1,34 @@
 (function() {
 	'use strict'
 
+	window.lj = new Game(config);
+
 	var config = {
 		nrOfRows: 11,
 		nrOfCols: 11,
 		tileSize: 32,
+		realmSize: 2,
 		assetsPath: 'assets/'
 	}
 
 	var intro = document.getElementById('gameIntro'),
-		start = intro.querySelector('.btn-start');
+		startBtn = intro.querySelector('.btn-start');
 
-	start.addEventListener('click', startGame);
+	startBtn.addEventListener('click', loadGame);
 
-	function startGame() {
+	function loadGame() {
 
+		loadImages();
+
+	}
+
+	function loadImages() {
 		var progress = intro.querySelector('#progress'),
 			progressBar = progress.querySelector('.progress-bar'),
 			images,
 			interval;
 
-		window.lj = new Game(config);
-
-		start.style.display = 'none';
+		startBtn.style.display = 'none';
 		progress.style.display = 'block';
 
 		images = [
@@ -50,13 +56,18 @@
 				clearInterval(interval);
 				setTimeout(function() {
 					intro.setAttribute('class', 'faded');
+					startGame();
 					setTimeout(function() {
 						intro.style.display = 'none';
 					},500);
 				},1000);
 			}
-			console.log(completed);
 		},16);
+	}
+
+	function startGame() {
+		lj.realm.makeRealm(1);
+		lj.hero.enter();
 	}
 
 }());
