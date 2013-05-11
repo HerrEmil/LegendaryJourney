@@ -12,10 +12,10 @@
 		"defense" : 0,  // 7
 		"magicfind" : 0 // 8
 	};
-	window.stats.init = function (obj) {
+	iStats.init = function (obj) {
 		'use strict';
 		_.extend(obj, window.stats.raw);
-	}
+	};
 	iStats.fix = function (iStats, name, level) {
 		this.name = name;
 		window.stats.init(this);
@@ -28,7 +28,14 @@
 		this.armor = iStats[6];
 		this.defense = iStats[7];
 		this.magicfind = iStats[8];
-		this.level = level;
+	};
+	iStats.vary = function (value, level) {
+		var rng = window.util.randomInterval,
+			lowerBound,
+			upperBound;
+		lowerBound = value * level;
+		upperBound = Math.round(lowerBound * 1.5);
+		return rng(lowerBound,upperBound);
 	};
 
 
@@ -39,43 +46,107 @@
 	var suf = iStats.suffixes = [];
 
 	//Prefix creation
-	pre.push(new iStats.fix([1,1,0,0,0,1,0,0,0],"Burning",1));
-	pre.push(new iStats.fix([3,0,0,1,0,0,0,0,0],"Strong",1));
-	pre.push(new iStats.fix([1,0,0,1,0,0,0,1,0],"Heavy",1));
-	pre.push(new iStats.fix([0,3,0,0,1,0,0,0,0],"Nimble",1));
-	pre.push(new iStats.fix([0,0,1,3,0,0,0,0,0],"Crafty",1));
-	pre.push(new iStats.fix([2,2,0,0,0,0,0,0,0],"Sharp",1));
-	pre.push(new iStats.fix([0,1,0,0,3,0,0,0,0],"Thin",1));
-	pre.push(new iStats.fix([0,0,0,0,0,3,0,0,0],"Grim",1));
-	pre.push(new iStats.fix([0,0,0,3,0,0,1,1,0],"Stalwart",1));
-	pre.push(new iStats.fix([0,0,2,0,2,0,0,0,0],"Bendy",1));
-	pre.push(new iStats.fix([window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1)],"Weird",1));
-	pre.push(new iStats.fix([1,0,0,0,0,0,0,0,0],"Weak",1));
-	pre.push(new iStats.fix([2,2,0,1,0,0,0,0,0],"Great",1));
-	pre.push(new iStats.fix([1,0,0,3,0,0,0,1,0],"Broad",1));
-	pre.push(new iStats.fix([0,4,0,0,0,2,0,1,0],"Pointy",1));
-	pre.push(new iStats.fix([0,0,0,0,0,0,2,2,0],"Immovable",1));
+	pre.push(new iStats.fix([1,1,0,0,0,1,0,0,0],"Burning"));
+	pre.push(new iStats.fix([3,0,0,1,0,0,0,0,0],"Strong"));
+	pre.push(new iStats.fix([1,0,0,1,0,0,0,1,0],"Heavy"));
+	pre.push(new iStats.fix([0,3,0,0,1,0,0,0,0],"Nimble"));
+	pre.push(new iStats.fix([0,0,1,3,0,0,0,0,0],"Crafty"));
+	pre.push(new iStats.fix([2,2,0,0,0,0,0,0,0],"Sharp"));
+	pre.push(new iStats.fix([0,1,0,0,3,0,0,0,0],"Thin"));
+	pre.push(new iStats.fix([0,0,0,0,0,3,0,0,0],"Grim"));
+	pre.push(new iStats.fix([0,0,0,3,0,0,1,1,0],"Stalwart"));
+	pre.push(new iStats.fix([0,0,2,0,2,0,0,0,0],"Bendy"));
+	pre.push(new iStats.fix([1,1,1,1,1,1,1,1,1],"Balanced"));
+	pre.push(new iStats.fix([1,0,0,0,0,0,0,0,0],"Weak"));
+	pre.push(new iStats.fix([2,2,0,1,0,0,0,0,0],"Great"));
+	pre.push(new iStats.fix([1,0,0,3,0,0,0,1,0],"Broad"));
+	pre.push(new iStats.fix([0,4,0,0,0,2,0,1,0],"Pointy"));
+	pre.push(new iStats.fix([0,0,0,0,0,0,2,2,0],"Immovable"));
 
 	//Suffix creation
-	suf.push(new iStats.fix([0,1,2,1,0,0,0,0,0],"of the Phoenix",1));
-	suf.push(new iStats.fix([window.util.randomInterval(3,5),0,0,0,0,0,0,0,0],"of Strength"	,1));
-	suf.push(new iStats.fix([0,window.util.randomInterval(3,5),0,0,0,0,0,0,0],"of Agility"		,1));
-	suf.push(new iStats.fix([0,0,window.util.randomInterval(3,5),0,0,0,0,0,0],"of Luck"		,1));
-	suf.push(new iStats.fix([0,0,0,window.util.randomInterval(6,9),0,0,0,0,0],"of Health"		,1));
-	suf.push(new iStats.fix([0,0,0,0,window.util.randomInterval(3,5),0,0,0,0],"of Precision"	,1));
-	suf.push(new iStats.fix([0,0,0,0,0,window.util.randomInterval(3,5),0,0,0],"of Heartseeking",1));
-	suf.push(new iStats.fix([0,0,0,0,0,0,window.util.randomInterval(6,9),0,0],"of Armor"		,1));
-	suf.push(new iStats.fix([0,0,0,0,0,0,0,window.util.randomInterval(6,9),0],"of Defense"		,1));
-	suf.push(new iStats.fix([0,0,0,0,0,0,0,0,window.util.randomInterval(6,9)],"of Magical Attraction",1));
-	suf.push(new iStats.fix([0,0,0,1,0,0,2,2,0],"of the Heavy",1));
-	suf.push(new iStats.fix([0,3,0,0,1,0,0,0,0],"of the Thief",1));
-	suf.push(new iStats.fix([0,2,0,0,0,0,0,0,-1],"of the Not-So-Brave",1));
-	suf.push(new iStats.fix([1,2,0,0,1,0,0,0,0],"of Blades",1));
-	suf.push(new iStats.fix([0,-1,0,7,0,0,0,0,0],"of the Golem",1));
-	suf.push(new iStats.fix([0,3,0,0,0,3,0,0,0],"of the Ninja",1));
-	suf.push(new iStats.fix([2,2,0,0,1,0,0,0,0],"of the Lion",1));
-	suf.push(new iStats.fix([0,0,2,0,2,0,0,0,3],"of the Bounty Hunter",1));
-	suf.push(new iStats.fix([window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1),window.util.randomInterval(0,1)],"of the Jester",1));
-	suf.push(new iStats.fix([0,1,2,1,0,0,0,0,0],"of the Secondborn",1));
-	suf.push(new iStats.fix([1,1,1,1,1,1,1,1,1],"of Kings",1));
+	suf.push(new iStats.fix([0,1,2,1,0,0,0,0,0],"of the Phoenix"));
+	suf.push(new iStats.fix([5,0,0,0,0,0,0,0,0],"of Strength"));
+	suf.push(new iStats.fix([0,5,0,0,0,0,0,0,0],"of Agility"));
+	suf.push(new iStats.fix([0,0,5,0,0,0,0,0,0],"of Luck"));
+	suf.push(new iStats.fix([0,0,0,5,0,0,0,0,0],"of Health"	));
+	suf.push(new iStats.fix([0,0,0,0,5,0,0,0,0],"of Precision"));
+	suf.push(new iStats.fix([0,0,0,0,0,5,0,0,0],"of Heartseeking"));
+	suf.push(new iStats.fix([0,0,0,0,0,0,8,0,0],"of Armor"));
+	suf.push(new iStats.fix([0,0,0,0,0,0,0,8,0],"of Defense"));
+	suf.push(new iStats.fix([0,0,0,0,0,0,0,0,7],"of Magical Attraction"));
+	suf.push(new iStats.fix([0,0,0,1,0,0,2,2,0],"of the Heavy"));
+	suf.push(new iStats.fix([0,3,0,0,1,0,0,0,0],"of the Thief"));
+	suf.push(new iStats.fix([0,2,0,0,0,0,0,0,-1],"of the Not-So-Brave"));
+	suf.push(new iStats.fix([1,2,0,0,1,0,0,0,0],"of Blades"));
+	suf.push(new iStats.fix([0,-1,0,7,0,0,0,0,0],"of the Golem"));
+	suf.push(new iStats.fix([0,3,0,0,0,3,0,0,0],"of the Ninja"));
+	suf.push(new iStats.fix([2,2,0,0,1,0,0,0,0],"of the Lion"));
+	suf.push(new iStats.fix([0,0,2,0,2,0,0,0,3],"of the Bounty Hunter"));
+	suf.push(new iStats.fix([-1,-1,-1,-1,-1,-1,-1,-1,-1],"of the Loser"));
+	suf.push(new iStats.fix([0,1,2,1,0,0,0,0,0],"of the Secondborn"));
+	suf.push(new iStats.fix([1,1,1,1,1,1,1,1,1],"of Kings"));
+
+	//Getters
+	pre.get = function(id, level){
+		var ilvl,
+			prefix,
+			rng = window.util.randomInterval,
+			statArray = [],
+			vary = window.stats.vary;
+		if(!level){
+			this.ilvl = 1
+		} else{
+			this.ilvl = level;
+		}
+		if(!id){
+			this.prefix = rng(0,window.stats.prefixes.length-1);
+		} else {
+			this.prefix = id;
+		}
+		//Generate some stats
+		statArray[0] = vary(pre[this.prefix].strength,this.ilvl);
+		statArray[1] = vary(pre[this.prefix].agility,this.ilvl);
+		statArray[2] = vary(pre[this.prefix].luck,this.ilvl);
+		statArray[3] = vary(pre[this.prefix].hp,this.ilvl);
+		statArray[4] = vary(pre[this.prefix].hit,this.ilvl);
+		statArray[5] = vary(pre[this.prefix].crit,this.ilvl);
+		statArray[6] = vary(pre[this.prefix].armor,this.ilvl);
+		statArray[7] = vary(pre[this.prefix].defense,this.ilvl);
+		statArray[8] = vary(pre[this.prefix].magicfind,this.ilvl);
+		statArray.name = pre[this.prefix].name;
+		statArray.id = this.prefix;
+		statArray.ilvl = this.ilvl;
+		return statArray;
+	};
+	suf.get = function(id, level){
+		var ilvl,
+			suffix,
+			rng = window.util.randomInterval,
+			statArray = [],
+			vary = window.stats.vary;
+		if(!level){
+			this.ilvl = 1
+		} else{
+			this.ilvl = level;
+		}
+		if(!id){
+			this.suffix = rng(0,window.stats.suffixes.length-1);
+		} else {
+			this.suffix = id;
+		}
+		//Generate some stats
+		statArray[0] = vary(suf[this.suffix].strength,this.ilvl);
+		statArray[1] = vary(suf[this.suffix].agility,this.ilvl);
+		statArray[2] = vary(suf[this.suffix].luck,this.ilvl);
+		statArray[3] = vary(suf[this.suffix].hp,this.ilvl);
+		statArray[4] = vary(suf[this.suffix].hit,this.ilvl);
+		statArray[5] = vary(suf[this.suffix].crit,this.ilvl);
+		statArray[6] = vary(suf[this.suffix].armor,this.ilvl);
+		statArray[7] = vary(suf[this.suffix].defense,this.ilvl);
+		statArray[8] = vary(suf[this.suffix].magicfind,this.ilvl);
+		statArray.name = suf[this.suffix].name;
+		statArray.id = this.suffix;
+		statArray.ilvl = this.ilvl;
+		return statArray;
+	};
 }());
