@@ -12,15 +12,23 @@ lj.realm = (function () {
 		bossRoom;
 
 	function getRoomNumberFromPosition(x, y) {
-		return (x * size) + y;
+		return (y * size) + x;
 	}
 
 	function randomDoorPosition() {
 		// Note that this only works with our 11 x 11 room size
-		return Math.floor(Math.random() * 5 + 1) * 2;
+		return Math.floor(Math.random() * 5 + 1) * 2 - 1;
 	}
 
-	function getRoom(room) {}
+	function getRoom(room) {
+		var copy = [],
+			x,
+			length = rooms[0].length;
+		for (x = 0; x < length; x += 1) {
+			copy[x] = rooms[room][x].slice(0);
+		}
+		return copy;
+	}
 	function spawnChestsAndMonsters() {}
 
 	// Generate a new room with doors according to doors array and fill with 
@@ -34,15 +42,15 @@ lj.realm = (function () {
 
 		// Add empty room
 		rooms[room] =  [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], //
 						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], //
 						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], //
 						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], //
 						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], //
 						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']];
 
 		// Save height and width of room
@@ -116,6 +124,29 @@ lj.realm = (function () {
 				}
 			}
 		}
+
+		// Place doors in room
+		// If left, place 'L' in x0 at y where doors says y should be
+		if (doors[room].L) {
+			// console.log('Placing left door in room ' + room + ' at position 0, ' + doors[room].L);
+			rooms[room][0][doors[room].L] = 'L';
+		}
+		// If up, place 'U' in y0 at X where doors says X should be
+		if (doors[room].U) {
+			rooms[room][doors[room].U][0] = 'U';
+		}
+		// If right, place 'R' in x(size-1) where doors says y should
+		if (doors[room].R) {
+			rooms[room][width - 1][doors[room].R] = 'R';
+		}
+		// If down, place 'D' in y(size-1) where doors says x
+		if (doors[room].D) {
+			rooms[room][doors[room].D][height - 1] = 'D';
+		}
+
+		// Place enemies
+
+		// If boss room, replace one enemy with boss
 	}
 
 	// Place boss in one of the top rooms
@@ -131,11 +162,19 @@ lj.realm = (function () {
 		doors.length = 0;
 
 		// Go through rooms from top left to bottom right and add doors in separate structure similar to rooms
-		for (x = 0; x < size; x += 1) {
-			for (y = 0; y < size; y += 1) {
+		for (y = 0; y < size; y += 1) {
+			for (x = 0; x < size; x += 1) {
 				roomNumber = getRoomNumberFromPosition(x, y);
+				// console.log('roomNumber: ' + roomNumber);
+				// console.log('x: ' + x);
+				// console.log('y: ' + y);
 				// Create new empty door position structure in the same position as a room in rooms array
-				doors[roomNumber] = {};
+				doors[roomNumber] = {
+					L : 0,
+					U : 0,
+					R : 0,
+					D : 0
+				};
 
 				// Left door should be placed in all column but the first
 				if (x > 0) {
@@ -146,6 +185,7 @@ lj.realm = (function () {
 				// Top door should be placed in all rows but the first
 				if (y > 0) {
 					// Top door is always placed on the same position as the bottom door in the room above
+					// console.log('doors[roomNumber - size] = doors[' + roomNumber + ' - ' + size + ']');
 					doors[roomNumber].U = doors[roomNumber - size].D;
 				}
 
@@ -166,7 +206,10 @@ lj.realm = (function () {
 	}
 
 	function makeRealm(size) {
-		// Clear previous realm including all chests, monsters and door positions
+		// Clear previous realm
+		rooms.length = 0;
+
+
 		// Make new realm of specified size
 		for (x = 0; x < size; x += 1) {
 			rooms[x] = [];
@@ -191,6 +234,24 @@ lj.realm = (function () {
 	function copyRealm() {}
 	function getChestsAndMonsters() {}
 	function clearTile(x, y) {}
+	// Should be superseeded by copyRoom later
+	function printRoom(room) {
+		var str = "";
+		for (y = 0; y < rooms[room][0].length; y += 1) {
+			for (x = 0; x < rooms[room].length; x += 1) {
+				str += rooms[room][x][y] + " ";
+			}
+			str += "\r\n";
+		}
+		console.log(str);
+	}
+
+	// Just for testing
+	function setSize(newSize) {
+		size = newSize;
+	}
+
+	function checkTile() {}
 
 	return {
 		// temporarily expose everything to test
@@ -201,6 +262,10 @@ lj.realm = (function () {
 		makeRoom : makeRoom,
 		placeBoss : placeBoss,
 		placeDoors : placeDoors,
+		printRoom : printRoom,
+		setSize : setSize,
+		doors : doors,
+		rooms : rooms,
 
 		// These should stay exposed after testing
 		makeRealm : makeRealm, // Call to initialize
@@ -208,6 +273,7 @@ lj.realm = (function () {
 		copyRoom : copyRoom,
 		copyRealm : copyRealm,
 		getChestsAndMonsters : getChestsAndMonsters,
-		clearTile : clearTile
+		clearTile : clearTile,
+		checkTile : checkTile
 	};
 }());
