@@ -66,8 +66,8 @@
 	}
 
 	function startGame() {
-		lj.realm.makeRealm(1);
-		lj.hero.enter();
+		lj.realm.makeRealm(3);
+		lj.scene.enter('DOWN');
 	}
 
 }());
