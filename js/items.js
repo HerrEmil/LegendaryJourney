@@ -30,7 +30,7 @@ window.lj = lj || {};
 			var total = this.poor.chance + this.normal.chance + this.rare.chance + this.epic.chance + this.legendary.chance,
 				roll = lj.util.randomInterval(1,total),
 				rolling = true;
-			// console.log("total: "+total+"\nroll: "+roll);
+			console.log(lj.hero.stats.get()["magicfind"]);
 			total -= this.legendary.chance;
 			if(total < roll){
 				return "legendary";
