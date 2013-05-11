@@ -86,11 +86,12 @@ lj.hero.stats = {
 		"luck" : 0,
 		"hp" : 100,
 		"hit" : 5,
-		"crit" : 10,
+		"crit" : 0,
 		"armor" : 0,
 		"defense" : 0,
 		"magicfind" : 0
 	},
+	health : 100,
 	buff : function(stat, value){
 		this.self[stat] += value;
 	},
@@ -111,4 +112,36 @@ lj.hero.stats = {
 		};
 		return statObj;
 	}
+}
+lj.hero.fight = function (enemy){
+	//Fight the enemy
+}
+lj.hero.attack = function (enemy){
+	//Perform an attack, evaluate the damage and return the results
+	var rng = lj.util.randomInterval,
+		friend = lj.hero.stats.get(),
+		netHit = friend["hit"]-enemy["defense"]+rng(1,1000),
+		damage,
+		result = {};
+
+
+	//Will you even hit?
+	if(netHit<900){
+		console.log("The hero missed! (with a roll of: "+netHit+")");
+		damage = 0;
+		result = {damage:0,type:"miss"};
+		return result;
+	}
+	//Alrighty, the hero connects. Damage time
+	//Strength first (both min and max base damage)
+	damage = friend["strength"];
+	//Agility gives double max damage, but no min damage
+	damage += rng(0,friend["agility"]*2);
+	//Will you crit?
+
+
+}
+lj.hero.defend = function (enemy){
+	//Let the enemy strike, evaluate the damage and return the results
+
 }

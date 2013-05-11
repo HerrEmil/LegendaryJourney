@@ -59,7 +59,7 @@ window.lj = lj || {};
 	pre.push(new iStats.fix([0,0,2,0,2,0,0,0,0],"Bendy"));
 	pre.push(new iStats.fix([1,1,1,1,1,1,1,1,1],"Balanced"));
 	pre.push(new iStats.fix([1,0,0,0,0,0,0,0,0],"Weak"));
-	pre.push(new iStats.fix([2,2,0,1,0,0,0,0,0],"Great"));
+	pre.push(new iStats.fix([2,2,0,1,0,0,0,0,0],"Grand"));
 	pre.push(new iStats.fix([1,0,0,3,0,0,0,1,0],"Broad"));
 	pre.push(new iStats.fix([0,4,0,0,0,2,0,1,0],"Pointy"));
 	pre.push(new iStats.fix([0,0,0,0,0,0,2,2,0],"Immovable"));

@@ -21,16 +21,17 @@ window.lj = lj || {};
 		"weapon" : []
 	};
 	iItems.qualities = {
-		"poor" : 		{"mod" :0.5, 	"chance":10},
-		"normal" : 		{"mod" :1, 		"chance":74},
-		"rare" : 		{"mod" :1.5, 	"chance":10},
-		"epic" : 		{"mod" :2.5,	"chance":4},
-		"legendary" : 	{"mod" :4, 		"chance":2},
+		"poor" : 		{"mod" :0.5, 	"chance":100},
+		"normal" : 		{"mod" :1, 		"chance":750},
+		"rare" : 		{"mod" :1.5, 	"chance":100},
+		"epic" : 		{"mod" :2.5,	"chance":40},
+		"legendary" : 	{"mod" :4, 		"chance":10},
 		get : function(){
 			var total = this.poor.chance + this.normal.chance + this.rare.chance + this.epic.chance + this.legendary.chance,
 				roll = lj.util.randomInterval(1,total),
-				rolling = true;
-			console.log(lj.hero.stats.get()["magicfind"]);
+				rolling = true,
+				mf = lj.hero.stats.get()["magicfind"];
+			console.log("Initial roll: "+roll+" Magic Find: "+mf+" Adjusted roll: "+(roll+mf));
 			total -= this.legendary.chance;
 			if(total < roll){
 				return "legendary";
