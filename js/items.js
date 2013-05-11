@@ -1,7 +1,8 @@
+window.lj = lj || {};
 (function(){
-	window.items = {};
-	var iItems = window.items;
-	var iStats = window.stats;
+	lj.items = {};
+	var iItems = lj.items;
+	var iStats = lj.stats;
 	iItems.util = {
 		capFirst : function (string) {
 			'use strict';
@@ -27,7 +28,7 @@
 		"legendary" : 	{"mod" :4, 		"chance":2},
 		get : function(){
 			var total = this.poor.chance + this.normal.chance + this.rare.chance + this.epic.chance + this.legendary.chance,
-				roll = window.util.randomInterval(1,total),
+				roll = lj.util.randomInterval(1,total),
 				rolling = true;
 			// console.log("total: "+total+"\nroll: "+roll);
 			total -= this.legendary.chance;
@@ -74,7 +75,7 @@
 		}
 
 		//Set the stats of the item based on type, prefix, affix and apply the quality multiplier
-		window.stats.init(this);
+		lj.stats.init(this);
 		this.strength = Math.round((this.prefix[0] + this.type[0] + this.suffix[0])*items.qualities[this.quality].mod);
 		this.agility = Math.round((this.prefix[1] + this.type[1] + this.suffix[1])*items.qualities[this.quality].mod);
 		this.luck = Math.round((this.prefix[2] + this.type[2] + this.suffix[2])*items.qualities[this.quality].mod);
@@ -90,14 +91,14 @@
 		this.name = this.prefix.name +' '+type.name+' '+this.suffix.name;
 		this.name = this.name.trim();
 		if(this.quality != "normal"){
-			this.name = window.util.capitaliseFirstLetter(this.quality) +' '+ this.name;
+			this.name = lj.util.capitaliseFirstLetter(this.quality) +' '+ this.name;
 		}
 		
 		// console.log(this.name);
 
 	};
 	iItems.makeItem = function(level,slot, quality){
-		var rng = window.util.randomInterval,
+		var rng = lj.util.randomInterval,
 			itemSlot,
 			itemType,
 			itemPrefix,
@@ -131,11 +132,11 @@
 		// console.log(this.itemType.name);
 
 		//Getting prefix
-		this.itemPrefix = window.stats.prefixes.get(rng(0,window.stats.prefixes.length-1));
+		this.itemPrefix = lj.stats.prefixes.get(rng(0,window.stats.prefixes.length-1));
 		// console.log(this.itemPrefix);
 
 		//Getting Suffix
-		this.itemSuffix = window.stats.suffixes.get(rng(0,window.stats.suffixes.length-1));
+		this.itemSuffix = lj.stats.suffixes.get(rng(0,window.stats.suffixes.length-1));
 		// console.log(this.itemSuffix);
 
 		//console.log(window.stats.prefixes[this.itemPrefix].name + ' ' +this.itemType.name+' '+window.stats.suffixes[this.itemSuffix].name);
@@ -209,9 +210,9 @@
 	items.types.get = function(level,slot,type){
 		var ilvl,
 			gear,
-			rng = window.util.randomInterval,
+			rng = lj.util.randomInterval,
 			statArray = [],
-			vary = window.stats.vary,
+			vary = lj.stats.vary,
 			slotArray,
 			slotIndex,
 			itemSlot,
@@ -234,8 +235,8 @@
 		}
 		//console.log(this.itemSlot);
 		if(!type){
-			typeArray = window.items.types[this.itemSlot];
-			typeIndex = rng(0,window.items.types[this.itemSlot].length-1);
+			typeArray = lj.items.types[this.itemSlot];
+			typeIndex = rng(0,lj.items.types[this.itemSlot].length-1);
 			this.itemType = typeArray[typeIndex];
 		} else {
 			this.itemType = type;
