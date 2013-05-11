@@ -137,10 +137,8 @@ lj.hero.fight = function (enemy){
 		}
 		herosTurn = !herosTurn;
 	};
-	lastAction.damage = null;
-	//lastAction.type = "victory";
-
-	//log.push(lastAction);
+	
+	log.push({actor:lastAction.actor,damage:0,type:"victory"});
 	return log;
 }
 lj.hero.duel = function (enemy,friend){
@@ -172,8 +170,6 @@ lj.hero.duel = function (enemy,friend){
 	}
 	//stalemate protection
 	if(damage <= 0){damage=1};
-	console.log("damage",damage);
-	console.log("type",type);
 	return {damage:damage,type:type};
 
 }
