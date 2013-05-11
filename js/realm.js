@@ -20,7 +20,7 @@ lj.realm = (function () {
 		return Math.floor(Math.random() * 5 + 1) * 2;
 	}
 
-	function getRoom() {}
+	function getRoom(room) {}
 	function spawnChestsAndMonsters() {}
 
 	// Generate a new room with doors according to doors array and fill with 
