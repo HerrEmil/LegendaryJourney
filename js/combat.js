@@ -81,8 +81,8 @@ lj.hero.gear = {
 }
 lj.hero.stats = {
 	self : {
-		"strength" : 10,
-		"agility" : 10,
+		"strength" : 5,
+		"agility" : 5,
 		"luck" : 0,
 		"hp" : 100,
 		"hit" : 5,
@@ -120,17 +120,14 @@ lj.hero.attack = function (enemy){
 	//Perform an attack, evaluate the damage and return the results
 	var rng = lj.util.randomInterval,
 		friend = lj.hero.stats.get(),
-		netHit = friend["hit"] - enemy["defense"]+rng(1,1000),
+		netHit = rng(1,1000)+friend["hit"]-enemy["defense"],
 		damage,
-		result = {};
-
-
+		type;
 	//Will you even hit?
-	if(netHit<900){
-		console.log("The hero missed! (with a roll of: "+netHit+")");
+	if(netHit<100){
 		damage = 0;
-		result = {damage:0,type:"miss"};
-		return result;
+		type = "miss";
+		return {damage:damage,type:type};
 	}
 	//Alrighty, the hero connects. Damage time
 	//Strength first (both min and max base damage)
@@ -138,7 +135,16 @@ lj.hero.attack = function (enemy){
 	//Agility gives double max damage, but no min damage
 	damage += rng(0,friend["agility"]*2);
 	//Will you crit?
-
+	if(rng(1,1000)>900){
+		damage = Math.round(damage*(150+friend["crit"])/100);
+		type = "crit"
+	}
+	//Enemy has armor :(
+	damage -= enemy["armor"];
+	if(!type){
+		type = "hit";
+	}
+	return {damage:damage,type:type};
 
 }
 lj.hero.defend = function (enemy){
