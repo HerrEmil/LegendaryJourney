@@ -257,10 +257,19 @@ window.lj = lj || {};
 		return statArray;
 	};
 }());
-lj.items.lots = function(num){
-	var num, i,obj;
-	for(i=0;i<num;i++){
-		obj = lj.items.makeItem();
-		console.log(obj.name);
+lj.items.lots = function(num,bool){
+	var num, i,obj, str='';
+	if(!bool){
+		for(i=0;i<num;i++){
+			obj = lj.items.makeItem();
+			console.log(obj.name);
+		}
+	} else {
+		for(i=0;i<num;i++){
+			obj = lj.items.makeItem();
+			str = str + obj.name+'\n';
+		}
+		return str;
 	}
+	
 }
