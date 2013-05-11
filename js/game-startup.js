@@ -1,6 +1,8 @@
 (function() {
 	'use strict'
 
+	window.lj = new Game(config);
+
 	var config = {
 		nrOfRows: 11,
 		nrOfCols: 11,
@@ -15,9 +17,6 @@
 	start.addEventListener('click', startGame);
 
 	function startGame() {
-
-		window.lj = new Game(config);
-		// lj.realm = new Realm(config);
 
 		loadImages();
 
