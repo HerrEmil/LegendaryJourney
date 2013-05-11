@@ -21,8 +21,32 @@ lj.realm = (function () {
 	}
 
 	function getRoom() {}
-	function makeRoom(room) {}
 	function spawnChestsAndMonsters() {}
+
+	// Generate a new room with doors according to doors array and fill with 
+	function makeRoom(room) {
+		var y,
+			x,
+			height,
+			width;
+
+		// Add empty room
+		rooms[room] =  [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+						[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']];
+
+		// Save height and width of room
+		width = rooms[room].length;
+		height = rooms[room][0].length;
+	}
 
 	// Place boss in one of the top rooms
 	function placeBoss(room) {
