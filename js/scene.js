@@ -26,9 +26,10 @@ var spriteMap = {
 	'9': floor // Chest type 9 
 }
 
+// Used to navigate rooms in 2 and 3 realms
 var roomModifier = {
-	'D': 3,
-	'U': -3,
+	'D': 1,
+	'U': -1,
 	'L': -1,
 	'R': 1
 }
@@ -85,7 +86,12 @@ lj.scene = (function() {
 	// Door can be "U", "D", "L", "R"
 	function exit(door) {
 
-		currentRoom = currentRoom + roomModifier[door];
+		var verticalOffset = 1;
+
+		if (door === 'U' || door === 'D') verticalOffset = lj.realm.getSize();
+
+		currentRoom = currentRoom + (roomModifier[door] * verticalOffset);
+
 		console.log(currentRoom);
 		lj.realm.enterRoom(currentRoom);
 

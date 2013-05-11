@@ -295,6 +295,10 @@ lj.realm = (function () {
 		return currentRoom;
 	}
 
+	function getSize() {
+		return size;
+	}
+
 	function makeRealm(realmSize) {
 		var i,
 			roomNumber;
@@ -382,6 +386,9 @@ lj.realm = (function () {
 
 		// Check which room you currently are in (room number needed for other functions)
 		getCurrentRoom : getCurrentRoom,
+
+		// Get realm size (1, two, or three)
+		getSize: getSize,
 
 		// Call when entering a door
 		enterRoom : enterRoom,
