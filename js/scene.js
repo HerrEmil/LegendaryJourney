@@ -5,6 +5,7 @@ window.lj = lj || {};
 var floor = [14, 49]
 
 var spriteMap = {
+	'!': [2, 4], // hero
 	'#': [18, 44], // wall
 	' ': floor, // floor
 	'L': floor, // Door leading Left
@@ -25,16 +26,17 @@ var spriteMap = {
 	'9': floor // Chest type 9 
 }
 
+// Used to navigate rooms in 2 and 3 realms
 var roomModifier = {
-	'D': 3,
-	'U': -3,
+	'D': 1,
+	'U': -1,
 	'L': -1,
 	'R': 1
 }
 
 lj.scene = (function() {
 
-	var currentRoom = null;
+	var currentRoom = null, room = null;
 
 	// Get the opposite door (for when entering and exiting)
 	function oppositeDoor(door) {
@@ -48,14 +50,8 @@ lj.scene = (function() {
 		return opposites[door];
 	}
 
-	// Enter a room
-	function enter(door) {
-		var spriteImage = lj.getImage('dungeon-sprite.png'),
-			room = null;
-
-		if (!currentRoom) currentRoom = lj.realm.getCurrentRoom();
-
-		room = lj.realm.getRoom(currentRoom);
+	function paint(tile) {
+		var spriteImage = lj.getImage('dungeon-sprite.png');
 
 		// Paint scene
 		for (var rowCtr = 0; rowCtr < 11; rowCtr++) {
@@ -63,11 +59,24 @@ lj.scene = (function() {
 				var tileId = spriteMap[room[colCtr][rowCtr]],
 					sourceX = Math.floor(tileId[1]) * 32,
 					sourceY = Math.floor(tileId[0]) * 32;
+				lj.context.save();
 				lj.context.drawImage(spriteImage, sourceX, sourceY,32,32,colCtr*32,rowCtr*32,32,32);
+				lj.context.restore();
 			}
 		}
 
+		// Paint hero
 		lj.context.save();
+		lj.context.drawImage(spriteImage, 4*32, 2*32,32,32,tile[0]*32,tile[1]*32,32,32);
+		lj.context.restore();
+
+	}
+
+	// Enter a room
+	function enter(door) {
+		if (!currentRoom) currentRoom = lj.realm.getCurrentRoom();
+
+		room = lj.realm.getRoom(currentRoom);
 
 		// Animate hero entering from door
 		lj.hero.enter(door);
@@ -77,7 +86,12 @@ lj.scene = (function() {
 	// Door can be "U", "D", "L", "R"
 	function exit(door) {
 
-		currentRoom = currentRoom + roomModifier[door];
+		var verticalOffset = 1;
+
+		if (door === 'U' || door === 'D') verticalOffset = lj.realm.getSize();
+
+		currentRoom = currentRoom + (roomModifier[door] * verticalOffset);
+
 		console.log(currentRoom);
 		lj.realm.enterRoom(currentRoom);
 
@@ -91,7 +105,8 @@ lj.scene = (function() {
 
 	return {
 		enter: enter,
-		exit: exit
+		exit: exit,
+		paint: paint
 	}
 
 }());
