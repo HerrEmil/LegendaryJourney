@@ -8,7 +8,7 @@ lj.realm = (function () {
 		y,
 		i,
 		doors = [],
-		currentRoom,
+		currentRoom = 90,
 		bossRoom;
 
 	function getRoomNumberFromPosition(x, y) {
@@ -23,13 +23,28 @@ lj.realm = (function () {
 	function getRoom(room) {
 		var copy = [],
 			x,
-			length = rooms[0].length;
+			length = rooms[currentRoom].length;
 		for (x = 0; x < length; x += 1) {
 			copy[x] = rooms[room][x].slice(0);
 		}
+		console.log(copy);
 		return copy;
 	}
-	function spawnChestsAndMonsters() {}
+	function spawnChestsAndMonsters(room) {
+		// Create a map of all possible spawns
+		// Pick a number of enemies
+		// Pick a number of chests
+
+		// Loop through enemies
+			// Pick a random spawn point
+			// If the spawn point is unused, place monster in room
+			// else, try again
+
+		// Loop through chests
+			// Pick a random spawn point
+			// If spawn point is unused, place chest in room
+			// else, try again
+	}
 
 	// Generate a new room with doors according to doors array and fill with 
 	function makeRoom(room) {
@@ -127,6 +142,8 @@ lj.realm = (function () {
 
 		// Place doors in room
 		// If left, place 'L' in x0 at y where doors says y should be
+		// console.log('in makeRoom room: ' + room);
+		// console.log('doors[room]: ' + doors[room]);
 		if (doors[room].L) {
 			// console.log('Placing left door in room ' + room + ' at position 0, ' + doors[room].L);
 			rooms[room][0][doors[room].L] = 'L';
@@ -144,7 +161,7 @@ lj.realm = (function () {
 			rooms[room][doors[room].D][height - 1] = 'D';
 		}
 
-		// Place enemies
+		spawnChestsAndMonsters();
 
 		// If boss room, replace one enemy with boss
 	}
@@ -205,18 +222,25 @@ lj.realm = (function () {
 
 	}
 
-	function makeRealm(size) {
+	function getCurrentRoom() {
+		return currentRoom;
+	}
+
+	function makeRealm(realmSize) {
+		var i,
+			roomNumber;
 		// Clear previous realm
 		rooms.length = 0;
-
+		size = realmSize;
 
 		// Make new realm of specified size
 		for (x = 0; x < size; x += 1) {
-			rooms[x] = [];
 			for (y = 0; y < size; y += 1) {
-				rooms[x][y] = [];
+				roomNumber = getRoomNumberFromPosition(x, y);
+				rooms[roomNumber] = [];
 			}
 		}
+
 		// set door positions
 		placeDoors();
 
@@ -224,7 +248,8 @@ lj.realm = (function () {
 		placeBoss();
 
 		// Start in one of the bottom rooms
-		currentRoom = rooms.length - Math.floor(Math.random() * size);
+		currentRoom = (rooms.length - 1) - Math.floor(Math.random() * size);
+		// console.log('In makeRealm, currentRoom: ' + currentRoom);
 
 		// Make first room
 		makeRoom(currentRoom);
@@ -274,6 +299,7 @@ lj.realm = (function () {
 		copyRealm : copyRealm,
 		getChestsAndMonsters : getChestsAndMonsters,
 		clearTile : clearTile,
-		checkTile : checkTile
+		checkTile : checkTile,
+		getCurrentRoom : getCurrentRoom
 	};
 }());
