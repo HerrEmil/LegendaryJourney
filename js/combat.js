@@ -1,79 +1,114 @@
 window.lj = lj || {};
 
-lj.hero = (function() {
-	'use strict'
+lj.hero.gear = {
+	equipped : {
+		"head" : null,
+		"shoulder" : null,
+		"chest" : null,
+		"cloak" : null,
+		"gloves" : null,
+		"pants" : null,
+		"boots" : null,
+		"ring" : null,
+		"weapon" : null
+	},
+	inventory : [],
+	equip : function(item){
+		//Store the currently equipped item
+		this.unequip(item.slot);
+		//equip the new
+		this.equipped[item.slot] = item;
 
-	var currentDir = null,
-		currentTile = [0,0]; // row, col
-
-	var stepModifiers = {
-		left: [0, -1],
-		right: [0, 1],
-		up: [-1, 0],
-		down: [1, 0]
+		//and remove from inventory
+		this.drop(item);
+	},
+	unequip : function(item){
+		var old;
+		//Store the currently equipped item
+		if(typeof item == 'string'){
+			old = this.equipped[item]
+		} else{
+			old = this.equipped[item.slot];
+		}
+		if(old != null){this.pickup(old);
+		this.equipped[old.slot] = null;}
+	},
+	pickup : function(item){
+		this.inventory.push(item);
+	},
+	drop : function(item){
+		var inventoryIndex;
+		//Find it
+		inventoryIndex = this.inventory.indexOf(item);
+		if(inventoryIndex != -1){
+			//Nuke it
+			this.inventory.splice(inventoryIndex, 1);
+		} else {
+			console.log("Item not in inventory");	
+		}
+	},
+	fill : function(j){
+		var i;
+		for(i=0;i<j;i++){
+			this.pickup(lj.items.makeItem());
+		}
+	},
+	test : function(j){
+		this.fill(j);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
+		console.log(lj.hero.gear.inventory);
+		console.log(lj.hero.gear.equipped);
 	}
+}
+lj.hero.stats = {
+	self : {
+		"strength" : 10,
+		"agility" : 10,
+		"luck" : 0,
+		"hp" : 100,
+		"hit" : 5,
+		"crit" : 10,
+		"armor" : 0,
+		"defense" : 0,
+		"magicfind" : 0
+	},
+	buff : function(stat, value){
+		this.self[stat] += value;
+	},
+	get : function(){
+		var statObj = JSON.parse(JSON.stringify(this.self)),
+			slots = ["head","shoulder","chest","cloak","gloves","pants","boots","ring","weapon"],
+			attrs = ["strength","agility","luck","hp","hit","crit","armor","defense","magicfind"],
+			i,
+			j;
 
-	// The hero enters the room...
-	function enter(door) {
-		// Get the starting tile from realm.js (get door tile)
-		var tile = [0, 0];
-		place(tile);
-		setupListeners();
+		for (i = 0; i<slots.length;i++){
+			for(j = 0;j<attrs.length;j++){
+				if(lj.hero.gear.equipped[slots[i]] != null){
+					statObj[attrs[j]] += lj.hero.gear.equipped[slots[i]][attrs[j]];
+					// console.log(statObj[attrs[j]]);
+				};
+			};
+		};
+		return statObj;
 	}
-
-	// The hero exits the room...
-	function exit() {
-
-	}
-
-	function setupListeners() {
-		lj.addKeyListener('left arrow', function() { step('left') });
-		lj.addKeyListener('right arrow', function() { step('right') });
-		lj.addKeyListener('up arrow', function() { step('up') });
-		lj.addKeyListener('down arrow', function() { step('down') });
-	}
-
-	// Is step in dir restriced
-	function isRestricted(dir) {
-		// Need room info from realm.js
-
-		return false;
-	}
-
-	// PRIVATE: place the hero in the room
-	function place(tile) {
-		// Figure out in what direction to face based on tile #
-		currentTile = tile;
-	}
-
-	// Makes the hero step in a direction
-	// Directions: left, right, up, down
-	function step(dir) {
-		var row, col;
-		// Is the hero turned in the right direction?
-		if (dir !== currentDir) turn(dir);
-
-		// Any restrictions, then don't move?
-		if (isRestricted(dir)) return;
-
-		// Make the step. Need to relate to the grid
-		row = currentTile[0] + stepModifiers[dir][0];
-		col = currentTile[1] + stepModifiers[dir][1];
-		currentTile = [row, col];
-
-		console.log('Hero moved to:', currentTile, currentDir);
-	}
-
-	// Turn the hero into the direction
-	function turn(dir) {
-		// Update the hero sprite
-		currentDir = dir;
-	}
-
-	// Public API
-	return {
-		enter: enter,
-		step: step,
-		exit: exit
-	}
-}());
+}

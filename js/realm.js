@@ -10,6 +10,9 @@ Room structure legend:
 
 'B' = Boss
 
+'E' = Generic Enemy
+'C' = Generic Chest
+
 'a' = Monster type a
 'b' = Monster type b
 'c' = Monster type c
@@ -49,7 +52,7 @@ lj.realm = (function () {
 	function getRoom(room) {
 		var copy = [],
 			x,
-			length = rooms[currentRoom].length;
+			length = rooms[room].length;
 		for (x = 0; x < length; x += 1) {
 			copy[x] = rooms[room][x].slice(0);
 		}
@@ -106,12 +109,7 @@ lj.realm = (function () {
 
 			// If boss room, replace last placed enemy with boss
 			if ((room === bossRoom) && (i === enemies - 1)) {
-				console.log('Creating boss room!');
-				console.log('Boss room before placing boss:');
-				printChestsAndMonsters(room);
 				chestsAndMonsters[room][roomX][roomY] = 'B';
-				console.log('Boss room after placing boss:');
-				printChestsAndMonsters(room);
 			}
 		}
 
@@ -225,10 +223,7 @@ lj.realm = (function () {
 
 		// Place doors in room
 		// If left, place 'L' in x0 at y where doors says y should be
-		// console.log('in makeRoom room: ' + room);
-		// console.log('doors[room]: ' + doors[room]);
 		if (doors[room].L) {
-			// console.log('Placing left door in room ' + room + ' at position 0, ' + doors[room].L);
 			rooms[room][0][doors[room].L] = 'L';
 		}
 		// If up, place 'U' in y0 at X where doors says X should be
@@ -247,10 +242,6 @@ lj.realm = (function () {
 		spawnChestsAndMonsters(room);
 	}
 
-	// Place boss in one of the top rooms
-	function placeBoss(room) {
-		bossRoom = Math.floor(Math.random() * size);
-	}
 	function placeDoors() {
 		var roomNumber,
 			x,
@@ -263,9 +254,7 @@ lj.realm = (function () {
 		for (y = 0; y < size; y += 1) {
 			for (x = 0; x < size; x += 1) {
 				roomNumber = getRoomNumberFromPosition(x, y);
-				// console.log('roomNumber: ' + roomNumber);
-				// console.log('x: ' + x);
-				// console.log('y: ' + y);
+
 				// Create new empty door position structure in the same position as a room in rooms array
 				doors[roomNumber] = {
 					L : 0,
@@ -283,7 +272,6 @@ lj.realm = (function () {
 				// Top door should be placed in all rows but the first
 				if (y > 0) {
 					// Top door is always placed on the same position as the bottom door in the room above
-					// console.log('doors[roomNumber - size] = doors[' + roomNumber + ' - ' + size + ']');
 					doors[roomNumber].U = doors[roomNumber - size].D;
 				}
 
@@ -314,7 +302,7 @@ lj.realm = (function () {
 		rooms.length = 0;
 		size = realmSize;
 
-		// Make new realm of specified size
+		// Make empty maps for rooms and monsters
 		for (x = 0; x < size; x += 1) {
 			for (y = 0; y < size; y += 1) {
 				roomNumber = getRoomNumberFromPosition(x, y);
@@ -323,22 +311,23 @@ lj.realm = (function () {
 			}
 		}
 
-		// set door positions
+		// Set door positions
 		placeDoors();
 
-		// Place boss
-		placeBoss();
+		// Pick one of the top rooms for the boss
+		bossRoom = Math.floor(Math.random() * size);
 
 		// Start in one of the bottom rooms
 		currentRoom = (rooms.length - 1) - Math.floor(Math.random() * size);
-		// console.log('In makeRealm, currentRoom: ' + currentRoom);
 
 		// Make first room
 		makeRoom(currentRoom);
 	}
-	function prepareNextRoom(room) {}
-	function clearTile(x, y) {}
 
+	// Remove a monster or chest from current room
+	function clearTile(x, y) {
+		chestsAndMonsters[currentRoom][x][y] = ' ';
+	}
 
 	function printRoom(room) {
 		var str = "";
@@ -353,7 +342,6 @@ lj.realm = (function () {
 
 	function printChestsAndMonsters(room) {
 		var str = "";
-		console.log(chestsAndMonsters);
 		for (y = 0; y < chestsAndMonsters[room][0].length; y += 1) {
 			for (x = 0; x < chestsAndMonsters[room].length; x += 1) {
 				str += chestsAndMonsters[room][x][y] + " ";
@@ -363,15 +351,14 @@ lj.realm = (function () {
 		console.log(str);
 	}
 
-	// Just for testing
-	function setSize(newSize) {
-		size = newSize;
-	}
-
-	function checkTile() {}
-
-	function getChestsAndMonstersArray() {
-		return chestsAndMonsters;
+	function getChestsAndMonsters(room) {
+		var copy = [],
+			x,
+			length = chestsAndMonsters[room].length;
+		for (x = 0; x < length; x += 1) {
+			copy[x] = chestsAndMonsters[room][x].slice(0);
+		}
+		return copy;
 	}
 
 	function enterRoom(room) {
@@ -382,29 +369,24 @@ lj.realm = (function () {
 	}
 
 	return {
-		// temporarily expose everything to test
-		getRoomNumberFromPosition : getRoomNumberFromPosition,
-		randomDoorPosition : randomDoorPosition,
-		spawnChestsAndMonsters : spawnChestsAndMonsters,
-		makeRoom : makeRoom,
-		placeBoss : placeBoss,
-		placeDoors : placeDoors,
+		// Exposed for testing
 		printRoom : printRoom,
-		setSize : setSize,
-		doors : doors,
-		rooms : rooms,
-		getChestsAndMonstersArray : getChestsAndMonstersArray,
 		printChestsAndMonsters : printChestsAndMonsters,
-		chestsAndMonsters : chestsAndMonsters,
-		bossRoom : bossRoom,
+
+		// Call when starting a quest to create the dungeon
+		makeRealm : makeRealm,
+
+		// Call to get a copy of the wall layout or monster/pickups layout
+		getRoom : getRoom,
+		getChestsAndMonsters : getChestsAndMonsters,
+
+		// Check which room you currently are in (room number needed for other functions)
+		getCurrentRoom : getCurrentRoom,
+
+		// Call when entering a door
 		enterRoom : enterRoom,
 
-		// These should stay exposed after testing
-		makeRealm : makeRealm,
-		prepareNextRoom : prepareNextRoom, // To do
-		clearTile : clearTile, // To do
-		checkTile : checkTile, // To do
-		getRoom : getRoom,
-		getCurrentRoom : getCurrentRoom
+		// Call to remove monster or chest
+		clearTile : clearTile
 	};
 }());
