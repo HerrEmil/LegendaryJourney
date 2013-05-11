@@ -114,12 +114,38 @@ lj.hero.stats = {
 	}
 }
 lj.hero.fight = function (enemy){
-	//Fight the enemy
+	//Lets meet the contenders:
+	var enemyHealth = enemy["hp"],
+		heroHealth = lj.hero.stats.health,
+		heroStats = lj.hero.stats.get(), //Snapshotting hero's stats so changing gear between strikes won't work
+		herosTurn = true,
+		lastAction,
+		log = [];
+
+	while(enemyHealth > 0 && heroHealth > 0){
+		lastAction = null;
+		if(herosTurn){
+			lastAction = lj.hero.duel(enemy, heroStats);
+			lastAction.actor = "hero";
+			log.push(lastAction);
+			enemyHealth -= lastAction.damage;
+		} else {
+			lastAction = lj.hero.duel(heroStats, enemy);
+			lastAction.actor = "enemy";
+			log.push(lastAction);
+			heroHealth -= lastAction.damage;
+		}
+		herosTurn = !herosTurn;
+	};
+	lastAction.damage = null;
+	//lastAction.type = "victory";
+
+	//log.push(lastAction);
+	return log;
 }
-lj.hero.attack = function (enemy){
+lj.hero.duel = function (enemy,friend){
 	//Perform an attack, evaluate the damage and return the results
 	var rng = lj.util.randomInterval,
-		friend = lj.hero.stats.get(),
 		netHit = rng(1,1000)+friend["hit"]-enemy["defense"],
 		damage,
 		type;
@@ -144,10 +170,10 @@ lj.hero.attack = function (enemy){
 	if(!type){
 		type = "hit";
 	}
+	//stalemate protection
+	if(damage <= 0){damage=1};
+	console.log("damage",damage);
+	console.log("type",type);
 	return {damage:damage,type:type};
-
-}
-lj.hero.defend = function (enemy){
-	//Let the enemy strike, evaluate the damage and return the results
 
 }
