@@ -1,5 +1,12 @@
-
 (function() {
+	'use strict'
+
+	var config = {
+		nrOfRows: 11,
+		nrOfCols: 11,
+		tileSize: 32,
+		assetsPath: 'assets/'
+	}
 
 	var intro = document.getElementById('gameIntro'),
 		start = intro.querySelector('.btn-start');
@@ -13,7 +20,7 @@
 			images,
 			interval;
 
-		window.lj = new Game();
+		window.lj = new Game(config);
 
 		start.style.display = 'none';
 		progress.style.display = 'block';
