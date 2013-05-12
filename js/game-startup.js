@@ -80,6 +80,9 @@
 		lj.realm.makeRealm(1);
 		lj.scene.enter('DOWN');
 		document.getElementById("healthBarBox").className = "";
+		document.getElementById("charPane").className = "";
+		document.getElementById("battleLog").className = "";
+		lj.hero.updateCharPane();
 	}
 
 }());

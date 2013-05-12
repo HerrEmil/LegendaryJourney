@@ -129,31 +129,31 @@ h1 {
 
 #battleLog {
 	position : absolute;
-	top : 170px;
-	left : 450px;
-	height: 330px;
+	top : 150px;
+	left : 650px;
+	height: 350px;
 	width: 200px;
 	overflow-y: scroll;
 	font-size: 10px;
 }
 
-#battleLog .poor {
+.poor {
 	color : gray;
 }
 
-#battleLog .normal {
+.normal {
 	color : white;
 }
 
-#battleLog .rare {
+.rare {
 	color : green;
 }
 
-#battleLog .epic {
+.epic {
 	color : yellow;
 }
 
-#battleLog .legendary {
+.legendary {
 	color : orange;
 }
 #healthBarBox {
@@ -166,6 +166,11 @@ h1 {
 	background-color : rgba(255,255,255,0.5);
 	text-align: center;
 	border-radius: 3px;
+	-webkit-transition: 0.3s;
+	   -moz-transition: 0.3s;
+	    -ms-transition: 0.3s;
+	     -o-transition: 0.3s;
+		    transition: 0.3s;
 }
 #healthBar {
 	position: relative;
@@ -177,6 +182,11 @@ h1 {
 	line-height : 20px;
 	z-index: 999;
 	border-radius: 3px;
+	-webkit-transition: 0.3s;
+	   -moz-transition: 0.3s;
+	    -ms-transition: 0.3s;
+	     -o-transition: 0.3s;
+		    transition: 0.3s;
 }
 #stay {
 	position : absolute;
@@ -197,4 +207,47 @@ h1 {
 }
 .hidden {
 	display: none;
+}
+#charPane {
+	position : absolute;
+	top : 170px;
+	left : 450px;
+	height: 330px;
+	width: 200px;
+	overflow: hidden;
+	font-size: 10px;
+	-webkit-transition: 0.3s;
+	   -moz-transition: 0.3s;
+	    -ms-transition: 0.3s;
+	     -o-transition: 0.3s;
+		    transition: 0.3s;
+}
+#gear{
+	position : absolute;
+	top : 0px;
+	left : 0px;
+	height: 150px;
+	width: 200px;
+}
+#stats{
+	position : absolute;
+	top : 150px;
+	left : 0px;
+	height: 180px;
+	width: 200px;
+}
+.slot {
+	display: inline-block;
+	width: 60px;
+}
+.stat {
+	display: inline-block;
+	width: 80px;
+}
+.header {
+	color: black;
+	text-align: center;
+	color: white;
+	font-weight: bold;
+	font-size: 12px;
 }
