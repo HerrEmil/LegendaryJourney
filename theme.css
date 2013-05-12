@@ -226,14 +226,14 @@ h1 {
 	position : absolute;
 	top : 0px;
 	left : 0px;
-	height: 150px;
+	height: 195px;
 	width: 200px;
 }
 #stats{
 	position : absolute;
-	top : 150px;
+	top : 195px;
 	left : 0px;
-	height: 180px;
+	height: 135px;
 	width: 200px;
 }
 .slot {
