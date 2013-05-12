@@ -5,28 +5,28 @@ lj.battleLog = (function () {
 
 	var battleLog = document.getElementById('battleLog');
 
-	function printMessage(text) {
-		// Create text node and break tag
-		var newMessage = document.createTextNode(text),
+	function printMessage(message) {
+		var messageContainer = document.createElement("span"),
 			br = document.createElement("br");
-		// Add new text and tag to HTML
-		battleLog.appendChild(newMessage);
+
+		// Put message in message container
+		messageContainer.innerHTML = message;
+
+		// Add message and break to HTML
+		battleLog.appendChild(messageContainer);
 		battleLog.appendChild(br);
 		// Scroll to bottom of scrollbox
 		battleLog.scrollTop = battleLog.scrollHeight - battleLog.clientHeight;
 	}
 
 	function acquire(item) {
-		var message = "You found " + item + "!";
+		var message = 'You found <span class="' + quality + '">' + item + '</span>!';
 		printMessage(message);
 	}
 
-	function autoEquip(item) {
-		var message1 = "It's better than what you have!",
-			message2 = "You equipped " + item + "!";
-		acquire(item);
-		printMessage(message1);
-		printMessage(message2);
+	function autoEquip(item, quality) {
+		var message = 'You found and equipped <span class="' + quality + '">' + item + '</span>!';
+		printMessage(message);
 	}
 
 	function monsterKilled(monster) {
