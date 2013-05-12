@@ -85,6 +85,44 @@ h1 {
 	left:75px;
 }
 
+#fight {
+	color: #fff;
+	font-size: 1.4em;
+	font-weight: bold;
+	position: absolute;
+	top:200px;
+	left:100px;
+	height:40px;
+	width: 80px;
+}
+	.damage, .hit {
+		background-color: rgba(0,0,0,0.7);
+		border-radius: 4px;
+		padding: 5px;
+		text-shadow:1px 1px #fff;
+		opacity: 0;
+		-webkit-transition: 0.3s;
+		   -moz-transition: 0.3s;
+		    -ms-transition: 0.3s;
+		     -o-transition: 0.3s;
+			    transition: 0.3s;
+	}
+	.damage {
+		float: right;
+		color: red;
+	}
+	.hit {
+		float: left;
+		color: green;
+	}
+
+	.dealing .hit {
+		opacity: 1;
+	}
+	.taking .damage {
+		opacity: 1
+	}
+
 #battleLog {
 	position : absolute;
 	top : 170px;
