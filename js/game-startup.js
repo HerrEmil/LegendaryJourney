@@ -17,6 +17,7 @@
 		if (eleClass === 'btn restart') {
 			lj.scene.reset();
 			lj.battleLog.clear();
+			lj.hero.gear.clear();
 		}
 	}
 

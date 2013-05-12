@@ -20,7 +20,6 @@ lj.battleLog = (function () {
 	}
 
 	function clear() {
-		console.log("clear");
 		battleLog.innerHTML = "";
 	}
 
