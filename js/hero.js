@@ -126,46 +126,27 @@ lj.hero = (function() {
 		else if (type === 'Enemy') {
 			var enemy = lj.enemy.get("brown", item);
 			var fight = lj.hero.fight(enemy);
-			// fight.log.forEach(function(action) {
-			// 	console.log(action.actor, action.type, action.damage);
-			// });
-			console.log(fight.outcome.actor, 'was victorious!');
 			if (fight.outcome.actor === 'hero') {
-				lj.realm.clearTile(tile);
-				lj.scene.eraseTileItem(tile);
-				if (item === 'B') {
-					setTimeout(function() {
-						lj.scene.levelUp();
+				setTimeout(function() {
+					lj.battleLog.monsterKilled(enemy.name);
+					lj.realm.clearTile(tile);
+					lj.scene.eraseTileItem(tile);
+					if (item === 'B') {
+						setTimeout(function() {
+							lj.scene.levelUp();
+							isBusy = false;
+						},1000)
+					}
+					else {
 						isBusy = false;
-					},1000)
-				}
-				else {
-					isBusy = false;
-				}
+					}
+				},1000);
 			}
 			else {
+				lj.battleLog.monsterKilled(enemy.name);
 				lj.scene.eraseTileItem(tile, true);
 			}
 		}
-		// else if (type === 'Boss') {
-		// 	var enemy = lj.enemy.get("brown", true);
-		// 	var fight = lj.hero.fight(enemy);
-		// 	// fight.log.forEach(function(action) {
-		// 	// 	console.log(action.actor, action.type, action.damage);
-		// 	// });
-		// 	console.log(fight.outcome.actor, 'was victorious!');
-		// 	if (fight.outcome.actor === 'hero') {
-		// 		lj.realm.clearTile(tile);
-		// 		lj.scene.eraseTileItem(tile);
-		// 		setTimeout(function() {
-		// 			lj.scene.levelUp();
-		// 			isBusy = false;
-		// 		},1000)
-		// 	}
-		// 	else {
-		// 		lj.scene.eraseTileItem(tile, true);
-		// 	}
-		// }
 		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
 	}
 
