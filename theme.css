@@ -114,3 +114,8 @@ h1 {
 #battleLog .legendary {
 	color : orange;
 }
+
+#battleLog .restart {
+	position : absolute;
+	left : 55px;
+}
