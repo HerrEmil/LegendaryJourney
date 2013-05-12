@@ -80,6 +80,7 @@
 	function startGame() {
 		lj.realm.makeRealm(1);
 		lj.scene.enter('DOWN');
+		document.getElementById("healthBarBox").className = "";
 	}
 
 }());
