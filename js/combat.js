@@ -98,7 +98,7 @@ lj.hero.stats = {
 	updateHealth : function (){
 		var percent,
 			current =this.health,
-			max = this.self.hp;
+			max = lj.hero.stats.get().hp;
 		percent = Math.round((current / max)*100)
 		document.getElementById("healthBar").style.width=2*percent+"px";
 		document.getElementById("stay").innerHTML =current+"/"+max;

@@ -151,3 +151,6 @@ h1 {
 	position : absolute;
 	left : 55px;
 }
+.hidden {
+	display: none;
+}
