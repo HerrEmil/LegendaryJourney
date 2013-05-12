@@ -101,6 +101,7 @@ lj.hero = (function() {
 	function interact(type) {
 		if (type === 'Chest') {
 			var item = lj.items.makeItem();
+			lj.hero.gear.pickup(item);
 			console.log(item.name);
 		}
 		else if (type === 'Enemy') {
