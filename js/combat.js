@@ -36,10 +36,6 @@ lj.hero.gear = {
 		}
 	},
 	pickup : function(item){
-<<<<<<< HEAD
-		console.log('Picking up', item)
-		this.inventory.push(item);
-=======
 		var current = this.equipped[item.slot],
 			curVal,
 			newVal;
@@ -61,7 +57,6 @@ lj.hero.gear = {
 			lj.battleLog.acquire(item.name);
 			return false;
 		}
->>>>>>> f0db1b828a299928f5323d9075206d9d5beeaa86
 	},
 	drop : function(item){
 		var inventoryIndex;
