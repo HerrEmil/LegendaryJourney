@@ -14,14 +14,11 @@ var spriteMap = {
 	'D': floor, // Door leading Down
 
 	'B': [1, 28], // Boss
-	'E': [1, 12], // Enemy
+	'a': [4, 4], // Wolf
+	'b': [2, 19], // Gnole
+	'c': [3, 5], // Troll
+	'd': [8, 15], // Undead mage
 	'C': [45, 44], // Chest
-
-	'a': floor, // Monster type a
-	'b': floor, // Monster type b
-	'c': floor, // Monster type c
-	'd': floor, // ...
-	'z': floor, // Monster type z
 
 	'1': floor, // Chest type 1
 	'2': floor, // Chest type 2
