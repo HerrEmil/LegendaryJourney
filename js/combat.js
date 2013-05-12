@@ -93,17 +93,27 @@ lj.hero.stats = {
 		"magicfind" : 0
 	},
 	health : 100,
+	updateHealth : function (){
+		var percent,
+			current =this.health,
+			max = this.self.hp;
+		percent = Math.round((current / max)*100)
+		document.getElementById("healthBar").style.width=2*percent+"px";
+		document.getElementById("stay").innerHTML =current+"/"+max;
+	},
 	heal : function(amount){
 		this.health += amount;
 		if(this.health > this.self.hp){
 			this.health = this.self.hp;
 		}
+		this.updateHealth();
 	},
 	hurt : function(amount){
 		this.health -= amount;
 		if(this.health <= 0){
 			this.health = 0;
 		};
+		this.updateHealth();
 	},
 	buff : function(stat, value){
 		this.self[stat] += value;
