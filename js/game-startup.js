@@ -16,6 +16,7 @@
 
 		if (eleClass === 'btn restart') {
 			lj.scene.reset();
+			lj.battleLog.clear();
 		}
 	}
 
@@ -77,6 +78,7 @@
 	function startGame() {
 		lj.realm.makeRealm(1);
 		lj.scene.enter('DOWN');
+		document.getElementById("healthBarBox").className = "";
 	}
 
 }());

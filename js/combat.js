@@ -21,6 +21,7 @@ lj.hero.gear = {
 
 		//and remove from inventory
 		this.drop(item);
+		lj.hero.stats.updateHealth();
 	},
 	unequip : function(item){
 		var old;
@@ -34,6 +35,7 @@ lj.hero.gear = {
 			this.inventory.push(old);
 			this.equipped[old.slot] = null;
 		}
+		lj.hero.stats.updateHealth();
 	},
 	pickup : function(item){
 		var current = this.equipped[item.slot],
@@ -96,22 +98,23 @@ lj.hero.stats = {
 	updateHealth : function (){
 		var percent,
 			current =this.health,
-			max = this.self.hp;
+			max = lj.hero.stats.get().hp;
 		percent = Math.round((current / max)*100)
 		document.getElementById("healthBar").style.width=2*percent+"px";
 		document.getElementById("stay").innerHTML =current+"/"+max;
 	},
 	heal : function(amount){
+		var maxhp = lj.hero.stats.get().hp;
 		this.health += amount;
-		if(this.health > this.self.hp){
-			this.health = this.self.hp;
+		if(this.health > lj.hero.stats.get().hp){
+			this.health = lj.hero.stats.get().hp;
 		}
 		this.updateHealth();
 	},
 	hurt : function(amount){
 		this.health -= amount;
 		if(this.health <= 0){
-			this.health = 0;
+			this.health = -1;
 		};
 		this.updateHealth();
 	},
