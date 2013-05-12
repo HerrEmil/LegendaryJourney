@@ -167,7 +167,6 @@ lj.scene = (function() {
 
 		currentRoom = currentRoom + (roomModifier[door] * verticalOffset);
 
-		console.log(currentRoom);
 		lj.realm.enterRoom(currentRoom);
 
 		lj.hero.exit();

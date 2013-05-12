@@ -30,6 +30,8 @@ lj.hero = (function() {
 
 	function reset() {
 		currentTile = [5,9];
+		isBusy = false;
+		lj.hero.stats.heal(1000);
 	}
 
 	// The hero enters the room...
@@ -78,7 +80,7 @@ lj.hero = (function() {
 			case '#': return; break;
 			case ' ':
 				place(tile);
-				lj.hero.stats.heal(1);
+				lj.hero.stats.heal(0.25);
 				// console.log('Hero moved to:', currentTile, currentDir);
 				break;
 			case 'D':
@@ -143,7 +145,7 @@ lj.hero = (function() {
 				},1000);
 			}
 			else {
-				lj.battleLog.monsterKilled(enemy.name);
+				lj.battleLog.heroKilled(enemy.name);
 				lj.scene.eraseTileItem(tile, true);
 			}
 		}

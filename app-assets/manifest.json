@@ -1,0 +1,21 @@
+{
+  "name": "Legendary Journey",
+  "description": "Kill monsters, acquire loot!",
+  "version": "1",
+  "app": {
+    "urls": [
+      "http://herremil.com/legendaryjourney/",
+      "http://herremil.com/legendaryjourney"
+    ],
+    "launch": {
+      "web_url": "http://mail.google.com/mail/"
+    }
+  },
+  "icons": {
+    "128": "icon_128.png"
+  },
+  "permissions": [
+    "unlimitedStorage",
+    "notifications"
+  ]
+}
