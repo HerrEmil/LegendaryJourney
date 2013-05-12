@@ -19,6 +19,11 @@ lj.battleLog = (function () {
 		battleLog.scrollTop = battleLog.scrollHeight - battleLog.clientHeight;
 	}
 
+	function clear() {
+		console.log("clear");
+		battleLog.innerHTML = "";
+	}
+
 	function acquire(item, quality) {
 		var message = 'You found <span class="' + quality + '">' + item + '</span>!';
 		printMessage(message);
@@ -62,6 +67,7 @@ lj.battleLog = (function () {
 		heroKilled : heroKilled,
 		levelComplete : levelComplete,
 		gameComplete : gameComplete,
-		customMessage : customMessage
+		customMessage : customMessage,
+		clear : clear
 	};
 }());
