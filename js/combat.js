@@ -31,7 +31,7 @@ lj.hero.gear = {
 			old = this.equipped[item.slot];
 		}
 		if(old != null){
-			this.inventory.push(item);
+			this.inventory.push(old);
 			this.equipped[old.slot] = null;
 		}
 	},
@@ -45,16 +45,16 @@ lj.hero.gear = {
 			newVal = this.gscore(item);
 		} else {
 			this.equip(item);
-			lj.battleLog.autoEquip(item.name);
+			lj.battleLog.autoEquip(item.name, item.quality);
 			return true;
 		}
 		if(newVal >= curVal){
 			this.equip(item);
-			lj.battleLog.autoEquip(item.name);
+			lj.battleLog.autoEquip(item.name, item.quality);
 			return true;
 		} else {
 			this.inventory.push(item);	
-			lj.battleLog.acquire(item.name);
+			lj.battleLog.acquire(item.name, item.quality);
 			return false;
 		}
 	},
