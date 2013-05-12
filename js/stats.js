@@ -84,8 +84,9 @@ window.lj = lj || {};
 	suf.push(new iStats.fix([2,2,0,0,1,0,0,0,0],"of the Lion"));
 	suf.push(new iStats.fix([0,0,2,0,2,0,0,0,3],"of the Bounty Hunter"));
 	suf.push(new iStats.fix([-1,-1,-1,-1,-1,-1,-1,-1,-1],"of the Loser"));
-	suf.push(new iStats.fix([0,1,2,1,0,0,0,0,0],"of the Secondborn"));
+	suf.push(new iStats.fix([0,1,2,1,0,0,0,0,0],"of the Hermit"));
 	suf.push(new iStats.fix([1,1,1,1,1,1,1,1,1],"of Kings"));
+	suf.push(new iStats.fix([0,0,0,0,2,2,0,0,0],"of Excessive Exaggeration"));
 
 	//Getters
 	pre.get = function(id, level){

@@ -31,7 +31,7 @@ window.lj = lj || {};
 				roll = lj.util.randomInterval(1,total),
 				rolling = true,
 				mf = lj.hero.stats.get()["magicfind"];
-			console.log("Initial roll: "+roll+" Magic Find: "+mf+" Adjusted roll: "+(roll+mf));
+			//console.log("Initial roll: "+roll+" Magic Find: "+mf+" Adjusted roll: "+(roll+mf));
 			total -= this.legendary.chance;
 			if(total < roll){
 				return "legendary";
@@ -183,7 +183,7 @@ window.lj = lj || {};
 	lj.items.types.boots.push(new iStats.fix([0,1,0,0,2,1,0,0,0],"Jaki-tabis"));
 	lj.items.types.boots.push(new iStats.fix([0,2,0,0,0,0,0,1,0],"Sneakers"));
 	lj.items.types.boots.push(new iStats.fix([0,0,0,1,0,0,2,2,0],"Greaves"));
-	lj.items.types.boots.push(new iStats.fix([0,1,0,1,0,0,2,3,1],"Dress Shoes"));
+	lj.items.types.boots.push(new iStats.fix([0,1,0,1,0,0,2,3,1],"Stilettos"));
 	//Ring
 	lj.items.types.ring.push(new iStats.fix([0,0,0,3,0,0,1,0,0],"Bronze Ring"));
 	lj.items.types.ring.push(new iStats.fix([1,2,0,0,0,0,0,1,0],"Silver Ring"));
