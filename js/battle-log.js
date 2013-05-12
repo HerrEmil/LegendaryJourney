@@ -19,7 +19,7 @@ lj.battleLog = (function () {
 		battleLog.scrollTop = battleLog.scrollHeight - battleLog.clientHeight;
 	}
 
-	function acquire(item) {
+	function acquire(item, quality) {
 		var message = 'You found <span class="' + quality + '">' + item + '</span>!';
 		printMessage(message);
 	}
