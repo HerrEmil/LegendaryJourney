@@ -13,6 +13,10 @@ var spriteMap = {
 	'R': floor, // Door leading Right
 	'D': floor, // Door leading Down
 
+	'B': [1, 28], // Boss
+	'E': [1, 12], // Enemy
+	'C': [45, 44], // Chest
+
 	'a': floor, // Monster type a
 	'b': floor, // Monster type b
 	'c': floor, // Monster type c
@@ -36,7 +40,9 @@ var roomModifier = {
 
 lj.scene = (function() {
 
-	var currentRoom = null, room = null;
+	var currentRoom = null,
+		room = null,
+		creaturesAndItems = null;
 
 	// Get the opposite door (for when entering and exiting)
 	function oppositeDoor(door) {
@@ -56,12 +62,22 @@ lj.scene = (function() {
 		// Paint scene
 		for (var rowCtr = 0; rowCtr < 11; rowCtr++) {
 			for (var colCtr = 0; colCtr < 11; colCtr++) {
+				lj.context.save();
 				var tileId = spriteMap[room[colCtr][rowCtr]],
 					sourceX = Math.floor(tileId[1]) * 32,
 					sourceY = Math.floor(tileId[0]) * 32;
-				lj.context.save();
 				lj.context.drawImage(spriteImage, sourceX, sourceY,32,32,colCtr*32,rowCtr*32,32,32);
 				lj.context.restore();
+				lj.context.save();
+				var itemSymbol = creaturesAndItems[colCtr][rowCtr],
+					itemId = spriteMap[itemSymbol],
+					itmX = Math.floor(itemId[1]) * 32,
+					itmY = Math.floor(itemId[0]) * 32;
+				if (itemSymbol !== '#' && itemSymbol !== ' ') {
+					lj.context.save();
+					lj.context.drawImage(spriteImage, itmX, itmY,32,32,colCtr*32,rowCtr*32,32,32);
+					lj.context.restore();
+				}
 			}
 		}
 
@@ -72,11 +88,18 @@ lj.scene = (function() {
 
 	}
 
+	// Called to remove monster or chest, when hero is standing on it
+	function eraseTileItem(tile) {
+		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
+		paint(tile);
+	}
+
 	// Enter a room
 	function enter(door) {
 		if (!currentRoom) currentRoom = lj.realm.getCurrentRoom();
 
 		room = lj.realm.getRoom(currentRoom);
+		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
 
 		// Animate hero entering from door
 		lj.hero.enter(door);
@@ -106,7 +129,8 @@ lj.scene = (function() {
 	return {
 		enter: enter,
 		exit: exit,
-		paint: paint
+		paint: paint,
+		eraseTileItem: eraseTileItem
 	}
 
 }());

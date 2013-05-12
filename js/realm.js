@@ -329,8 +329,8 @@ lj.realm = (function () {
 	}
 
 	// Remove a monster or chest from current room
-	function clearTile(x, y) {
-		chestsAndMonsters[currentRoom][x][y] = ' ';
+	function clearTile(tile) {
+		chestsAndMonsters[currentRoom][tile[0]][tile[1]] = ' ';
 	}
 
 	function printRoom(room) {

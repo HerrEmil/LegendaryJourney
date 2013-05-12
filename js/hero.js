@@ -5,13 +5,21 @@ lj.hero = (function() {
 
 	var currentDir = null,
 		room = null,
-		currentTile = [5,9]; // col, row
+		creaturesAndItems = null,
+		currentTile = [5,9], // col, row
+		isBusy = false;
 
 	var stepModifiers = {
 		left: [0, -1],
 		right: [0, 1],
 		up: [-1, 0],
 		down: [1, 0]
+	}
+
+	var creaturesAndItemsMap = {
+		'B': 'Boss',
+		'E': 'Enemy',
+		'C': 'Chest'
 	}
 
 	setupListeners();
@@ -21,6 +29,7 @@ lj.hero = (function() {
 		// Get the starting tile from realm.js (get door tile)
 		var currentRoom = lj.realm.getCurrentRoom();
 		room = lj.realm.getRoom(currentRoom);
+		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
 		console.log(currentRoom);
 		place(currentTile);
 		console.log(currentTile);
@@ -41,6 +50,7 @@ lj.hero = (function() {
 	// PRIVATE: place the hero on a tile
 	function place(tile) {
 		currentTile = tile;
+		checkTile(tile);
 		lj.scene.paint(tile);
 	}
 
@@ -51,8 +61,8 @@ lj.hero = (function() {
 		switch (type) {
 			case '#': return; break;
 			case ' ':
-				console.log('Hero moved to:', currentTile, currentDir);
 				place(tile);
+				// console.log('Hero moved to:', currentTile, currentDir);
 				break;
 			case 'D':
 				currentTile[1] = 0;
@@ -75,14 +85,35 @@ lj.hero = (function() {
 		}
 	}
 
+	function checkTile(tile) {
+		var item = creaturesAndItems[tile[0]][tile[1]],
+			currentRoom = lj.realm.getCurrentRoom();
+		// console.log('Our hero will interact with', type);
+		if (creaturesAndItemsMap[item]) {
+			isBusy = true;
+			interact(creaturesAndItemsMap[item]);
+			lj.realm.clearTile(tile);
+			creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
+			lj.scene.eraseTileItem(tile);
+		}
+	}
+
 	function interact(type) {
-		console.log('Our here will interact with', type);
+		if (type === 'Chest') {
+			var item = lj.items.makeItem();
+			console.log(item.name);
+		}
+		isBusy = false;
 	}
 
 	// Makes the hero step in a direction
 	// Directions: left, right, up, down
 	function step(dir) {
 		var row, col, nextTile;
+
+		// We ain't going anywhere if busy looting or fighting
+		if (isBusy) return;
+
 		// Is the hero turned in the right direction?
 		if (dir !== currentDir) turn(dir);
 
