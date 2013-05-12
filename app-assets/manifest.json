@@ -1,7 +1,7 @@
 {
 	"manifest_version" : 2,
 	"name": "Legendary Journey",
-	"description": "Kill monsters, acquire loot!",
+	"description": "Journey down the realm of the evil blue mage, collect legendary loot!",
 	"version": "1.1",
 	"app": {
 		"urls": [
