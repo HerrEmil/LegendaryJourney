@@ -94,3 +94,23 @@ h1 {
 	overflow-y: scroll;
 	font-size: 10px;
 }
+
+#battleLog .poor {
+	color : gray;
+}
+
+#battleLog .normal {
+	color : white;
+}
+
+#battleLog .rare {
+	color : green;
+}
+
+#battleLog .epic {
+	color : yellow;
+}
+
+#battleLog .legendary {
+	color : orange;
+}
