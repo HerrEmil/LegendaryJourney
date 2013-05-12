@@ -2,7 +2,7 @@ window.lj = lj || {};
 
 // ## Setting and updating the current scene of the game
 
-var floor = [14, 49]
+var floor = [14, 49];
 
 var spriteMap = {
 	'!': [2, 4], // hero
@@ -43,6 +43,15 @@ lj.scene = (function() {
 	var currentRoom = null,
 		room = null,
 		creaturesAndItems = null;
+
+	function reset() {
+		lj.hero.reset();
+		lj.realm.makeRealm(1);
+		currentRoom = null;
+		room = null;
+		creaturesAndItems = null;
+		enter('D');
+	}
 
 	function levelUp() {
 		var currentLevel = lj.realm.getSize();
@@ -177,7 +186,8 @@ lj.scene = (function() {
 		exit: exit,
 		paint: paint,
 		eraseTileItem: eraseTileItem,
-		levelUp: levelUp
+		levelUp: levelUp,
+		reset: reset
 	}
 
 }());
