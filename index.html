@@ -6,7 +6,7 @@
 	</head>
 	<body>
 
-		<canvas id="game" width="600" height="352">
+		<canvas id="game" width="352" height="352">
 			No game for you! Browser need to support canvas.
 		</canvas>
 
@@ -20,6 +20,8 @@
 
 		<h1>Legendary Journey</h1>
 
+		<div id="battleLog" style="height: 200px; width: 200px; overflow: scroll;"></div>
+
 		<script src="lib/underscore-min.js"></script>
 		<script src="lib/game.js"></script>
 		<script src="js/game-startup.js"></script>
@@ -31,5 +33,6 @@
 		<script src="js/items.js"></script>
 		<script src="js/combat.js"></script>
 		<script src="js/enemy.js"></script>
+		<script src="js/battle-log.js"></script>
 	</body>
 </html>

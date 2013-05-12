@@ -66,7 +66,7 @@
 	}
 
 	function startGame() {
-		lj.realm.makeRealm(3);
+		lj.realm.makeRealm(1);
 		lj.scene.enter('DOWN');
 	}
 

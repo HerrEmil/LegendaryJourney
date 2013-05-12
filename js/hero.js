@@ -24,6 +24,10 @@ lj.hero = (function() {
 
 	setupListeners();
 
+	function reset() {
+		currentTile = [5,9];
+	}
+
 	// The hero enters the room...
 	function enter(door) {
 		// Get the starting tile from realm.js (get door tile)
@@ -50,13 +54,21 @@ lj.hero = (function() {
 	// PRIVATE: place the hero on a tile
 	function place(tile) {
 		currentTile = tile;
-		checkTile(tile);
 		lj.scene.paint(tile);
+		checkTile(tile);
 	}
 
 	function move(tile) {
-		var type = room[tile[0]][tile[1]];
-		var spriteImage = lj.getImage('dungeon-sprite.png');
+		var type;
+
+		try {
+			type = room[tile[0]][tile[1]];
+		}
+		catch (err) {
+			move(currentTile);
+			return;
+		}
+
 		// Find out what type of tile we're moving to
 		switch (type) {
 			case '#': return; break;
@@ -81,45 +93,63 @@ lj.hero = (function() {
 				lj.scene.exit(type);
 				break;
 			default:
-				interact(type);
+				break;
 		}
 	}
 
 	function checkTile(tile) {
-		var item = creaturesAndItems[tile[0]][tile[1]],
-			currentRoom = lj.realm.getCurrentRoom();
+		var item = creaturesAndItems[tile[0]][tile[1]];
+			
 		// console.log('Our hero will interact with', type);
 		if (creaturesAndItemsMap[item]) {
 			isBusy = true;
-			interact(creaturesAndItemsMap[item]);
-			lj.realm.clearTile(tile);
-			creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
-			lj.scene.eraseTileItem(tile);
+			interact(creaturesAndItemsMap[item], tile);
 		}
 	}
 
-	function interact(type) {
+	function interact(type, tile) {
+		var currentRoom = lj.realm.getCurrentRoom();
 		if (type === 'Chest') {
 			var item = lj.items.makeItem();
 			lj.hero.gear.pickup(item);
 			console.log(item.name);
+			lj.realm.clearTile(tile);
+			lj.scene.eraseTileItem(tile);
 		}
 		else if (type === 'Enemy') {
 			var enemy = lj.enemy.get("brown");
 			var fight = lj.hero.fight(enemy);
-			fight.log.forEach(function(action) {
-				console.log(action.actor, action.type, action.damage);
-			});
+			// fight.log.forEach(function(action) {
+			// 	console.log(action.actor, action.type, action.damage);
+			// });
 			console.log(fight.outcome.actor, 'was victorious!');
+			if (fight.outcome.actor === 'hero') {
+				lj.realm.clearTile(tile);
+				lj.scene.eraseTileItem(tile);
+			}
+			else {
+				lj.scene.eraseTileItem(tile, true);
+			}
 		}
 		else if (type === 'Boss') {
 			var enemy = lj.enemy.get("brown", true);
 			var fight = lj.hero.fight(enemy);
-			fight.log.forEach(function(action) {
-				console.log(action.actor, action.type, action.damage);
-			});
+			// fight.log.forEach(function(action) {
+			// 	console.log(action.actor, action.type, action.damage);
+			// });
 			console.log(fight.outcome.actor, 'was victorious!');
+			if (fight.outcome.actor === 'hero') {
+				lj.realm.clearTile(tile);
+				lj.scene.eraseTileItem(tile);
+				setTimeout(function() {
+					lj.scene.levelUp();
+				},1000)
+			}
+			else {
+				lj.scene.eraseTileItem(tile, true);
+			}
 		}
+		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
 		isBusy = false;
 	}
 
@@ -154,6 +184,7 @@ lj.hero = (function() {
 	return {
 		enter: enter,
 		step: step,
-		exit: exit
+		exit: exit,
+		reset: reset
 	}
 }());

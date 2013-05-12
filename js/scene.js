@@ -44,6 +44,22 @@ lj.scene = (function() {
 		room = null,
 		creaturesAndItems = null;
 
+	function levelUp() {
+		var currentLevel = lj.realm.getSize();
+		if (currentLevel === 3) {
+			console.log('You win!');
+			return;
+		}
+		else {
+			lj.realm.makeRealm(currentLevel + 1);
+		}
+		lj.hero.reset();
+		currentRoom = null;
+		room = null;
+		creaturesAndItems = null;
+		enter('D');
+	}
+
 	// Get the opposite door (for when entering and exiting)
 	function oppositeDoor(door) {
 		var opposites = {
@@ -56,7 +72,7 @@ lj.scene = (function() {
 		return opposites[door];
 	}
 
-	function paint(tile) {
+	function paint(tile, isDead) {
 		var spriteImage = lj.getImage('dungeon-sprite.png');
 
 		// Paint scene
@@ -82,16 +98,18 @@ lj.scene = (function() {
 		}
 
 		// Paint hero
-		lj.context.save();
-		lj.context.drawImage(spriteImage, 4*32, 2*32,32,32,tile[0]*32,tile[1]*32,32,32);
-		lj.context.restore();
+		if (!isDead) {
+			lj.context.save();
+			lj.context.drawImage(spriteImage, 4*32, 2*32,32,32,tile[0]*32,tile[1]*32,32,32);
+			lj.context.restore();
+		}
 
 	}
 
 	// Called to remove monster or chest, when hero is standing on it
-	function eraseTileItem(tile) {
+	function eraseTileItem(tile, isDead) {
 		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
-		paint(tile);
+		paint(tile, isDead);
 	}
 
 	// Enter a room
@@ -130,7 +148,8 @@ lj.scene = (function() {
 		enter: enter,
 		exit: exit,
 		paint: paint,
-		eraseTileItem: eraseTileItem
+		eraseTileItem: eraseTileItem,
+		levelUp: levelUp
 	}
 
 }());
