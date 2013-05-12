@@ -91,5 +91,6 @@ h1 {
 	left : 450px;
 	height: 350px;
 	width: 200px;
-	overflow: scroll;
+	overflow-y: scroll;
+	font-size: 10px;
 }
