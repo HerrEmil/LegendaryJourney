@@ -50,8 +50,8 @@ lj.hero = (function() {
 	// PRIVATE: place the hero on a tile
 	function place(tile) {
 		currentTile = tile;
-		checkTile(tile);
 		lj.scene.paint(tile);
+		checkTile(tile);
 	}
 
 	function move(tile) {
@@ -89,30 +89,28 @@ lj.hero = (function() {
 				lj.scene.exit(type);
 				break;
 			default:
-				console.log(currentTile);
-				move(currentTile);
 				break;
 		}
 	}
 
 	function checkTile(tile) {
-		var item = creaturesAndItems[tile[0]][tile[1]],
-			currentRoom = lj.realm.getCurrentRoom();
+		var item = creaturesAndItems[tile[0]][tile[1]];
+			
 		// console.log('Our hero will interact with', type);
 		if (creaturesAndItemsMap[item]) {
 			isBusy = true;
-			interact(creaturesAndItemsMap[item]);
-			lj.realm.clearTile(tile);
-			creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
-			lj.scene.eraseTileItem(tile);
+			interact(creaturesAndItemsMap[item], tile);
 		}
 	}
 
-	function interact(type) {
+	function interact(type, tile) {
+		var currentRoom = lj.realm.getCurrentRoom();
 		if (type === 'Chest') {
 			var item = lj.items.makeItem();
 			lj.hero.gear.pickup(item);
 			console.log(item.name);
+			lj.realm.clearTile(tile);
+			lj.scene.eraseTileItem(tile);
 		}
 		else if (type === 'Enemy') {
 			var enemy = lj.enemy.get("brown");
@@ -121,6 +119,13 @@ lj.hero = (function() {
 			// 	console.log(action.actor, action.type, action.damage);
 			// });
 			console.log(fight.outcome.actor, 'was victorious!');
+			if (fight.outcome.actor === 'hero') {
+				lj.realm.clearTile(tile);
+				lj.scene.eraseTileItem(tile);
+			}
+			else {
+				lj.scene.eraseTileItem(tile, true);
+			}
 		}
 		else if (type === 'Boss') {
 			var enemy = lj.enemy.get("brown", true);
@@ -129,7 +134,15 @@ lj.hero = (function() {
 			// 	console.log(action.actor, action.type, action.damage);
 			// });
 			console.log(fight.outcome.actor, 'was victorious!');
+			if (fight.outcome.actor === 'hero') {
+				lj.realm.clearTile(tile);
+				lj.scene.eraseTileItem(tile);
+			}
+			else {
+				lj.scene.eraseTileItem(tile, true);
+			}
 		}
+		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
 		isBusy = false;
 	}
 

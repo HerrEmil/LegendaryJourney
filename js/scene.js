@@ -56,7 +56,7 @@ lj.scene = (function() {
 		return opposites[door];
 	}
 
-	function paint(tile) {
+	function paint(tile, isDead) {
 		var spriteImage = lj.getImage('dungeon-sprite.png');
 
 		// Paint scene
@@ -82,16 +82,18 @@ lj.scene = (function() {
 		}
 
 		// Paint hero
-		lj.context.save();
-		lj.context.drawImage(spriteImage, 4*32, 2*32,32,32,tile[0]*32,tile[1]*32,32,32);
-		lj.context.restore();
+		if (!isDead) {
+			lj.context.save();
+			lj.context.drawImage(spriteImage, 4*32, 2*32,32,32,tile[0]*32,tile[1]*32,32,32);
+			lj.context.restore();
+		}
 
 	}
 
 	// Called to remove monster or chest, when hero is standing on it
-	function eraseTileItem(tile) {
+	function eraseTileItem(tile, isDead) {
 		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
-		paint(tile);
+		paint(tile, isDead);
 	}
 
 	// Enter a room
