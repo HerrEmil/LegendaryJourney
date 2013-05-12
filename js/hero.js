@@ -114,7 +114,8 @@ lj.hero = (function() {
 			var item = lj.items.makeItem();
 			lj.hero.gear.pickup(item);
 			lj.realm.clearTile(tile);
-			lj.scene.eraseTileItem(tile);
+			lj.scene.eraseTileItem(tile);		
+			isBusy = false;
 		}
 		else if (type === 'Enemy') {
 			var enemy = lj.enemy.get("brown");
@@ -126,6 +127,7 @@ lj.hero = (function() {
 			if (fight.outcome.actor === 'hero') {
 				lj.realm.clearTile(tile);
 				lj.scene.eraseTileItem(tile);
+				isBusy = false;
 			}
 			else {
 				lj.scene.eraseTileItem(tile, true);
@@ -143,6 +145,7 @@ lj.hero = (function() {
 				lj.scene.eraseTileItem(tile);
 				setTimeout(function() {
 					lj.scene.levelUp();
+					isBusy = false;
 				},1000)
 			}
 			else {
@@ -150,7 +153,6 @@ lj.hero = (function() {
 			}
 		}
 		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
-		isBusy = false;
 	}
 
 	// Makes the hero step in a direction
