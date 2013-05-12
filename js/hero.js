@@ -177,11 +177,11 @@ lj.hero = (function() {
 	function showFightStat(log, timeout) {
 		setTimeout(function() {
 			if (log.actor === 'hero') {
-				// lj.hero.stats.hurt(log.damage);
 				hitEl.innerHTML = log.damage;
 				fightEl.setAttribute('class', 'dealing');
 			}
 			else {
+				lj.hero.stats.hurt(log.damage);
 				damageEl.innerHTML = log.damage;
 				fightEl.setAttribute('class', 'taking');
 			}
