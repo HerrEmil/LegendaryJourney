@@ -18,8 +18,12 @@ lj.hero = (function() {
 
 	var creaturesAndItemsMap = {
 		'B': 'Boss',
-		'E': 'Enemy',
 		'C': 'Chest'
+		'E': 'Enemy',
+		'a': 'Enemy',
+		'b': 'Enemy',
+		'c': 'Enemy',
+		'd': 'Enemy'
 	}
 
 	setupListeners();
