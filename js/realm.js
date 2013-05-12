@@ -95,6 +95,19 @@ lj.realm = (function () {
 									['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']];
 
 		numberOfSpawns = spawnPoints.length;
+
+		for (i = 0; i < chests; i += 1) {
+			// Pick a random spawn point and grab its x and y values
+			randomPosition = Math.floor(Math.random() * numberOfSpawns);
+			roomX = spawnPoints[randomPosition].x;
+			roomY = spawnPoints[randomPosition].y;
+
+			// Add an chest in chest and monster structure, as long as it's not in the character's spawn point
+			if (roomX !== 5 || roomY !== 9) {
+				chestsAndMonsters[room][roomX][roomY] = 'C';
+			}
+		}
+
 		// Loop through enemies
 		for (i = 0; i < enemies; i += 1) {
 			// Pick a random spawn point and grab its x and y values
@@ -110,18 +123,6 @@ lj.realm = (function () {
 			// If boss room, replace last placed enemy with boss
 			if ((room === bossRoom) && (i === enemies - 1)) {
 				chestsAndMonsters[room][roomX][roomY] = 'B';
-			}
-		}
-
-		for (i = 0; i < chests; i += 1) {
-			// Pick a random spawn point and grab its x and y values
-			randomPosition = Math.floor(Math.random() * numberOfSpawns);
-			roomX = spawnPoints[randomPosition].x;
-			roomY = spawnPoints[randomPosition].y;
-
-			// Add an chest in chest and monster structure, as long as it's not in the character's spawn point
-			if (roomX !== 5 || roomY !== 9) {
-				chestsAndMonsters[room][roomX][roomY] = 'C';
 			}
 		}
 	}
