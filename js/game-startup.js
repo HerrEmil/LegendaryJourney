@@ -34,15 +34,16 @@
 		images = [
 			'dungeon-sprite.png',
 			'hero-walk.png',
-			'armor-sprite.png',
-			'camp-fire.png',
-			'crystal-blue.png',
-			'crystal-green.png',
-			'crystal-grey.png',
-			'crystal-orange.png',
-			'crystal-pink.png',
-			'crystal-yellow.png',
-			'orc-sprite.png'
+			// 'armor-sprite.png',
+			// 'camp-fire.png',
+			// 'crystal-blue.png',
+			// 'crystal-green.png',
+			// 'crystal-grey.png',
+			// 'crystal-orange.png',
+			// 'crystal-pink.png',
+			// 'crystal-yellow.png',
+			// 'orc-sprite.png'
+			'splatter.jpg'
 		];
 
 		images.forEach(function(image) {

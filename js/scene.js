@@ -100,16 +100,44 @@ lj.scene = (function() {
 		// Paint hero
 		if (!isDead) {
 			lj.context.save();
-			lj.context.drawImage(spriteImage, 4*32, 2*32,32,32,tile[0]*32,tile[1]*32,32,32);
+			lj.context.drawImage(spriteImage, 17*32, 6*32,32,32,tile[0]*32,tile[1]*32,32,32);
 			lj.context.restore();
 		}
 
+	}
+
+	function paintGameOver(tile) {
+		var spriteImage = lj.getImage('dungeon-sprite.png');
+
+		// Paint scene
+		for (var rowCtr = 0; rowCtr < 11; rowCtr++) {
+			for (var colCtr = 0; colCtr < 11; colCtr++) {
+				lj.context.save();
+				var tileId = spriteMap[room[colCtr][rowCtr]],
+					sourceX = Math.floor(tileId[1]) * 32,
+					sourceY = Math.floor(tileId[0]) * 32;
+				lj.context.drawImage(spriteImage, sourceX, sourceY,32,32,colCtr*32,rowCtr*32,32,32);
+				lj.context.restore();
+			}
+		}
+
+		// Paint dead hero
+		lj.context.save();
+		lj.context.drawImage(spriteImage, 32*32, 43*32,32,32,tile[0]*32,tile[1]*32,32,32);
+		lj.context.restore();
 	}
 
 	// Called to remove monster or chest, when hero is standing on it
 	function eraseTileItem(tile, isDead) {
 		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
 		paint(tile, isDead);
+
+		if (isDead) {
+			setTimeout(function() {
+				paintGameOver(tile);
+			},1000);
+		}
+
 	}
 
 	// Enter a room
