@@ -55,8 +55,16 @@ lj.hero = (function() {
 	}
 
 	function move(tile) {
-		var type = room[tile[0]][tile[1]];
-		var spriteImage = lj.getImage('dungeon-sprite.png');
+		var type;
+
+		try {
+			type = room[tile[0]][tile[1]];
+		}
+		catch (err) {
+			move(currentTile);
+			return;
+		}
+
 		// Find out what type of tile we're moving to
 		switch (type) {
 			case '#': return; break;
@@ -81,7 +89,9 @@ lj.hero = (function() {
 				lj.scene.exit(type);
 				break;
 			default:
-				interact(type);
+				console.log(currentTile);
+				move(currentTile);
+				break;
 		}
 	}
 
@@ -107,17 +117,17 @@ lj.hero = (function() {
 		else if (type === 'Enemy') {
 			var enemy = lj.enemy.get("brown");
 			var fight = lj.hero.fight(enemy);
-			fight.log.forEach(function(action) {
-				console.log(action.actor, action.type, action.damage);
-			});
+			// fight.log.forEach(function(action) {
+			// 	console.log(action.actor, action.type, action.damage);
+			// });
 			console.log(fight.outcome.actor, 'was victorious!');
 		}
 		else if (type === 'Boss') {
 			var enemy = lj.enemy.get("brown", true);
 			var fight = lj.hero.fight(enemy);
-			fight.log.forEach(function(action) {
-				console.log(action.actor, action.type, action.damage);
-			});
+			// fight.log.forEach(function(action) {
+			// 	console.log(action.actor, action.type, action.damage);
+			// });
 			console.log(fight.outcome.actor, 'was victorious!');
 		}
 		isBusy = false;
