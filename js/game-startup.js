@@ -14,7 +14,7 @@
 	function checkRestartButton(event) {
 		var eleClass = event.target.getAttribute('class');
 
-		if (eleClass === restart) {
+		if (eleClass === 'btn restart') {
 			lj.scene.reset();
 		}
 	}
