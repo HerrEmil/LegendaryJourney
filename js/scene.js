@@ -112,6 +112,45 @@ lj.scene = (function() {
 
 	}
 
+	function paintWin(tile) {
+		var room =  [['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
+					['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']];
+
+		var spriteImage = lj.getImage('dungeon-sprite.png');
+
+		// Paint scene
+		for (var rowCtr = 0; rowCtr < 11; rowCtr++) {
+			for (var colCtr = 0; colCtr < 11; colCtr++) {
+				lj.context.save();
+				var tileId = spriteMap[room[colCtr][rowCtr]],
+					sourceX = Math.floor(tileId[1]) * 32,
+					sourceY = Math.floor(tileId[0]) * 32;
+				lj.context.drawImage(spriteImage, sourceX, sourceY,32,32,colCtr*32,rowCtr*32,32,32);
+				lj.context.restore();
+			}
+		}
+
+		lj.context.save();
+		lj.context.drawImage(spriteImage, 17*32, 6*32,32,32,tile[0]*32,tile[1]*32,32,32);
+		lj.context.restore();
+
+		lj.context.font = "50px serif";
+		lj.context.fillStyle = "#FFA500";
+		lj.context.fillText('You win!', 80, 150);
+		lj.context.font = "14px serif";
+		lj.context.fillStyle = "#FFFFFF";
+		lj.context.fillText('You are a LEGENDARY warrior', 80, 200);
+	}
+
 	function paintGameOver(tile) {
 		var spriteImage = lj.getImage('dungeon-sprite.png');
 
@@ -181,6 +220,7 @@ lj.scene = (function() {
 		enter: enter,
 		exit: exit,
 		paint: paint,
+		paintWin: paintWin,
 		eraseTileItem: eraseTileItem,
 		levelUp: levelUp,
 		reset: reset
