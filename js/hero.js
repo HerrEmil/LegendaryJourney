@@ -34,9 +34,9 @@ lj.hero = (function() {
 		var currentRoom = lj.realm.getCurrentRoom();
 		room = lj.realm.getRoom(currentRoom);
 		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
-		console.log(currentRoom);
+		// console.log(currentRoom);
 		place(currentTile);
-		console.log(currentTile);
+		// console.log(currentTile);
 	}
 
 	// The hero exits the room...
