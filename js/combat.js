@@ -94,6 +94,7 @@ lj.hero.gear = {
 			"weapon" : null
 		};
 		lj.hero.gear.inventory = [];
+		lj.hero.stats.updateHealth();
 	}
 }
 lj.hero.stats = {
@@ -183,7 +184,7 @@ lj.hero.fight = function (enemy){
 		}
 		herosTurn = !herosTurn;
 	};
-	this.stats.hurt(heroDamageTaken);
+	//this.stats.hurt(heroDamageTaken); (Handled by the combat)
 	return {
 		outcome: {actor:lastAction.actor,damage:heroDamageTaken,type:"victory"},
 		log: log
@@ -213,7 +214,7 @@ lj.hero.duel = function (enemy,friend){
 	}
 	//Enemy has armor :(
 	//damage -= enemy["armor"]; //Flat reduction was too strong
-	damage = damage*(100-enemy["armor"])/100;
+	damage = Math.round(damage*(100-enemy["armor"])/100);
 	if(!type){
 		type = "hit";
 	}
