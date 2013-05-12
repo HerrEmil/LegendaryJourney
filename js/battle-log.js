@@ -16,7 +16,7 @@ lj.battleLog = (function () {
 		battleLog.scrollTop = battleLog.scrollHeight - battleLog.clientHeight;
 	}
 
-	function aqcuire(item) {
+	function acquire(item) {
 		var message = "You found " + item + "!";
 		printMessage(message);
 	}
@@ -24,7 +24,7 @@ lj.battleLog = (function () {
 	function autoEquip(item) {
 		var message1 = "It's better than what you have!",
 			message2 = "You equipped " + item + "!";
-		aqcuire(item);
+		acquire(item);
 		printMessage(message1);
 		printMessage(message2);
 	}
@@ -54,7 +54,7 @@ lj.battleLog = (function () {
 	}
 
 	return {
-		aqcuire : aqcuire,
+		acquire : acquire,
 		autoEquip : autoEquip,
 		monsterKilled : monsterKilled,
 		heroKilled : heroKilled,

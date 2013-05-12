@@ -84,3 +84,12 @@ h1 {
 	top:150px;
 	left:75px;
 }
+
+#battleLog {
+	position : absolute;
+	top : 150px;
+	left : 450px;
+	height: 350px;
+	width: 200px;
+	overflow: scroll;
+}
