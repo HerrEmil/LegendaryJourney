@@ -40,6 +40,22 @@ lj.realm = (function () {
 		currentRoom = 90,
 		bossRoom;
 
+	function pickRandomEnemyType() {
+		var randomNumber = Math.floor(Math.random() * 4);
+		switch (randomNumber) {
+		case 0:
+			return 'a';
+		case 1:
+			return 'b';
+		case 2:
+			return 'c';
+		case 3:
+			return 'd';
+		default:
+			return 'E';
+		}
+	}
+
 	function getRoomNumberFromPosition(x, y) {
 		return (y * size) + x;
 	}
@@ -117,12 +133,11 @@ lj.realm = (function () {
 
 			// Add an enemy in chest and monster structure, as long as it's not in the character's spawn point
 			if (roomX !== 5 || roomY !== 9) {
-				chestsAndMonsters[room][roomX][roomY] = 'E';
-			}
-
-			// If boss room, replace last placed enemy with boss
-			if ((room === bossRoom) && (i === enemies - 1)) {
-				chestsAndMonsters[room][roomX][roomY] = 'B';
+				chestsAndMonsters[room][roomX][roomY] = pickRandomEnemyType();
+				// If boss room, replace last placed enemy with boss
+				if ((room === bossRoom) && (i === enemies - 1)) {
+					chestsAndMonsters[room][roomX][roomY] = 'B';
+				}
 			}
 		}
 	}

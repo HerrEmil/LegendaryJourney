@@ -11,10 +11,20 @@
 		assetsPath: 'assets/'
 	}
 
+	function checkRestartButton(event) {
+		var eleClass = event.target.getAttribute('class');
+
+		if (eleClass === 'btn restart') {
+			lj.scene.reset();
+		}
+	}
+
 	var intro = document.getElementById('gameIntro'),
-		startBtn = intro.querySelector('.btn-start');
+		startBtn = intro.querySelector('.btn-start'),
+		battleLog = document.getElementById('battleLog');
 
 	startBtn.addEventListener('click', loadGame);
+	battleLog.addEventListener('click', checkRestartButton);
 
 	function loadGame() {
 
