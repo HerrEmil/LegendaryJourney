@@ -30,12 +30,38 @@ lj.hero.gear = {
 		} else{
 			old = this.equipped[item.slot];
 		}
-		if(old != null){this.pickup(old);
-		this.equipped[old.slot] = null;}
+		if(old != null){
+			this.inventory.push(item);
+			this.equipped[old.slot] = null;
+		}
 	},
 	pickup : function(item){
+<<<<<<< HEAD
 		console.log('Picking up', item)
 		this.inventory.push(item);
+=======
+		var current = this.equipped[item.slot],
+			curVal,
+			newVal;
+
+		if(current != null){
+			curVal = this.gscore(current);
+			newVal = this.gscore(item);
+		} else {
+			this.equip(item);
+			lj.battleLog.autoEquip(item.name);
+			return true;
+		}
+		if(newVal >= curVal){
+			this.equip(item);
+			lj.battleLog.autoEquip(item.name);
+			return true;
+		} else {
+			this.inventory.push(item);	
+			lj.battleLog.acquire(item.name);
+			return false;
+		}
+>>>>>>> f0db1b828a299928f5323d9075206d9d5beeaa86
 	},
 	drop : function(item){
 		var inventoryIndex;
@@ -45,39 +71,18 @@ lj.hero.gear = {
 			//Nuke it
 			this.inventory.splice(inventoryIndex, 1);
 		} else {
-			console.log("Item not in inventory");	
+			//console.log("Item not in inventory Probably because you just picked it up");	
 		}
 	},
-	fill : function(j){
-		var i;
-		for(i=0;i<j;i++){
-			this.pickup(lj.items.makeItem());
+	gscore : function(item){
+		//quick and dirty gear evaluator.
+		var i,
+			attrs = ["strength","agility","luck","hp","hit","crit","armor","defense","magicfind"],
+			score = 0;
+		for(i=0;i<9;i++){
+			score += item[attrs[i]];
 		}
-	},
-	test : function(j){
-		this.fill(j);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		lj.hero.gear.equip(lj.hero.gear.inventory[0]);
-		console.log(lj.hero.gear.inventory);
-		console.log(lj.hero.gear.equipped);
+		return score;
 	}
 }
 lj.hero.stats = {
@@ -93,6 +98,18 @@ lj.hero.stats = {
 		"magicfind" : 0
 	},
 	health : 100,
+	heal : function(amount){
+		this.health += amount;
+		if(this.health > this.self.hp){
+			this.health = this.self.hp;
+		}
+	},
+	hurt : function(amount){
+		this.health -= amount;
+		if(this.health <= 0){
+			this.health = 0;
+		};
+	},
 	buff : function(stat, value){
 		this.self[stat] += value;
 	},
@@ -175,18 +192,3 @@ lj.hero.duel = function (enemy,friend){
 	if(damage <= 0){damage=1};
 	return {damage:damage,type:type};
 }
-// lj.hero.logSummary = function(log){
-// 	var i,
-// 		heroDamage = 0,
-// 		enemyDamage = 0;
-// 	console.log('Winner was: '+log.outcome.actor);
-// 	for(var i=0;i<log.length-1;i++){
-// 		if(log[i].actor = "hero"){
-// 			heroDamage += log[i].damage;
-// 		} else {
-// 			enemyDamage += log[i].damage;
-// 		}
-// 	}
-// 	console.log('Hero did: '+heroDamage);
-// 	console.log('Enemy did: '+enemyDamage);
-// }
