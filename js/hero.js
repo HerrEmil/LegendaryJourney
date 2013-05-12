@@ -162,7 +162,7 @@ lj.hero = (function() {
 				fight = lj.hero.fight(enemy),
 				position = [tile[0] * 32, (tile[1] - 1) * 32];
 
-			fightEl.style.top = position[1] + 140 + 'px';
+			fightEl.style.top = position[1] + 150 + 'px';
 			fightEl.style.left = position[0] + 50 + 'px';
 
 			fight.log.forEach(function(log, index) {
