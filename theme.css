@@ -78,9 +78,14 @@ h1 {
 	left:75px;
 }
 
-#game {
+#game, #youDie {
 	background-color: #333;
 	position: absolute;
 	top:150px;
 	left:75px;
+}
+
+#youDie {
+	background-color: #fff;
+	display: none;
 }

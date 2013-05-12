@@ -106,10 +106,22 @@ lj.scene = (function() {
 
 	}
 
+	function paintGameOver() {
+		var spriteImage = lj.getImage('splatter.jpg');
+		lj.context.drawImage(spriteImage, 0, 0);
+	}
+
 	// Called to remove monster or chest, when hero is standing on it
 	function eraseTileItem(tile, isDead) {
 		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
 		paint(tile, isDead);
+
+		if (isDead) {
+			setTimeout(function() {
+				paintGameOver();
+			},1000);
+		}
+
 	}
 
 	// Enter a room

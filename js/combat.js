@@ -34,6 +34,7 @@ lj.hero.gear = {
 		this.equipped[old.slot] = null;}
 	},
 	pickup : function(item){
+		console.log('Picking up', item)
 		this.inventory.push(item);
 	},
 	drop : function(item){
