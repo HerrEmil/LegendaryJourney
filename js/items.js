@@ -32,6 +32,7 @@ window.lj = lj || {};
 				rolling = true,
 				mf = lj.hero.stats.get()["magicfind"];
 			//console.log("Initial roll: "+roll+" Magic Find: "+mf+" Adjusted roll: "+(roll+mf));
+			roll += mf*lj.realm.getSize();
 			total -= this.legendary.chance;
 			if(total < roll){
 				return "legendary";
