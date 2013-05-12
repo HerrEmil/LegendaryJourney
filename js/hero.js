@@ -1,5 +1,9 @@
 window.lj = lj || {};
 
+var fightEl = document.getElementById('fight'),
+	damageEl = fightEl.querySelector('.damage'),
+	hitEl = fightEl.querySelector('.hit');
+
 lj.hero = (function() {
 	'use strict'
 
@@ -79,8 +83,8 @@ lj.hero = (function() {
 		switch (type) {
 			case '#': return; break;
 			case ' ':
-				place(tile);
 				lj.hero.stats.heal(0.25);
+				place(tile);
 				// console.log('Hero moved to:', currentTile, currentDir);
 				break;
 			case 'D':
@@ -118,38 +122,69 @@ lj.hero = (function() {
 	function interact(item, tile) {
 		var currentRoom = lj.realm.getCurrentRoom(),
 			type = creaturesAndItemsMap[item];
+
+
+		function outcome(timeout) {
+			setTimeout(function() {
+				fightEl.setAttribute('class', '');
+				if (fight.outcome.actor === 'hero') {
+						lj.battleLog.monsterKilled(enemy.name);
+						lj.realm.clearTile(tile);
+						lj.scene.eraseTileItem(tile);
+						if (item === 'B') {
+							setTimeout(function() {
+								lj.scene.levelUp();
+								isBusy = false;
+							},1000)
+						}
+						else {
+							isBusy = false;
+						}
+				}
+				else {
+					lj.battleLog.heroKilled(enemy.name);
+					lj.scene.eraseTileItem(tile, true);
+				}
+				creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
+			},timeout);
+		}
+
 		if (type === 'Chest') {
 			var item = lj.items.makeItem();
 			lj.hero.gear.pickup(item);
 			lj.realm.clearTile(tile);
 			lj.scene.eraseTileItem(tile);		
 			isBusy = false;
+			creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
 		}
 		else if (type === 'Enemy') {
-			var enemy = lj.enemy.get("brown", item);
-			var fight = lj.hero.fight(enemy);
-			if (fight.outcome.actor === 'hero') {
-				setTimeout(function() {
-					lj.battleLog.monsterKilled(enemy.name);
-					lj.realm.clearTile(tile);
-					lj.scene.eraseTileItem(tile);
-					if (item === 'B') {
-						setTimeout(function() {
-							lj.scene.levelUp();
-							isBusy = false;
-						},1000)
-					}
-					else {
-						isBusy = false;
-					}
-				},1000);
+			var enemy = lj.enemy.get("brown", item),
+				fight = lj.hero.fight(enemy),
+				position = [tile[0] * 32, (tile[1] - 1) * 32];
+
+			fightEl.style.top = position[1] + 140 + 'px';
+			fightEl.style.left = position[0] + 50 + 'px';
+
+			fight.log.forEach(function(log, index) {
+				showFightStat(log, index * 400);
+			});
+
+			outcome(fight.log.length * 400)
+			
+		}
+	}
+
+	function showFightStat(log, timeout) {
+		setTimeout(function() {
+			if (log.actor === 'hero') {
+				hitEl.innerHTML = log.damage;
+				fightEl.setAttribute('class', 'dealing');
 			}
 			else {
-				lj.battleLog.heroKilled(enemy.name);
-				lj.scene.eraseTileItem(tile, true);
+				damageEl.innerHTML = log.damage;
+				fightEl.setAttribute('class', 'taking');
 			}
-		}
-		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
+		},timeout);
 	}
 
 	// Makes the hero step in a direction
