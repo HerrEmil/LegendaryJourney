@@ -136,7 +136,18 @@ lj.realm = (function () {
 				chestsAndMonsters[room][roomX][roomY] = pickRandomEnemyType();
 				// If boss room, replace last placed enemy with boss
 				if ((room === bossRoom) && (i === enemies - 1)) {
+					console.log('room: ' + room);
+					console.log('boosRoom: ' + bossRoom);
+					console.log('i: ' + i);
+					console.log('enemies - 1: ' + (enemies - 1));
+					console.log('placing B at ' + roomX + ', ' + roomY + ' which contains ' + chestsAndMonsters[room][roomX][roomY]);
+					console.log('Monster layout before boss: ');
+					printChestsAndMonsters(room);
 					chestsAndMonsters[room][roomX][roomY] = 'B';
+					console.log('Monster layout after boss:');
+					printChestsAndMonsters(room);
+					console.log('Room layout:');
+					printRoom(room);
 				}
 			}
 		}
