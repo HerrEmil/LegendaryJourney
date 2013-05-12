@@ -73,9 +73,9 @@ lj.realm = (function () {
 			chests = Math.floor(Math.random() * 2 + 1) + 4; // Between 4 and 6 chests
 
 		// Create a map of all possible spawn points
-		length = rooms.length;
-		for (x = 1; x <= length; x += 1) {
-			for (y = 1; y <= length; y += 1) {
+		length = rooms[room].length;
+		for (x = 1; x < length; x += 1) {
+			for (y = 1; y < length; y += 1) {
 				if (rooms[room][x][y] === ' ') {
 					spawnPoints.push({x : x, y : y});
 				}
