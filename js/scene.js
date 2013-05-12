@@ -46,13 +46,13 @@ lj.scene = (function() {
 
 	function levelUp() {
 		var currentLevel = lj.realm.getSize();
-		if (currentLevel === 3) {
-			console.log('You win!');
-			return;
-		}
-		else {
+		// if (currentLevel === 3) {
+			// console.log('You win!');
+			// return;
+		// }
+		// else {
 			lj.realm.makeRealm(currentLevel + 1);
-		}
+		// }
 		lj.hero.reset();
 		currentRoom = null;
 		room = null;
