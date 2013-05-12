@@ -173,5 +173,19 @@ lj.hero.duel = function (enemy,friend){
 	//stalemate protection
 	if(damage <= 0){damage=1};
 	return {damage:damage,type:type};
-
 }
+// lj.hero.logSummary = function(log){
+// 	var i,
+// 		heroDamage = 0,
+// 		enemyDamage = 0;
+// 	console.log('Winner was: '+log.outcome.actor);
+// 	for(var i=0;i<log.length-1;i++){
+// 		if(log[i].actor = "hero"){
+// 			heroDamage += log[i].damage;
+// 		} else {
+// 			enemyDamage += log[i].damage;
+// 		}
+// 	}
+// 	console.log('Hero did: '+heroDamage);
+// 	console.log('Enemy did: '+enemyDamage);
+// }
