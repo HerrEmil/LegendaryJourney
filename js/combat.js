@@ -80,6 +80,20 @@ lj.hero.gear = {
 			score += item[attrs[i]];
 		}
 		return score;
+	},
+	clear : function(){
+		lj.hero.gear.equipped = {
+			"head" : null,
+			"shoulder" : null,
+			"chest" : null,
+			"cloak" : null,
+			"gloves" : null,
+			"pants" : null,
+			"boots" : null,
+			"ring" : null,
+			"weapon" : null
+		};
+		lj.hero.gear.inventory = [];
 	}
 }
 lj.hero.stats = {
@@ -97,11 +111,15 @@ lj.hero.stats = {
 	health : 100,
 	updateHealth : function (){
 		var percent,
-			current =this.health,
+			current =Math.floor(this.health),
 			max = lj.hero.stats.get().hp;
 		percent = Math.round((current / max)*100)
 		document.getElementById("healthBar").style.width=2*percent+"px";
-		document.getElementById("stay").innerHTML =current+"/"+max;
+		if(current==0){
+			document.getElementById("stay").innerHTML = "DEAD";
+		} else {
+			document.getElementById("stay").innerHTML = current+"/"+max;
+		}
 	},
 	heal : function(amount){
 		var maxhp = lj.hero.stats.get().hp;
@@ -110,11 +128,11 @@ lj.hero.stats = {
 			this.health = lj.hero.stats.get().hp;
 		}
 		this.updateHealth();
-	},
+	}, //Rememer to keep track of decimals and keep pretty numbers
 	hurt : function(amount){
 		this.health -= amount;
 		if(this.health <= 0){
-			this.health = -1;
+			this.health = 0;
 		};
 		this.updateHealth();
 	},
@@ -142,7 +160,7 @@ lj.hero.stats = {
 lj.hero.fight = function (enemy){
 	//Lets meet the contenders:
 	var enemyHealth = enemy["hp"],
-		heroHealth = lj.hero.stats.health,
+		heroHealth = Math.floor(lj.hero.stats.health),
 		heroStats = lj.hero.stats.get(), //Snapshotting hero's stats so changing gear between strikes won't work
 		herosTurn = true,
 		lastAction,
@@ -194,7 +212,8 @@ lj.hero.duel = function (enemy,friend){
 		type = "crit"
 	}
 	//Enemy has armor :(
-	damage -= enemy["armor"];
+	//damage -= enemy["armor"]; //Flat reduction was too strong
+	damage = damage*(100-enemy["armor"])/100;
 	if(!type){
 		type = "hit";
 	}

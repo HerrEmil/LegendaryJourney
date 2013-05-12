@@ -28,11 +28,11 @@ window.lj = lj || {};
 		"legendary" : 	{"mod" :4, 		"chance":10},
 		get : function(){
 			var total = this.poor.chance + this.normal.chance + this.rare.chance + this.epic.chance + this.legendary.chance,
-				roll = lj.util.randomInterval(1,total),
+				roll,
 				rolling = true,
-				mf = lj.hero.stats.get()["magicfind"];
+				mf = (lj.hero.stats.get()["magicfind"]+1)*Math.pow(2,lj.realm.getSize()-1);
 			//console.log("Initial roll: "+roll+" Magic Find: "+mf+" Adjusted roll: "+(roll+mf));
-			roll += mf*lj.realm.getSize();
+			roll = lj.util.randomInterval(mf,total);
 			total -= this.legendary.chance;
 			if(total < roll){
 				return "legendary";
