@@ -78,7 +78,7 @@ lj.hero = (function() {
 			case '#': return; break;
 			case ' ':
 				place(tile);
-				lj.hero.stats.heal(1);
+				lj.hero.stats.heal(0.5);
 				// console.log('Hero moved to:', currentTile, currentDir);
 				break;
 			case 'D':
@@ -143,7 +143,7 @@ lj.hero = (function() {
 				},1000);
 			}
 			else {
-				lj.battleLog.monsterKilled(enemy.name);
+				lj.battleLog.heroKilled(enemy.name);
 				lj.scene.eraseTileItem(tile, true);
 			}
 		}
