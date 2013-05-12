@@ -80,6 +80,20 @@ lj.hero.gear = {
 			score += item[attrs[i]];
 		}
 		return score;
+	},
+	clear : function(){
+		lj.hero.gear.equipped = {
+			"head" : null,
+			"shoulder" : null,
+			"chest" : null,
+			"cloak" : null,
+			"gloves" : null,
+			"pants" : null,
+			"boots" : null,
+			"ring" : null,
+			"weapon" : null
+		};
+		lj.hero.gear.inventory = [];
 	}
 }
 lj.hero.stats = {
