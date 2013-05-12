@@ -93,6 +93,7 @@ lj.hero = (function() {
 				lj.scene.exit(type);
 				break;
 			default:
+				move(currentTile);
 				break;
 		}
 	}
@@ -112,7 +113,6 @@ lj.hero = (function() {
 		if (type === 'Chest') {
 			var item = lj.items.makeItem();
 			lj.hero.gear.pickup(item);
-			console.log(item.name);
 			lj.realm.clearTile(tile);
 			lj.scene.eraseTileItem(tile);
 		}
