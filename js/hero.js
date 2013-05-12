@@ -74,6 +74,7 @@ lj.hero = (function() {
 			case '#': return; break;
 			case ' ':
 				place(tile);
+				lj.hero.stats.heal(1);
 				// console.log('Hero moved to:', currentTile, currentDir);
 				break;
 			case 'D':
