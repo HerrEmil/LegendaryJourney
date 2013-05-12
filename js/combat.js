@@ -138,8 +138,10 @@ lj.hero.fight = function (enemy){
 		herosTurn = !herosTurn;
 	};
 	
-	log.push({actor:lastAction.actor,damage:0,type:"victory"});
-	return log;
+	return {
+		outcome: {actor:lastAction.actor,damage:0,type:"victory"},
+		log: log
+	}
 }
 lj.hero.duel = function (enemy,friend){
 	//Perform an attack, evaluate the damage and return the results

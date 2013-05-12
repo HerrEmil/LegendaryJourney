@@ -103,6 +103,22 @@ lj.hero = (function() {
 			var item = lj.items.makeItem();
 			console.log(item.name);
 		}
+		else if (type === 'Enemy') {
+			var enemy = lj.enemy.get("brown");
+			var fight = lj.hero.fight(enemy);
+			fight.log.forEach(function(action) {
+				console.log(action.actor, action.type, action.damage);
+			});
+			console.log(fight.outcome.actor, 'was victorious!');
+		}
+		else if (type === 'Boss') {
+			var enemy = lj.enemy.get("brown", true);
+			var fight = lj.hero.fight(enemy);
+			fight.log.forEach(function(action) {
+				console.log(action.actor, action.type, action.damage);
+			});
+			console.log(fight.outcome.actor, 'was victorious!');
+		}
 		isBusy = false;
 	}
 
