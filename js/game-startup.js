@@ -28,9 +28,7 @@
 	battleLog.addEventListener('click', checkRestartButton);
 
 	function loadGame() {
-
 		loadImages();
-
 	}
 
 	function loadImages() {
