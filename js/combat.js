@@ -48,15 +48,18 @@ lj.hero.gear = {
 		} else {
 			this.equip(item);
 			lj.battleLog.autoEquip(item.name, item.quality);
+			lj.hero.updateCharPane()
 			return true;
 		}
 		if(newVal >= curVal){
 			this.equip(item);
 			lj.battleLog.autoEquip(item.name, item.quality);
+			lj.hero.updateCharPane()
 			return true;
 		} else {
 			this.inventory.push(item);	
 			lj.battleLog.acquire(item.name, item.quality);
+			lj.hero.updateCharPane()
 			return false;
 		}
 	},
@@ -95,6 +98,7 @@ lj.hero.gear = {
 		};
 		lj.hero.gear.inventory = [];
 		lj.hero.stats.updateHealth();
+		lj.hero.updateCharPane()
 	}
 }
 lj.hero.stats = {
@@ -221,4 +225,75 @@ lj.hero.duel = function (enemy,friend){
 	//stalemate protection
 	if(damage <= 0){damage=1};
 	return {damage:damage,type:type};
+}
+//For lack of better, charPane goes here
+lj.hero.updateCharPane = function(){
+	
+	var statStr = '',
+		gearStr = '',
+		gear = lj.hero.gear.equipped,
+		hero = lj.hero.stats.get();
+	//Update the Stat pane
+	statStr += '<span class="header">Your current stats</span><br>';
+	statStr += '<span class="stat">Strength:</span>'+hero.strength+'<br>';
+	statStr += '<span class="stat">Agility:</span>'+hero.agility+'<br>';
+	statStr += '<span class="stat">Luck:</span>'+hero.luck+'<br>';
+	statStr += '<span class="stat">Hit Points:</span>'+hero.hp+'<br>';
+	statStr += '<span class="stat">Hit Increase:</span>'+hero.hit+'<br>';
+	statStr += '<span class="stat">Crit Increase:</span>'+hero.crit+'<br>';
+	statStr += '<span class="stat">Armor:</span>'+hero.armor+'<br>';
+	statStr += '<span class="stat">Defense:</span>'+hero.defense+'<br>';
+	statStr += '<span class="stat">Magic Find:</span>'+hero.magicfind;
+	document.getElementById("stats").innerHTML = statStr;
+
+	//Update the gear pane
+	
+	gearStr += '<span class="header">Your current gear</span><br>';
+	if(gear.head !== null){
+		gearStr += '<span class="slot head">Head:</span><span class="'+gear.head.quality+'">'+gear.head.name+'</span><br>';
+	} else {
+		gearStr += '<span class="slot">Head:</span>None!<br>';
+	}
+	if(gear.shoulder !== null){
+		gearStr += '<span class="slot shoulder">Shoulders:</span><span class="'+gear.shoulder.quality+'">'+gear.shoulder.name+'</span><br>';
+	} else {
+		gearStr += '<span class="slot">Shoulders:</span>None!<br>';
+	}
+	if(gear.cloak !== null){
+		gearStr += '<span class="slot back">Back:</span><span class="'+gear.cloak.quality+'">'+gear.cloak.name+'</span><br>';
+	} else {
+		gearStr += '<span class="slot">Back:</span>None!<br>';
+	}
+	if(gear.chest !== null){
+		gearStr += '<span class="slot chest">Chest:</span><span class="'+gear.chest.quality+'">'+gear.chest.name+'</span><br>';
+	} else {
+		gearStr += '<span class="slot">Chest:</span>None!<br>';
+	}
+	if(gear.gloves !== null){
+		gearStr += '<span class="slot gloves">Gloves:</span><span class="'+gear.gloves.quality+'">'+gear.gloves.name+'</span><br>';
+	} else {
+		gearStr += '<span class="slot">Gloves:</span>None!<br>';
+	}
+	if(gear.pants !== null){
+		gearStr += '<span class="slot pants">Pants:</span><span class="'+gear.pants.quality+'">'+gear.pants.name+'</span><br>';
+	} else {
+		gearStr += '<span class="slot">Pants:</span>None!<br>';
+	}
+	if(gear.boots !== null){
+		gearStr += '<span class="slot boots">Boots:</span><span class="'+gear.boots.quality+'">'+gear.boots.name+'</span><br>';
+	} else {
+		gearStr += '<span class="slot">Boots:</span>None!<br>';
+	}
+	if(gear.ring !== null){
+		gearStr += '<span class="slot ring">Ring:</span><span class="'+gear.ring.quality+'">'+gear.ring.name+'</span><br>';
+	} else {
+		gearStr += '<span class="slot">Ring:</span>None!<br>';
+	}
+	if(gear.weapon !== null){
+		gearStr += '<span class="slot weapon">Weapon:</span><span class="'+gear.weapon.quality+'">'+gear.weapon.name+'</span>';
+	} else {
+		gearStr += '<span class="slot">Weapon:</span>None!';
+	}
+
+	document.getElementById("gear").innerHTML = gearStr;
 }
