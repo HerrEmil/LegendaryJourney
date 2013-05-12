@@ -108,19 +108,23 @@ h1 {
 			    transition: 0.3s;
 	}
 	.damage {
+		background-color: rgba(194,5,26,0.7);
 		float: right;
-		color: red;
+		/*color: red;*/
 	}
 	.hit {
+		background-color: rgba(5,180,5,0.7);
 		float: left;
-		color: green;
+		/*color: green;*/
 	}
 
 	.dealing .hit {
 		opacity: 1;
+		-webkit-transform:translate3d(-20px, -30px, 0);
 	}
 	.taking .damage {
-		opacity: 1
+		opacity: 1;
+		-webkit-transform:translate3d(20px, 30px, 0);
 	}
 
 #battleLog {
