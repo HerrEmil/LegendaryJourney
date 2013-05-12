@@ -133,7 +133,8 @@ lj.hero.fight = function (enemy){
 		heroStats = lj.hero.stats.get(), //Snapshotting hero's stats so changing gear between strikes won't work
 		herosTurn = true,
 		lastAction,
-		log = [];
+		log = [],
+		heroDamageTaken = 0;
 
 	while(enemyHealth > 0 && heroHealth > 0){
 		lastAction = null;
@@ -147,12 +148,13 @@ lj.hero.fight = function (enemy){
 			lastAction.actor = "enemy";
 			log.push(lastAction);
 			heroHealth -= lastAction.damage;
+			heroDamageTaken += lastAction.damage;
 		}
 		herosTurn = !herosTurn;
 	};
-	
+	this.stats.hurt(heroDamageTaken);
 	return {
-		outcome: {actor:lastAction.actor,damage:0,type:"victory"},
+		outcome: {actor:lastAction.actor,damage:heroDamageTaken,type:"victory"},
 		log: log
 	}
 }
