@@ -96,10 +96,10 @@ h1 {
 	width: 80px;
 }
 	.damage, .hit {
-		background-color: rgba(0,0,0,0.7);
+		/*background-color: rgba(0,0,0,0.7);*/
 		border-radius: 4px;
 		padding: 5px;
-		text-shadow:1px 1px #fff;
+		/*text-shadow:1px 1px #fff;*/
 		opacity: 0;
 		-webkit-transition: 0.3s;
 		   -moz-transition: 0.3s;
@@ -108,12 +108,12 @@ h1 {
 			    transition: 0.3s;
 	}
 	.damage {
-		background-color: rgba(194,5,26,0.7);
+		/*background-color: rgba(194,5,26,0.7);*/
 		float: right;
 		/*color: red;*/
 	}
 	.hit {
-		background-color: rgba(5,180,5,0.7);
+		/*background-color: rgba(5,180,5,0.7);*/
 		float: left;
 		/*color: green;*/
 	}
