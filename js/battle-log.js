@@ -24,6 +24,7 @@ lj.battleLog = (function () {
 	function autoEquip(item) {
 		var message1 = "It's better than what you have!",
 			message2 = "You equipped " + item + "!";
+		aqcuire(item);
 		printMessage(message1);
 		printMessage(message2);
 	}
