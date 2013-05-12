@@ -24,6 +24,10 @@ lj.hero = (function() {
 
 	setupListeners();
 
+	function reset() {
+		currentTile = [5,9];
+	}
+
 	// The hero enters the room...
 	function enter(door) {
 		// Get the starting tile from realm.js (get door tile)
@@ -137,6 +141,9 @@ lj.hero = (function() {
 			if (fight.outcome.actor === 'hero') {
 				lj.realm.clearTile(tile);
 				lj.scene.eraseTileItem(tile);
+				setTimeout(function() {
+					lj.scene.levelUp();
+				},1000)
 			}
 			else {
 				lj.scene.eraseTileItem(tile, true);
@@ -177,6 +184,7 @@ lj.hero = (function() {
 	return {
 		enter: enter,
 		step: step,
-		exit: exit
+		exit: exit,
+		reset: reset
 	}
 }());

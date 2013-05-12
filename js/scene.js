@@ -44,6 +44,22 @@ lj.scene = (function() {
 		room = null,
 		creaturesAndItems = null;
 
+	function levelUp() {
+		var currentLevel = lj.realm.getSize();
+		if (currentLevel === 3) {
+			console.log('You win!');
+			return;
+		}
+		else {
+			lj.realm.makeRealm(currentLevel + 1);
+		}
+		lj.hero.reset();
+		currentRoom = null;
+		room = null;
+		creaturesAndItems = null;
+		enter('D');
+	}
+
 	// Get the opposite door (for when entering and exiting)
 	function oppositeDoor(door) {
 		var opposites = {
@@ -132,7 +148,8 @@ lj.scene = (function() {
 		enter: enter,
 		exit: exit,
 		paint: paint,
-		eraseTileItem: eraseTileItem
+		eraseTileItem: eraseTileItem,
+		levelUp: levelUp
 	}
 
 }());
