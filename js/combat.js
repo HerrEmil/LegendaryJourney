@@ -99,7 +99,7 @@ lj.hero.gear = {
 			"ring" : null,
 			"weapon" : null
 		};
-		lj.hero.legendary.slots = {
+		lj.hero.gear.legendary.slots = {
 			"head" : null,
 			"shoulder" : null,
 			"chest" : null,
@@ -135,8 +135,8 @@ lj.hero.gear = {
 		add : function(item){
 			this.slots[item.slot] = item;
 			if(this.count() == 9){
-				lj.scene.paintWin();
 				lj.battleLog.gameComplete();
+				lj.scene.paintWin();
 			}
 		}
 	}
