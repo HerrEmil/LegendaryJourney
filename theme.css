@@ -256,6 +256,7 @@ h1 {
 	left : 0px;
 	height: 80px;
 	width: 200px;
+	text-align: right;
 }
 .slot {
 	display: inline-block;
@@ -263,7 +264,8 @@ h1 {
 }
 .stat {
 	display: inline-block;
-	width: 95px;
+	width: 86px;
+	text-align: left;
 }
 .header {
 	color: black;
@@ -272,6 +274,7 @@ h1 {
 	/*font-weight: bold;
 	font-family: serif;
 	font-size: 12px;*/
+	text-align: left;
 }
 
 ::-webkit-scrollbar { 
