@@ -145,11 +145,12 @@ h1 {
 
 #battleLog {
 	position : absolute;
-	top : 150px;
-	left : 655px;
-	height: 350px;
+	top : 250px;
+	left : 450px;
+	height: 250px;
 	width: 200px;
 	overflow-y: scroll;
+	border-top: double gray 1px;
 	/*font-size: 8px;
 	font-family: 'pf_tempesta_sevenregular', 'Monaco', 'arial', 'sans-serif';*/
 }
@@ -179,7 +180,7 @@ h1 {
 	left : 450px;
 	height: 15px;
 	width: 200px;
-	font-size: 10px;
+	font-size: 8px;
 	background-color : rgba(255,255,255,0.5);
 	text-align: center;
 	border-radius: 3px;
@@ -228,11 +229,10 @@ h1 {
 }
 #charPane {
 	position : absolute;
-	top : 170px;
+	top : 150px;
 	left : 450px;
-	height: 330px;
-	width: 200px;
-	overflow: hidden;
+	height: 350px;
+	width: 400px;
 	/*font-size: 10px;*/
 	-webkit-transition: 0.3s;
 	   -moz-transition: 0.3s;
@@ -243,13 +243,13 @@ h1 {
 #gear{
 	position : absolute;
 	top : 0px;
-	left : 0px;
-	height: 250px;
+	left : 205px;
+	height: 350px;
 	width: 200px;
 }
 #stats{
 	position : absolute;
-	top : 250px;
+	top : 20px;
 	left : 0px;
 	height: 80px;
 	width: 200px;
@@ -260,7 +260,7 @@ h1 {
 }
 .stat {
 	display: inline-block;
-	width: 80px;
+	width: 95px;
 }
 .header {
 	color: black;
