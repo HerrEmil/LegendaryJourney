@@ -39,10 +39,9 @@ lj.battleLog = (function () {
 	}
 
 	function heroKilled(monster) {
-		var message1 = "You were killed by " + monster + " :(",
-			message2 = '<br/><div class="btn restart">Try again!</div>';
+		var message1 = "You were killed by " + monster + " :(";
 		printMessage(message1);
-		printMessage(message2);
+		printMessage('<br/><div class="btn restart">Try again!</div>');
 	}
 
 	function levelComplete(level) {
@@ -53,6 +52,7 @@ lj.battleLog = (function () {
 	function gameComplete() {
 		printMessage("You completed the game!");
 		printMessage("You are AWESOME! Congratulations!");
+		printMessage('<br/><div class="btn restart">Play again!</div>');
 	}
 
 	function customMessage(message) {
