@@ -42,8 +42,8 @@
 		progress.style.display = 'block';
 
 		images = [
-			'dungeon-sprite.png',
-			'hero-walk.png',
+			'dungeon-sprite.png'
+			// 'hero-walk.png',
 			// 'armor-sprite.png',
 			// 'camp-fire.png',
 			// 'crystal-blue.png',
@@ -53,7 +53,7 @@
 			// 'crystal-pink.png',
 			// 'crystal-yellow.png',
 			// 'orc-sprite.png'
-			'splatter.jpg'
+			// 'splatter.jpg'
 		];
 
 		images.forEach(function(image) {
