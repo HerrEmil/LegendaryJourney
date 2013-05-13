@@ -106,7 +106,7 @@ lj.hero.stats = {
 		"strength" : 5,
 		"agility" : 5,
 		"luck" : 0,
-		"hp" : 100,
+		"hp" : 0,
 		"hit" : 5,
 		"crit" : 0,
 		"armor" : 0,
@@ -117,7 +117,7 @@ lj.hero.stats = {
 	updateHealth : function (){
 		var percent,
 			current =Math.floor(this.health),
-			max = lj.hero.stats.get().hp;
+			max = 100+(lj.hero.stats.get().hp)*5;
 		percent = Math.round((current / max)*100)
 		document.getElementById("healthBar").style.width=2*percent+"px";
 		if(current==0){
@@ -127,10 +127,10 @@ lj.hero.stats = {
 		}
 	},
 	heal : function(amount){
-		var maxhp = lj.hero.stats.get().hp;
+		var maxhp = 100+(lj.hero.stats.get().hp)*5;
 		this.health += amount;
-		if(this.health > lj.hero.stats.get().hp){
-			this.health = lj.hero.stats.get().hp;
+		if(this.health > maxhp){
+			this.health = maxhp;
 		}
 		this.updateHealth();
 	}, //Rememer to keep track of decimals and keep pretty numbers
