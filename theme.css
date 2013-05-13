@@ -256,7 +256,6 @@ h1 {
 	left : 0px;
 	height: 80px;
 	width: 200px;
-	text-align: right;
 }
 .slot {
 	display: inline-block;
@@ -264,8 +263,14 @@ h1 {
 }
 .stat {
 	display: inline-block;
-	width: 86px;
+	width: 80px;
 	text-align: left;
+}
+.right {
+	text-align: right;
+	width: 10px;
+	display: inline-block;
+	padding-right: 10px;
 }
 .header {
 	color: black;

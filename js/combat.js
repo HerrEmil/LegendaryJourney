@@ -244,15 +244,15 @@ lj.hero.updateCharPane = function(){
 		hero = lj.hero.stats.get();
 	//Update the Stat pane
 	statStr += '<div class="header">Your current stats</div>';
-	statStr += '<span class="stat">Strength:</span>'+hero.strength+'&nbsp&nbsp';
-	statStr += '<span class="stat">Agility:</span>'+hero.agility+'&nbsp&nbsp<br>';
-	//statStr += '<span class="stat">Luck:  &nbsp&nbsp'+hero.luck+'</span>';
-	statStr += '<span class="stat">Hit Points:</span>'+hero.hp+'&nbsp&nbsp';
-	statStr += '<span class="stat">Hit Increase:</span>'+hero.hit+'&nbsp&nbsp<br>';
-	statStr += '<span class="stat">Crit Increase:</span>'+hero.crit+'&nbsp&nbsp';
-	statStr += '<span class="stat">Armor:</span>'+hero.armor+'&nbsp&nbsp<br>';
-	statStr += '<span class="stat">Defense:</span>'+hero.defense+'&nbsp&nbsp';
-	statStr += '<span class="stat">Magic Find:</span>'+hero.magicfind+'&nbsp&nbsp';
+	statStr += '<span class="stat">Strength:</span><span class="right">'+hero.strength+'</span>';
+	statStr += '<span class="stat">Agility:</span><span class="right">'+hero.agility+'</span><br>';
+	//statStr += '<span class="stat">Luck:  </span>'+hero.luck+'</span>';
+	statStr += '<span class="stat">Hit Points:</span><span class="right">'+hero.hp+'</span>';
+	statStr += '<span class="stat">Hit Increase:</span><span class="right">'+hero.hit+'</span><br>';
+	statStr += '<span class="stat">Crit Increase:</span><span class="right">'+hero.crit+'</span>';
+	statStr += '<span class="stat">Armor:</span><span class="right">'+hero.armor+'</span><br>';
+	statStr += '<span class="stat">Defense:</span><span class="right">'+hero.defense+'</span>';
+	statStr += '<span class="stat">Magic Find:</span><span class="right">'+hero.magicfind+'</span>';
 	document.getElementById("stats").innerHTML = statStr;
 
 	//Update the gear pane
