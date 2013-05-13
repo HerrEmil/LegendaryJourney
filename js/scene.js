@@ -112,7 +112,7 @@ lj.scene = (function() {
 
 	}
 
-	function paintWin(tile) {
+	function paintWin() {
 		var room =  [['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
 					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
 					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
@@ -126,6 +126,8 @@ lj.scene = (function() {
 					['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']];
 
 		var spriteImage = lj.getImage('dungeon-sprite.png');
+
+		var tile = [5,2];
 
 		// Paint scene
 		for (var rowCtr = 0; rowCtr < 11; rowCtr++) {
