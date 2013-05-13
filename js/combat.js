@@ -128,7 +128,7 @@ lj.hero.stats = {
 	},
 	heal : function(amount){
 		var maxhp = 100+(lj.hero.stats.get().hp)*5;
-		this.health = this.health * (100+amount)/100;
+		this.health += maxhp * (amount)/100;
 		if(this.health > maxhp){
 			this.health = maxhp;
 		}
