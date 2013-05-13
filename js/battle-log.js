@@ -24,33 +24,33 @@ lj.battleLog = (function () {
 	}
 
 	function acquire(item, quality) {
-		var message = 'You found <span class="' + quality + '">' + item + '</span>!';
+		var message = 'Found <span class="' + quality + '">' + item + '</span>.';
 		printMessage(message);
 	}
 
 	function autoEquip(item, quality) {
-		var message = 'You found and equipped <span class="' + quality + '">' + item + '</span>!';
+		var message = 'You equipped the <span class="' + quality + '">' + item + '</span>!';
 		printMessage(message);
 	}
 
 	function monsterKilled(monster) {
-		var message = "Slayed " + monster + "!";
+		var message = "Slayed the " + monster + "!";
 		printMessage(message);
 	}
 
 	function heroKilled(monster) {
-		var message1 = "You were killed by " + monster + " :(";
+		var message1 = "You were killed by the " + monster + " :(";
 		printMessage(message1);
 		printMessage('<br/><div class="btn restart">Try again!</div>');
 	}
 
 	function levelComplete(level) {
-		var message = "You finished level " + level + "! :D";
+		var message = "You finished level " + level + "! :)";
 		printMessage(message);
 	}
 
 	function gameComplete() {
-		printMessage("You completed the game!");
+		printMessage("You completed the game! :D");
 		printMessage("You are AWESOME! Congratulations!");
 		printMessage('<br/><div class="btn restart">Play again!</div>');
 	}

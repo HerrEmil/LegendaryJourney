@@ -64,6 +64,7 @@ lj.scene = (function() {
 		room = null;
 		creaturesAndItems = null;
 		enter('D');
+		lj.battleLog.levelComplete(currentLevel);
 	}
 
 	// Get the opposite door (for when entering and exiting)
