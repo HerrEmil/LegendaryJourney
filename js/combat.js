@@ -97,6 +97,7 @@ lj.hero.gear = {
 			"weapon" : null
 		};
 		lj.hero.gear.inventory = [];
+		lj.hero.stats.health = 100;
 		lj.hero.stats.updateHealth();
 		lj.hero.updateCharPane()
 	}
@@ -128,10 +129,18 @@ lj.hero.stats = {
 	},
 	heal : function(amount){
 		var maxhp = 100+(lj.hero.stats.get().hp)*5;
+		//Percentage based heal
+		// this.health += maxhp * (amount)/100;
+		// if(this.health > maxhp){
+		// 	this.health = maxhp;
+		// } 
+
+		//Number based heal
 		this.health += amount;
 		if(this.health > maxhp){
 			this.health = maxhp;
-		}
+		} 
+
 		this.updateHealth();
 	}, //Rememer to keep track of decimals and keep pretty numbers
 	hurt : function(amount){
