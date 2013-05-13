@@ -22,6 +22,9 @@ lj.hero.gear = {
 		//and remove from inventory
 		this.drop(item);
 		lj.hero.stats.updateHealth();
+		if(item.quality == "legendary"){
+			this.legendary.add(item);
+		};
 	},
 	unequip : function(item){
 		var old;
@@ -100,6 +103,31 @@ lj.hero.gear = {
 		lj.hero.stats.health = 100;
 		lj.hero.stats.updateHealth();
 		lj.hero.updateCharPane()
+	},
+	legendary : {
+		slots :{
+			"head" : null,
+			"shoulder" : null,
+			"chest" : null,
+			"cloak" : null,
+			"gloves" : null,
+			"pants" : null,
+			"boots" : null,
+			"ring" : null,
+			"weapon" : null
+		},
+		count : function(){
+			var count = _.filter(this.slots, function(num){ return num !== null; });
+			var realCount = count.length;
+			return realCount;
+		},
+		add : function(item){
+			this.slots[item.slot] = item;
+			if(this.count() == 9){
+				lj.scene.paintWin();
+				lj.battleLog.gameComplete();
+			}
+		}
 	}
 }
 lj.hero.stats = {
