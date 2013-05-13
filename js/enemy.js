@@ -2,7 +2,7 @@ window.lj = lj || {};
 lj.enemy = {};
 
 lj.enemy.base = function(type,mod){
-	var realmMod = Math.pow(1+0.5,lj.realm.getSize()-1);
+	var realmMod = Math.pow(1+0.4,lj.realm.getSize()-2);
 	this.strength = Math.round(type.stats[0]*mod.stats[0]*realmMod);
 	this.agility = Math.round(type.stats[1]*mod.stats[1]*realmMod);
 	this.hp = Math.round(type.stats[2]*mod.stats[2]*realmMod);
