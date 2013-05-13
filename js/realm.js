@@ -85,7 +85,7 @@ lj.realm = (function () {
 			roomX,
 			roomY,
 			// Pick a semi-random number or enemies and chests
-			enemies = Math.floor(Math.random() * 6 + 1) + 8, // Between 8 and 12 enemies
+			enemies = Math.floor(Math.random() * 4 + 1) + 4, // Between 4 and 8 enemies
 			chests = Math.floor(Math.random() * 2 + 1) + 4; // Between 4 and 6 chests
 
 		// Create a map of all possible spawn points
