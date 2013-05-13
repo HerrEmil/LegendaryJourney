@@ -97,6 +97,7 @@ lj.hero.gear = {
 			"weapon" : null
 		};
 		lj.hero.gear.inventory = [];
+		lj.hero.stats.health = 100;
 		lj.hero.stats.updateHealth();
 		lj.hero.updateCharPane()
 	}
@@ -133,7 +134,7 @@ lj.hero.stats = {
 		// if(this.health > maxhp){
 		// 	this.health = maxhp;
 		// } 
-		
+
 		//Number based heal
 		this.health += amount;
 		if(this.health > maxhp){
