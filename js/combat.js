@@ -136,7 +136,7 @@ lj.hero.gear = {
 			this.slots[item.slot] = item;
 			if(this.count() == 9){
 				lj.battleLog.gameComplete();
-				lj.scene.paintWin();
+				setTimeout(lj.scene.paintWin,300);
 			}
 		}
 	}
