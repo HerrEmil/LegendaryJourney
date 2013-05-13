@@ -49,14 +49,14 @@ lj.hero.gear = {
 			curVal = this.gscore(current);
 			newVal = this.gscore(item);
 		} else {
-			this.equip(item);
 			lj.battleLog.autoEquip(item.name, item.quality);
+			this.equip(item);
 			lj.hero.updateCharPane()
 			return true;
 		}
 		if(newVal >= curVal){
-			this.equip(item);
 			lj.battleLog.autoEquip(item.name, item.quality);
+			this.equip(item);
 			lj.hero.updateCharPane()
 			return true;
 		} else {
@@ -89,6 +89,17 @@ lj.hero.gear = {
 	},
 	clear : function(){
 		lj.hero.gear.equipped = {
+			"head" : null,
+			"shoulder" : null,
+			"chest" : null,
+			"cloak" : null,
+			"gloves" : null,
+			"pants" : null,
+			"boots" : null,
+			"ring" : null,
+			"weapon" : null
+		};
+		lj.hero.legendary.slots = {
 			"head" : null,
 			"shoulder" : null,
 			"chest" : null,
