@@ -170,9 +170,14 @@ lj.hero = (function() {
 				showFightStat(log, index * 400);
 			});
 
-			outcome((fight.log.length + 1) * 400);
+			outcome((fight.log.length + 0.3) * 400);
 			
 		}
+	}
+
+	// Our Hero is Legendary
+	function ascend() {
+		isBusy = true;
 	}
 
 	function showFightStat(log, timeout) {
@@ -221,6 +226,7 @@ lj.hero = (function() {
 		enter: enter,
 		step: step,
 		exit: exit,
-		reset: reset
+		reset: reset,
+		ascend: ascend
 	}
 }());
