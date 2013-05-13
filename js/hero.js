@@ -144,6 +144,7 @@ lj.hero = (function() {
 				else {
 					lj.battleLog.heroKilled(enemy.name);
 					lj.scene.eraseTileItem(tile, true);
+					lj.hero.updateCharPane();
 				}
 				creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
 			},timeout);
