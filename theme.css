@@ -230,14 +230,14 @@ h1 {
 	position : absolute;
 	top : 0px;
 	left : 0px;
-	height: 195px;
+	height: 250px;
 	width: 200px;
 }
 #stats{
 	position : absolute;
-	top : 195px;
+	top : 250px;
 	left : 0px;
-	height: 135px;
+	height: 80px;
 	width: 200px;
 }
 .slot {
