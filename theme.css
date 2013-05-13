@@ -16,6 +16,9 @@ body {
 	font-family: 'pf_tempesta_sevenregular', 'Monaco', 'arial', 'sans-serif';
 	font-smooth: never;
 	-webkit-font-smoothing : none;
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility:    hidden;
+	-ms-backface-visibility:     hidden;
 }
 
 
