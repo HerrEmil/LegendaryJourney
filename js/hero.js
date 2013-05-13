@@ -170,7 +170,7 @@ lj.hero = (function() {
 				showFightStat(log, index * 400);
 			});
 
-			outcome(fight.log.length * 400)
+			outcome((fight.log.length + 1) * 400);
 			
 		}
 	}
