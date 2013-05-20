@@ -2,23 +2,23 @@ window.lj = lj || {};
 
 // ## Setting and updating the current scene of the game
 
-var floor = [14, 49];
+var floor = [0, 4]; //[14, 49];
 
 var spriteMap = {
-	'!': [2, 4], // hero
-	'#': [18, 44], // wall
+	'!': [0, 8], //[2, 4], // hero
+	'#': [0, 0], // wall
 	' ': floor, // floor
 	'L': floor, // Door leading Left
 	'U': floor, // Door leading Up
 	'R': floor, // Door leading Right
 	'D': floor, // Door leading Down
 
-	'B': [1, 28], // Boss
-	'a': [4, 4], // Wolf
-	'b': [2, 19], // Gnole
-	'c': [3, 5], // Troll
-	'd': [8, 15], // Undead mage
-	'C': [45, 44], // Chest
+	'B': [0, 9], // Boss
+	'a': [0, 11], // Wolf
+	'b': [0, 12], // Gnoll
+	'c': [0, 13], // Troll
+	'd': [0, 14], // Mage ghost
+	'C': [0, 10], // Chest
 
 	'1': floor, // Chest type 1
 	'2': floor, // Chest type 2
@@ -107,7 +107,7 @@ lj.scene = (function() {
 		// Paint hero
 		if (!isDead) {
 			lj.context.save();
-			lj.context.drawImage(spriteImage, 17*32, 6*32,32,32,tile[0]*32,tile[1]*32,32,32);
+			lj.context.drawImage(spriteImage, 8*32, 0*32,32,32,tile[0]*32,tile[1]*32,32,32);
 			lj.context.restore();
 		}
 
@@ -143,7 +143,7 @@ lj.scene = (function() {
 		}
 
 		lj.context.save();
-		lj.context.drawImage(spriteImage, 17*32, 6*32,32,32,tile[0]*32,tile[1]*32,32,32);
+		lj.context.drawImage(spriteImage, 8*32, 0*32,32,32,tile[0]*32,tile[1]*32,32,32);
 		lj.context.restore();
 
 		lj.context.font = "50px serif";
@@ -171,7 +171,7 @@ lj.scene = (function() {
 
 		// Paint dead hero
 		lj.context.save();
-		lj.context.drawImage(spriteImage, 32*32, 43*32,32,32,tile[0]*32,tile[1]*32,32,32);
+		lj.context.drawImage(spriteImage, 15*32, 0*32,32,32,tile[0]*32,tile[1]*32,32,32);
 		lj.context.restore();
 	}
 
