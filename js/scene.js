@@ -38,6 +38,7 @@ var roomModifier = {
 lj.scene = (function() {
 
 	var currentRoom = null,
+		currentTiles = null,
 		room = null,
 		creaturesAndItems = null;
 
@@ -79,6 +80,24 @@ lj.scene = (function() {
 		return opposites[door];
 	}
 
+	function getTiles() {
+		var tiles = [],
+			row = null,
+			col = null;
+
+		for (var rowCtr = 0; rowCtr < 11; rowCtr++) {
+			row = [];
+			for (var colCtr = 0; colCtr < 11; colCtr++) {
+				var tileId = spriteMap[room[colCtr][rowCtr]],
+					sourceX = (tileId[1] + Math.floor(Math.random() * 4)) * 32,
+					sourceY = tileId[0] * 32;
+				row.push([sourceX, sourceY]);
+			}
+			tiles.push(row);
+		}
+		return tiles;
+	}
+
 	function paint(tile, isDead) {
 		var spriteImage = lj.getImage('dungeon-sprite.png');
 
@@ -86,10 +105,7 @@ lj.scene = (function() {
 		for (var rowCtr = 0; rowCtr < 11; rowCtr++) {
 			for (var colCtr = 0; colCtr < 11; colCtr++) {
 				lj.context.save();
-				var tileId = spriteMap[room[colCtr][rowCtr]],
-					sourceX = Math.floor(tileId[1]) * 32,
-					sourceY = Math.floor(tileId[0]) * 32;
-				lj.context.drawImage(spriteImage, sourceX, sourceY,32,32,colCtr*32,rowCtr*32,32,32);
+				lj.context.drawImage(spriteImage, currentTiles[rowCtr][colCtr][0], currentTiles[rowCtr][colCtr][1],32,32,colCtr*32,rowCtr*32,32,32);
 				lj.context.restore();
 				lj.context.save();
 				var itemSymbol = creaturesAndItems[colCtr][rowCtr],
@@ -164,7 +180,7 @@ lj.scene = (function() {
 				var tileId = spriteMap[room[colCtr][rowCtr]],
 					sourceX = Math.floor(tileId[1]) * 32,
 					sourceY = Math.floor(tileId[0]) * 32;
-				lj.context.drawImage(spriteImage, sourceX, sourceY,32,32,colCtr*32,rowCtr*32,32,32);
+				lj.context.drawImage(spriteImage, currentTiles[rowCtr][colCtr][0], currentTiles[rowCtr][colCtr][1],32,32,colCtr*32,rowCtr*32,32,32);
 				lj.context.restore();
 			}
 		}
@@ -194,6 +210,8 @@ lj.scene = (function() {
 
 		room = lj.realm.getRoom(currentRoom);
 		creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
+
+		currentTiles = getTiles();
 
 		// Animate hero entering from door
 		lj.hero.enter(door);
