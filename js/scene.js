@@ -99,7 +99,7 @@ lj.scene = (function() {
 	}
 
 	function paint(tile, isDead) {
-		var spriteImage = lj.getImage('dungeon-sprite.png');
+		var spriteImage = lj.getImage('sprite.png');
 
 		// Paint scene
 		for (var rowCtr = 0; rowCtr < 11; rowCtr++) {
@@ -142,7 +142,7 @@ lj.scene = (function() {
 					['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], //
 					['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']];
 
-		var spriteImage = lj.getImage('dungeon-sprite.png');
+		var spriteImage = lj.getImage('sprite.png');
 
 		var tile = [5,2];
 
@@ -171,7 +171,7 @@ lj.scene = (function() {
 	}
 
 	function paintGameOver(tile) {
-		var spriteImage = lj.getImage('dungeon-sprite.png');
+		var spriteImage = lj.getImage('sprite.png');
 
 		// Paint scene
 		for (var rowCtr = 0; rowCtr < 11; rowCtr++) {

@@ -42,7 +42,7 @@
 		progress.style.display = 'block';
 
 		images = [
-			'dungeon-sprite.png'
+			'sprite.png'
 			// 'hero-walk.png',
 			// 'armor-sprite.png',
 			// 'camp-fire.png',
