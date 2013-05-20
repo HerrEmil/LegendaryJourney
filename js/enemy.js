@@ -45,8 +45,8 @@ lj.enemy.mods = [];
 	//Brown
 	col["brown"].a = new mon([2,4,25,1,1,1,2],"Wolf");
 	col["brown"].b = new mon([3,2,20,0,1,2,0],"Gnoll");
-	col["brown"].c = new mon([1,6,35,1,2,1,1],"Troll");
-	col["brown"].d = new mon([3,4,40,1,1,5,0],"Ghost Mage");
+	col["brown"].c = new mon([1,6,35,1,2,1,1],"Swamp Monster");
+	col["brown"].d = new mon([3,4,40,1,1,5,0],"Undead Mage");
 	col["brown"].B = new mon([7,7,80,1,1,5,0],"Evil Blue Mage");
 	//TODO: Blue, green and red
 
