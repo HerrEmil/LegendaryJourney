@@ -81,9 +81,15 @@ lj.hero.gear = {
 		//quick and dirty gear evaluator.
 		var i,
 			attrs = ["strength","agility","hp","hit","crit","armor","defense","magicfind"],
-			score = 0;
+			score = 0,
+			cur;
 		for(i=0;i<8;i++){
-			score += item[attrs[i]];
+			cur = attrs[i];
+			if(cur == "hit" || cur == "crit" || cur == "magicfind"){
+				score += (item[cur])/2;
+			} else {
+				score += item[cur];
+			}
 		}
 		return score;
 	},
