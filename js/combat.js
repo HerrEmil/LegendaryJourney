@@ -35,7 +35,7 @@ lj.hero.gear = {
 			old = this.equipped[item.slot];
 		}
 		if(old != null){
-			this.inventory.push(old);
+			//this.inventory.push(old);
 			this.equipped[old.slot] = null;
 		}
 		lj.hero.stats.updateHealth();
@@ -60,7 +60,7 @@ lj.hero.gear = {
 			lj.hero.updateCharPane()
 			return true;
 		} else {
-			this.inventory.push(item);	
+			//this.inventory.push(item);	
 			lj.battleLog.acquire(item.name, item.quality);
 			lj.hero.updateCharPane()
 			return false;
