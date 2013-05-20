@@ -95,6 +95,11 @@ window.lj = lj || {};
 		if(this.quality != "normal"){
 			this.name = lj.util.capitaliseFirstLetter(this.quality) +' '+ this.name;
 		}
+
+		//Some housework
+		delete this.prefix;
+		delete this.suffix;
+		delete this.type;
 		
 		// console.log(this.name);
 
