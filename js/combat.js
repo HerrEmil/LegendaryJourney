@@ -91,6 +91,9 @@ lj.hero.gear = {
 				score += item[cur];
 			}
 		}
+		if(item.quality === "legendary"){
+			score += 1000 //Inflate legendary values
+		}
 		return score;
 	},
 	clear : function(){

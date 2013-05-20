@@ -25,7 +25,7 @@ window.lj = lj || {};
 		"normal" : 		{"mod" :1, 		"chance":750},
 		"rare" : 		{"mod" :1.5, 	"chance":100},
 		"epic" : 		{"mod" :2.5,	"chance":40},
-		"legendary" : 	{"mod" :4, 		"chance":10},
+		"legendary" : 	{"mod" :5, 		"chance":10},
 		get : function(){
 			var total = this.poor.chance + this.normal.chance + this.rare.chance + this.epic.chance + this.legendary.chance,
 				roll,
