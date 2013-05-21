@@ -63,6 +63,8 @@ window.lj = lj || {};
 	pre.push(new iStats.fix([1,0,0,3,0,0,0,1,0],"Broad"));
 	pre.push(new iStats.fix([0,4,0,0,0,2,0,1,0],"Pointy"));
 	pre.push(new iStats.fix([0,0,0,0,0,0,2,2,0],"Immovable"));
+	pre.push(new iStats.fix([1,1,0,0,0,0,0,0,2],"Glorious"));
+
 
 	//Suffix creation
 	suf.push(new iStats.fix([0,1,2,1,0,0,0,0,0],"of the Phoenix"));
@@ -72,12 +74,12 @@ window.lj = lj || {};
 	suf.push(new iStats.fix([0,0,0,5,0,0,0,0,0],"of Health"	));
 	suf.push(new iStats.fix([0,0,0,0,5,0,0,0,0],"of Precision"));
 	suf.push(new iStats.fix([0,0,0,0,0,5,0,0,0],"of Heartseeking"));
-	suf.push(new iStats.fix([0,0,0,0,0,0,8,0,0],"of Armor"));
+	suf.push(new iStats.fix([0,0,0,0,0,0,5,0,0],"of Armor"));
 	suf.push(new iStats.fix([0,0,0,0,0,0,0,8,0],"of Defense"));
 	suf.push(new iStats.fix([0,0,0,0,0,0,0,0,7],"of Magical Attraction"));
 	suf.push(new iStats.fix([0,0,0,1,0,0,2,2,0],"of the Heavy"));
 	suf.push(new iStats.fix([0,3,0,0,1,0,0,0,0],"of the Thief"));
-	suf.push(new iStats.fix([0,2,0,0,0,0,0,0,-1],"of the Not-So-Brave"));
+	suf.push(new iStats.fix([0,2,0,0,0,0,0,0,-1],"of the Coward"));
 	suf.push(new iStats.fix([1,2,0,0,1,0,0,0,0],"of Blades"));
 	suf.push(new iStats.fix([0,-1,0,7,0,0,0,0,0],"of the Golem"));
 	suf.push(new iStats.fix([0,3,0,0,0,3,0,0,0],"of the Ninja"));
@@ -86,7 +88,8 @@ window.lj = lj || {};
 	suf.push(new iStats.fix([-1,-1,-1,-1,-1,-1,-1,-1,-1],"of the Loser"));
 	suf.push(new iStats.fix([0,1,2,1,0,0,0,0,0],"of the Hermit"));
 	suf.push(new iStats.fix([1,1,1,1,1,1,1,1,1],"of Kings"));
-	suf.push(new iStats.fix([0,0,0,0,2,2,0,0,0],"of Excessive Exaggeration"));
+	suf.push(new iStats.fix([0,0,0,0,2,2,0,0,0],"of Ill Intent"));
+	suf.push(new iStats.fix([-1,4,0,0,0,3,0,0,0],"of the Praying Mantis"));
 
 	//Getters
 	pre.get = function(id, level){

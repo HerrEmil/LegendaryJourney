@@ -85,11 +85,12 @@ lj.hero.gear = {
 			cur;
 		for(i=0;i<8;i++){
 			cur = attrs[i];
-			if(cur == "hit" || cur == "crit" || cur == "magicfind"){
+			/*if(cur == "hit" || cur == "crit" || cur == "magicfind"){
 				score += (item[cur])/2;
 			} else {
 				score += item[cur];
-			}
+			}*/
+			score += item[cur];
 		}
 		if(item.quality === "legendary"){
 			score += 1000 //Inflate legendary values

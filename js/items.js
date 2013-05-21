@@ -30,7 +30,8 @@ window.lj = lj || {};
 			var total = this.poor.chance + this.normal.chance + this.rare.chance + this.epic.chance + this.legendary.chance,
 				roll,
 				rolling = true,
-				mf = (lj.hero.stats.get()["magicfind"]+1)*Math.pow(2,lj.realm.getSize()-1);
+				baseMF = (lj.hero.stats.get()["magicfind"] >= 0 ? lj.hero.stats.get()["magicfind"] : 1),
+				mf = baseMF*Math.pow(2,lj.realm.getSize()-1);
 			//console.log("Initial roll: "+roll+" Magic Find: "+mf+" Adjusted roll: "+(roll+mf));
 			roll = lj.util.randomInterval(mf,total);
 			total -= this.legendary.chance;
@@ -166,7 +167,7 @@ window.lj = lj || {};
 	lj.items.types.shoulder.push(new iStats.fix([0,0,0,0,0,0,2,2,0],"Pauldrons"));
 	lj.items.types.shoulder.push(new iStats.fix([0,0,0,0,2,2,0,0,0],"Shoulder Spikes"));
 	lj.items.types.shoulder.push(new iStats.fix([2,0,0,0,0,0,1,1,0],"Pads"));
-	lj.items.types.shoulder.push(new iStats.fix([0,0,0,0,0,0,0,0,1],"Mantle"));
+	lj.items.types.shoulder.push(new iStats.fix([0,2,0,0,0,0,0,0,1],"Spaulders"));
 	//Chest
 	lj.items.types.chest.push(new iStats.fix([0,1,0,3,0,0,0,0,0],"Robe"));
 	lj.items.types.chest.push(new iStats.fix([0,0,0,0,0,0,2,2,0],"Breastplate"));
@@ -175,7 +176,7 @@ window.lj = lj || {};
 	//Cloak
 	lj.items.types.cloak.push(new iStats.fix([0,0,3,0,0,0,0,0,0],"Cape"));
 	lj.items.types.cloak.push(new iStats.fix([0,0,0,0,0,0,0,0,2],"Backpack"));
-	lj.items.types.cloak.push(new iStats.fix([0,2,0,0,0,2,0,0,0],"Scarf"));
+	lj.items.types.cloak.push(new iStats.fix([0,2,0,0,0,2,0,0,0],"Cloak"));
 	//Gloves
 	lj.items.types.gloves.push(new iStats.fix([0,0,0,0,0,0,2,2,0],"Gauntlets"));
 	lj.items.types.gloves.push(new iStats.fix([0,2,0,0,0,0,1,1,0],"Gloves"));
@@ -203,7 +204,7 @@ window.lj = lj || {};
 	//Swords
 	lj.items.types.weapon.push(new iStats.fix([3,4,0,0,2,0,0,0,0],"Dagger"));
 	lj.items.types.weapon.push(new iStats.fix([6,1,0,0,2,0,0,0,0],"Claymore"));
-	lj.items.types.weapon.push(new iStats.fix([0,6,0,0,2,0,0,0,0],"Katana"));
+	lj.items.types.weapon.push(new iStats.fix([1,6,0,0,2,0,0,0,0],"Katana"));
 	lj.items.types.weapon.push(new iStats.fix([3,3,0,0,2,1,0,0,0],"Schimitar"));
 	//Hammers
 	lj.items.types.weapon.push(new iStats.fix([9,-1,0,0,0,0,0,-1,0],"Stone Maul"));
