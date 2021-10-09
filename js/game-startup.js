@@ -1,88 +1,70 @@
-(function() {
-	'use strict'
+(() => {
+  window.lj = new Game({
+    nrOfRows: 11,
+    nrOfCols: 11,
+    tileSize: 32,
+    realmSize: 2,
+    assetsPath: "assets/",
+  });
 
-	window.lj = new Game(config);
+  function checkRestartButton({ target }) {
+    const eleClass = target.getAttribute("class");
 
-	var config = {
-		nrOfRows: 11,
-		nrOfCols: 11,
-		tileSize: 32,
-		realmSize: 2,
-		assetsPath: 'assets/'
-	}
+    if (eleClass === "btn restart") {
+      lj.scene.reset();
+      lj.battleLog.clear();
+      lj.hero.gear.clear();
+    }
+  }
 
-	function checkRestartButton(event) {
-		var eleClass = event.target.getAttribute('class');
+  const intro = document.getElementById("gameIntro");
+  const startBtn = intro.querySelector(".btn-start");
+  const battleLog = document.getElementById("battleLog");
 
-		if (eleClass === 'btn restart') {
-			lj.scene.reset();
-			lj.battleLog.clear();
-			lj.hero.gear.clear();
-		}
-	}
+  startBtn.addEventListener("click", loadGame);
+  battleLog.addEventListener("click", checkRestartButton);
 
-	var intro = document.getElementById('gameIntro'),
-		startBtn = intro.querySelector('.btn-start'),
-		battleLog = document.getElementById('battleLog');
+  function loadGame() {
+    loadImages();
+  }
 
-	startBtn.addEventListener('click', loadGame);
-	battleLog.addEventListener('click', checkRestartButton);
+  function loadImages() {
+    const progress = intro.querySelector("#progress");
+    const progressBar = progress.querySelector(".progress-bar");
+    let images;
+    let interval;
 
-	function loadGame() {
-		loadImages();
-	}
+    startBtn.style.display = "none";
+    progress.style.display = "block";
 
-	function loadImages() {
-		var progress = intro.querySelector('#progress'),
-			progressBar = progress.querySelector('.progress-bar'),
-			images,
-			interval;
+    images = ["sprite.png"];
 
-		startBtn.style.display = 'none';
-		progress.style.display = 'block';
+    images.forEach((image) => {
+      lj.queueImage(image);
+    });
 
-		images = [
-			'sprite.png'
-			// 'hero-walk.png',
-			// 'armor-sprite.png',
-			// 'camp-fire.png',
-			// 'crystal-blue.png',
-			// 'crystal-green.png',
-			// 'crystal-grey.png',
-			// 'crystal-orange.png',
-			// 'crystal-pink.png',
-			// 'crystal-yellow.png',
-			// 'orc-sprite.png'
-			// 'splatter.jpg'
-		];
+    interval = setInterval(() => {
+      const completed = lj.loadImages();
+      progressBar.style.width = `${completed * 2}px`;
+      if (completed === 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          intro.setAttribute("class", "faded");
+          startGame();
+          setTimeout(() => {
+            intro.style.display = "none";
+          }, 500);
+        }, 1000);
+      }
+    }, 16);
+  }
 
-		images.forEach(function(image) {
-			lj.queueImage(image);
-		});
-
-		interval = setInterval(function() {
-			var completed = lj.loadImages();
-			progressBar.style.width = completed * 2 + 'px';
-			if (completed === 100) {
-				clearInterval(interval);
-				setTimeout(function() {
-					intro.setAttribute('class', 'faded');
-					startGame();
-					setTimeout(function() {
-						intro.style.display = 'none';
-					},500);
-				},1000);
-			}
-		},16);
-	}
-
-	function startGame() {
-		lj.realm.makeRealm(1);
-		lj.scene.enter('DOWN');
-		document.getElementById("healthBarBox").className = "";
-		document.getElementById("charPane").className = "";
-		document.getElementById("battleLog").className = "";
-		lj.hero.updateCharPane();
-	}
-
-}());
+  function startGame() {
+    lj.realm.makeRealm(1);
+    lj.scene.enter("DOWN");
+    document.getElementById("healthBarBox").className = "";
+    document.getElementById("charPane").className = "";
+    document.getElementById("battleLog").className = "";
+    lj.hero.updateCharPane();
+  }
+})();

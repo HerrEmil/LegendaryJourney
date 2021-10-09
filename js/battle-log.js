@@ -1,72 +1,70 @@
 window.lj = lj || {};
 
-lj.battleLog = (function () {
-	"use strict";
+lj.battleLog = (() => {
+  const battleLog = document.getElementById("battleLog");
 
-	var battleLog = document.getElementById('battleLog');
+  function printMessage(message) {
+    const messageContainer = document.createElement("span");
+    const br = document.createElement("br");
 
-	function printMessage(message) {
-		var messageContainer = document.createElement("span"),
-			br = document.createElement("br");
+    // Put message in message container
+    messageContainer.innerHTML = message;
 
-		// Put message in message container
-		messageContainer.innerHTML = message;
+    // Add message and break to HTML
+    battleLog.appendChild(messageContainer);
+    battleLog.appendChild(br);
+    // Scroll to bottom of scrollbox
+    battleLog.scrollTop = battleLog.scrollHeight - battleLog.clientHeight;
+  }
 
-		// Add message and break to HTML
-		battleLog.appendChild(messageContainer);
-		battleLog.appendChild(br);
-		// Scroll to bottom of scrollbox
-		battleLog.scrollTop = battleLog.scrollHeight - battleLog.clientHeight;
-	}
+  function clear() {
+    battleLog.innerHTML = "";
+  }
 
-	function clear() {
-		battleLog.innerHTML = "";
-	}
+  function acquire(item, quality) {
+    const message = `Found <span class="${quality}">${item}</span>.`;
+    printMessage(message);
+  }
 
-	function acquire(item, quality) {
-		var message = 'Found <span class="' + quality + '">' + item + '</span>.';
-		printMessage(message);
-	}
+  function autoEquip(item, quality) {
+    const message = `You equipped the <span class="${quality}">${item}</span>!`;
+    printMessage(message);
+  }
 
-	function autoEquip(item, quality) {
-		var message = 'You equipped the <span class="' + quality + '">' + item + '</span>!';
-		printMessage(message);
-	}
+  function monsterKilled(monster) {
+    const message = `Slayed the ${monster}!`;
+    printMessage(message);
+  }
 
-	function monsterKilled(monster) {
-		var message = "Slayed the " + monster + "!";
-		printMessage(message);
-	}
+  function heroKilled(monster) {
+    const message1 = `You were killed by the ${monster} :(`;
+    printMessage(message1);
+    printMessage('<br/><div class="btn restart">Try again!</div>');
+  }
 
-	function heroKilled(monster) {
-		var message1 = "You were killed by the " + monster + " :(";
-		printMessage(message1);
-		printMessage('<br/><div class="btn restart">Try again!</div>');
-	}
+  function levelComplete(level) {
+    const message = `You finished level ${level}! :)`;
+    printMessage(message);
+  }
 
-	function levelComplete(level) {
-		var message = "You finished level " + level + "! :)";
-		printMessage(message);
-	}
+  function gameComplete() {
+    printMessage("You completed the game! :D");
+    printMessage("You are AWESOME! Congratulations!");
+    printMessage('<br/><div class="btn restart">Play again!</div>');
+  }
 
-	function gameComplete() {
-		printMessage("You completed the game! :D");
-		printMessage("You are AWESOME! Congratulations!");
-		printMessage('<br/><div class="btn restart">Play again!</div>');
-	}
+  function customMessage(message) {
+    printMessage(message);
+  }
 
-	function customMessage(message) {
-		printMessage(message);
-	}
-
-	return {
-		acquire : acquire,
-		autoEquip : autoEquip,
-		monsterKilled : monsterKilled,
-		heroKilled : heroKilled,
-		levelComplete : levelComplete,
-		gameComplete : gameComplete,
-		customMessage : customMessage,
-		clear : clear
-	};
-}());
+  return {
+    acquire,
+    autoEquip,
+    monsterKilled,
+    heroKilled,
+    levelComplete,
+    gameComplete,
+    customMessage,
+    clear,
+  };
+})();
