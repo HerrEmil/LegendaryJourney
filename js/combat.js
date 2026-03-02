@@ -143,7 +143,7 @@ lj.hero.gear = {
     },
     add(item) {
       this.slots[item.slot] = item;
-      if (this.fullLegendarySet() == 9) {
+      if (this.fullLegendarySet()) {
         lj.battleLog.gameComplete();
         setTimeout(() => {
           lj.scene.paintWin();
@@ -155,11 +155,11 @@ lj.hero.gear = {
 };
 lj.hero.stats = {
   self: {
-    strength: 5,
-    agility: 5,
+    strength: 8,
+    agility: 7,
     luck: 0,
     hp: 0,
-    hit: 5,
+    hit: 7,
     crit: 0,
     armor: 0,
     defense: 0,

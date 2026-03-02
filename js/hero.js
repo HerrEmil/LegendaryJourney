@@ -85,7 +85,7 @@ lj.hero = (() => {
       case "#":
         return;
       case " ":
-        lj.hero.stats.heal(0.5);
+        lj.hero.stats.heal(1.5);
         place(tile);
         break;
       case "D":
