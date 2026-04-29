@@ -19,7 +19,7 @@
   },
   {
     "name": "Total transfer (initial)",
-    "path": ["dist/index.html", "dist/theme.css", "dist/{js,lib}/*.js", "dist/fonts/*.woff2", "dist/assets/page-bg.jpg"],
+    "path": ["dist/index.html", "dist/theme.css", "dist/{js,lib}/*.js", "dist/fonts/*.woff2", "dist/assets/page-bg.webp"],
     "limit": "200 KB",
     "brotli": true
   }

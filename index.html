@@ -2,12 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Legendary Journey</title>
     <meta
       name="description"
       content="Journey down the realm of the evil blue mage, collect legendary loot!"
     />
     <link rel="icon" type="image/png" href="app-assets/icon_128.png" />
+    <link rel="preload" as="image" href="assets/page-bg.webp" type="image/webp" />
+    <link rel="preload" as="font" href="fonts/pf_tempesta_seven-webfont.woff2" type="font/woff2" crossorigin />
     <link rel="stylesheet" type="text/css" href="theme.css" />
   </head>
   <body>
@@ -44,17 +47,17 @@
     </div>
     <div id="battleLog" class="hidden"></div>
 
-	<script src="lib/game.js"></script>
-	<script src="js/game-startup.js"></script>
-	<script src="js/realm.js"></script>
-	<script src="js/hero.js"></script>
-	<script src="js/scene.js"></script>
-	<script src="js/util.js"></script>
-	<script src="js/stats.js"></script>
-	<script src="js/items.js"></script>
-	<script src="js/combat.js"></script>
-	<script src="js/enemy.js"></script>
-	<script src="js/battle-log.js"></script>
+	<script defer src="lib/game.js"></script>
+	<script defer src="js/game-startup.js"></script>
+	<script defer src="js/realm.js"></script>
+	<script defer src="js/hero.js"></script>
+	<script defer src="js/scene.js"></script>
+	<script defer src="js/util.js"></script>
+	<script defer src="js/stats.js"></script>
+	<script defer src="js/items.js"></script>
+	<script defer src="js/combat.js"></script>
+	<script defer src="js/enemy.js"></script>
+	<script defer src="js/battle-log.js"></script>
 
   </body>
 </html>

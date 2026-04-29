@@ -28,7 +28,7 @@ body {
 
 
 #gameIntro {
-	background-image: url('assets/page-bg.jpg');
+	background-image: url('assets/page-bg.webp');
 	background-repeat: no-repeat;
 	position: fixed;
 	top:0;
