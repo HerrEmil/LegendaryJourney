@@ -1,3 +1,6 @@
 .DS_Store
 *.png.tmp
 test-*.png
+node_modules/
+dist/
+.lighthouseci/

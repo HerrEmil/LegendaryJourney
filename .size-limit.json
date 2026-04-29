@@ -1,0 +1,26 @@
+[
+  {
+    "name": "JS (all)",
+    "path": "dist/{js,lib}/*.js",
+    "limit": "55 KB",
+    "brotli": true
+  },
+  {
+    "name": "CSS",
+    "path": "dist/theme.css",
+    "limit": "5 KB",
+    "brotli": true
+  },
+  {
+    "name": "Fonts",
+    "path": "dist/fonts/*.woff2",
+    "limit": "30 KB",
+    "brotli": false
+  },
+  {
+    "name": "Total transfer (initial)",
+    "path": ["dist/index.html", "dist/theme.css", "dist/{js,lib}/*.js", "dist/fonts/*.woff2", "dist/assets/page-bg.jpg"],
+    "limit": "200 KB",
+    "brotli": true
+  }
+]

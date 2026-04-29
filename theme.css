@@ -1,23 +1,17 @@
 @font-face {
     font-family: 'pf_tempesta_sevenregular';
-    src: url('fonts/pf_tempesta_seven-webfont.eot');
-    src: url('fonts/pf_tempesta_seven-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/pf_tempesta_seven-webfont.woff') format('woff'),
-         url('fonts/pf_tempesta_seven-webfont.ttf') format('truetype'),
-         url('fonts/pf_tempesta_seven-webfont.svg#pf_tempesta_sevenregular') format('svg');
+    src: url('fonts/pf_tempesta_seven-webfont.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
     font-family: 'fondamentoregular';
-    src: url('fonts/fondamentoregular.eot');
-    src: url('fonts/fondamentoregular.eot?#iefix') format('embedded-opentype'),
-         url('fonts/fondamentoregular.woff') format('woff'),
-         url('fonts/fondamentoregular.ttf') format('truetype'),
-         url('fonts/fondamentoregular.svg#Fondamento-Regular"') format('svg');
+    src: url('fonts/fondamentoregular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 body {

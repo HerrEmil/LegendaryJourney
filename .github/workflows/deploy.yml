@@ -26,7 +26,18 @@ jobs:
           aws s3 sync . s3://${{ secrets.S3_BUCKET }}/ \
             --delete \
             --exclude ".git/*" \
-            --exclude ".github/*"
+            --exclude ".github/*" \
+            --exclude "node_modules/*" \
+            --exclude "dist/*" \
+            --exclude ".lighthouseci/*" \
+            --exclude "scripts/*" \
+            --exclude "package.json" \
+            --exclude "package-lock.json" \
+            --exclude ".size-limit.json" \
+            --exclude "lighthouserc.json" \
+            --exclude ".gitignore" \
+            --exclude "README.md" \
+            --exclude "app-assets/work files/*"
 
       - name: Invalidate CloudFront cache
         run: |
