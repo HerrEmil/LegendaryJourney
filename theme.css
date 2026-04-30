@@ -28,8 +28,11 @@ body {
 
 
 #gameIntro {
+	background-color: #0a080d;
 	background-image: url('assets/page-bg.webp');
 	background-repeat: no-repeat;
+	background-position: center top;
+	background-size: cover;
 	position: fixed;
 	top:0;
 	bottom: 0;
