@@ -38,6 +38,7 @@ body {
 	bottom: 0;
 	left: 0;
 	right: 0;
+	z-index: 10;
 	-webkit-transition: 0.5s;
 	   -moz-transition: 0.5s;
 	    -ms-transition: 0.5s;
@@ -110,7 +111,7 @@ h1 {
 }
 
 #game {
-	background-color: #333;
+	background-color: #0a080d;
 	position: absolute;
 	top:150px;
 	left:75px;
