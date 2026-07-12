@@ -1,0 +1,48 @@
+{
+  "_comment": "Content ladder for the autonomous content runs. Each run builds the first entry whose status is 'todo', wires it to be reachable in play, passes the self-verify gate (scripts/selfplay.mjs + size-limit), then flips it to 'done'. Never repeat a done entry.",
+  "ladder": [
+    {
+      "id": "blue-tier",
+      "priority": 1,
+      "status": "done",
+      "summary": "Populate lj.enemy.types.blue {a,b,c,d,B} (frost/arcane theme) and add lj.enemy.familyForRealm(size) so realm 2+ spawns the blue family. Reuses existing a/b/c/d/B tile symbols (single-row sprite sheet has no per-color art).",
+      "built": "2026-07-12"
+    },
+    {
+      "id": "green-tier",
+      "priority": 2,
+      "status": "todo",
+      "summary": "Populate lj.enemy.types.green {a,b,c,d,B} and extend the familyForRealm ladder so realm 3+ spawns green. Keep the modest per-tier step-up (~1.2-1.5x)."
+    },
+    {
+      "id": "red-tier",
+      "priority": 3,
+      "status": "todo",
+      "summary": "Populate lj.enemy.types.red {a,b,c,d,B} and extend the ladder so realm 4+ spawns red."
+    },
+    {
+      "id": "new-boss-mechanic",
+      "priority": 4,
+      "status": "todo",
+      "summary": "Add a new boss with an actual mechanic (e.g. enrage, life-steal, multi-phase) wired through hero.js combat, not just a stat block."
+    },
+    {
+      "id": "affix-batch",
+      "priority": 5,
+      "status": "todo",
+      "summary": "Add a coherent batch of item prefixes/suffixes to js/stats.js and/or enemy mods to js/enemy.js."
+    },
+    {
+      "id": "room-template-biome",
+      "priority": 6,
+      "status": "todo",
+      "summary": "Add a new room template / biome variation to js/realm.js gen, with matching spriteMap coverage."
+    },
+    {
+      "id": "targeted-rebalance",
+      "priority": 7,
+      "status": "todo",
+      "summary": "Data-driven rebalance pass guided by scripts/selfplay.mjs output; only if the win rate has drifted toward a band edge."
+    }
+  ]
+}

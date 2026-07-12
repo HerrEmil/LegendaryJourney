@@ -154,7 +154,10 @@ lj.hero = (() => {
       isBusy = false;
       creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom);
     } else if (type === "Enemy") {
-      var enemy = lj.enemy.get("brown", item);
+      var enemy = lj.enemy.get(
+        lj.enemy.familyForRealm(lj.realm.getSize()),
+        item
+      );
       var fight = lj.hero.fight(enemy);
       const position = [tile[0] * 32, (tile[1] - 1) * 32];
 

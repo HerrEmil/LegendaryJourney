@@ -1,0 +1,12 @@
+{
+  "_comment": "Win-rate acceptance band for scripts/selfplay.mjs --check. Content changes must keep the simulated win rate inside [min,max] and strictly beatable (>0) and survivable (<1). Regenerate the observed numbers with: node scripts/selfplay.mjs --runs 500",
+  "min": 0.25,
+  "max": 0.75,
+  "established": "2026-07-12",
+  "lastContent": "blue-tier",
+  "observed": {
+    "winRate": 0.36,
+    "runs": 500,
+    "note": "brown realm 1, blue (clamped) realms 2+. ~35-40% across trials; deaths split between the realm boss and room attrition. Sits below the pre-blue brown-only baseline (~43%), so the blue tier is a real but modest step up."
+  }
+}
