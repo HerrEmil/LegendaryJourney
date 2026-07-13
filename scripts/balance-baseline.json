@@ -3,10 +3,10 @@
   "min": 0.25,
   "max": 0.75,
   "established": "2026-07-12",
-  "lastContent": "green-tier",
+  "lastContent": "red-tier",
   "observed": {
-    "winRate": 0.32,
-    "runs": 1000,
-    "note": "brown realm 1, blue realm 2, green (clamped) realms 3+. ~30-33% across trials; deaths still split boss/room (~450 boss / ~229 room per 1000). Green clamps across every realm >=3, so even a tiny raw step (<=1.17x agility/HP over blue, armor untouched) is a real difficulty increase on top of 1.4^(size-1) scaling — a ~1.2x bump cratered it below the 25% floor in testing. Sits a modest step below the ~36% blue baseline."
+    "winRate": 0.29,
+    "runs": 3000,
+    "note": "brown r1, blue r2, green r3, red (clamped) r4+. 29.1% at 3000 runs (872/3000); ~28-29% across trials at higher N (27.9% over 12000). Deaths split boss/room (~1505 boss / ~623 room per 3000), never 0/100%. Red owns realm 4+, which selfplay shows is the whole decisive game, so its step over green had to be gentle (armor untouched everywhere; +1 HP/grade plus +1 agility on striker+boss, +1 boss crit). A full notch (flat +1 str on striker+boss) measured ~24% — under the 25% floor — so it was rejected. Sits a clean ~4pt step below the ~33% green baseline, mirroring blue->green."
   }
 }

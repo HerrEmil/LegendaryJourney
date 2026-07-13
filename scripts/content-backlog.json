@@ -18,8 +18,9 @@
     {
       "id": "red-tier",
       "priority": 3,
-      "status": "todo",
-      "summary": "Populate lj.enemy.types.red {a,b,c,d,B} and extend the ladder so realm 4+ spawns red."
+      "status": "done",
+      "summary": "Populate lj.enemy.types.red {a,b,c,d,B} (\"The Emberdeep\" molten/infernal theme) so the familyLadder auto-routes realm 4+ to red. Reuses a/b/c/d/B tile symbols (already in spriteMap + creaturesAndItemsMap). Red now owns realm 4+ — which selfplay shows is essentially the whole decisive game (nearly every win/death) — so green retreats to realm 3 alone and the green->red step is deliberately gentle: armor UNTOUCHED on every grade (it is a % dmg-reduction that compounds hardest with depth), escalation is +1 HP/grade plus +1 agility on striker+boss and +1 boss crit. A full notch (flat +1 str on striker+boss) cratered the sim to ~24% (below the 25% floor); this holds ~28-29%, a clean ~4pt step below green mirroring blue->green.",
+      "built": "2026-07-13"
     },
     {
       "id": "new-boss-mechanic",

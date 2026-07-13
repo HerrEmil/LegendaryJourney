@@ -66,18 +66,37 @@ lj.enemy.mods = [];
   col["blue"].B = new mon([7, 7, 85, 1, 2, 5, 2], "Frostlord"); // frost-court boss
 
   //Green - "The Blightwood": past the frozen court the realm rots into a
-  //poisoned overgrowth of venom-beasts and plague-druids. This is the deepest
-  //built tier, so familyForRealm CLAMPS it across every realm >=3 and the
-  //1.4^(size-1) scaling stacks on top run after run. That clamp makes it hit
-  //much harder than the raw stats suggest, so the step over blue is kept tiny
-  //(<=1.17x on agility/HP, armor untouched): selfplay showed a full ~1.2x bump
-  //dropped the win rate below the 25% floor. Roles mirror blue, each dialed one
-  //notch meaner.
+  //poisoned overgrowth of venom-beasts and plague-druids. Green now owns realm
+  //3 alone (red clamps 4+ below), the way blue owns realm 2. When green was the
+  //deepest tier it clamped every realm >=3, so its step over blue was kept tiny
+  //(<=1.17x on agility/HP, armor untouched) — selfplay showed a full ~1.2x bump
+  //dropped the win rate below the 25% floor. Left as-is: realm 3 is a brief
+  //waypoint and re-tuning it is out of scope for the red run. Roles mirror blue,
+  //each dialed one notch meaner.
   col["green"].a = new mon([2, 7, 26, 1, 2, 1, 2], "Venomfang Adder"); // glass-cannon striker
   col["green"].b = new mon([3, 1, 32, 0, 1, 4, 1], "Bramble Golem"); // slow thorn wall
   col["green"].c = new mon([1, 8, 35, 1, 3, 1, 4], "Sporeling"); // evasive crit-critter
   col["green"].d = new mon([3, 4, 47, 1, 1, 6, 1], "Blight Druid"); // armored caster
   col["green"].B = new mon([7, 7, 90, 1, 2, 5, 2], "Rotbark Ancient"); // blightwood boss
+
+  //Red - "The Emberdeep": below the rotting Blightwood the realm sinks into a
+  //molten underworld of magma constructs, fire-imps and ash-cultists. Red is
+  //now the deepest built tier, so familyForRealm CLAMPS it across every realm
+  //>=4 — and selfplay shows realm 4+ is essentially the whole decisive game
+  //(nearly every win and death happens there), on top of already-deep
+  //1.4^(size-1) scaling. So the step over green is deliberately gentle: armor
+  //(the % damage-reduction that compounds hardest with depth) is left UNTOUCHED
+  //on every grade, and the escalation is +1 HP per grade plus ONE offensive
+  //touch — +1 agility on the striker and the boss, +1 boss crit. A fuller
+  //"notch" (flat +1 strength on striker+boss, as green added over blue) cratered
+  //the sim to ~24%, under the 25% floor; this block holds it near ~28% (a clean
+  //~4pt step below green, mirroring blue->green). Roles mirror green, one
+  //notch meaner.
+  col["red"].a = new mon([2, 8, 27, 1, 2, 1, 2], "Ember Imp"); // glass-cannon striker
+  col["red"].b = new mon([3, 1, 33, 0, 1, 4, 1], "Magma Golem"); // slow molten wall
+  col["red"].c = new mon([1, 8, 36, 1, 3, 1, 4], "Cinder Sprite"); // evasive crit-critter
+  col["red"].d = new mon([3, 4, 48, 1, 1, 6, 1], "Ashen Warlock"); // armored caster
+  col["red"].B = new mon([7, 8, 93, 1, 3, 5, 2], "The Emberlord"); // emberdeep boss
 
   //Set up mods
   mod.push(new mon([1, 2, 1, 1, 1, -1, 1], "Angry"));
@@ -91,9 +110,10 @@ lj.enemy.mods = [];
 })();
 
 // Ordered family ladder for realm depth, kept to only the POPULATED families so
-// familyForRealm can never route to an empty tier (red is still {}). As future
-// tiers are filled they are picked up here automatically; the ladder clamps at
-// the deepest built family for all deeper realms.
+// familyForRealm can never route to an empty tier. All four families are now
+// filled (brown r1, blue r2, green r3, red r4+); the filter still guards
+// against any future empty tier, and the ladder clamps at the deepest built
+// family for all deeper realms.
 lj.enemy.familyLadder = ["brown", "blue", "green", "red"].filter(function (
   family
 ) {
