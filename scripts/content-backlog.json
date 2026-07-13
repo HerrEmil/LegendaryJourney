@@ -11,8 +11,9 @@
     {
       "id": "green-tier",
       "priority": 2,
-      "status": "todo",
-      "summary": "Populate lj.enemy.types.green {a,b,c,d,B} and extend the familyForRealm ladder so realm 3+ spawns green. Keep the modest per-tier step-up (~1.2-1.5x)."
+      "status": "done",
+      "summary": "Populate lj.enemy.types.green {a,b,c,d,B} (\"The Blightwood\" poison/nature theme) and extend the familyForRealm ladder so realm 3+ spawns green. familyLadder auto-picks up the populated family; realm 3=green, realm 4+ clamp to green. Step over blue kept tiny (<=1.17x agility/HP, armor untouched) because the realm-3+ clamp compounds hard with 1.4^(size-1) scaling.",
+      "built": "2026-07-13"
     },
     {
       "id": "red-tier",

@@ -3,10 +3,10 @@
   "min": 0.25,
   "max": 0.75,
   "established": "2026-07-12",
-  "lastContent": "blue-tier",
+  "lastContent": "green-tier",
   "observed": {
-    "winRate": 0.36,
-    "runs": 500,
-    "note": "brown realm 1, blue (clamped) realms 2+. ~35-40% across trials; deaths split between the realm boss and room attrition. Sits below the pre-blue brown-only baseline (~43%), so the blue tier is a real but modest step up."
+    "winRate": 0.32,
+    "runs": 1000,
+    "note": "brown realm 1, blue realm 2, green (clamped) realms 3+. ~30-33% across trials; deaths still split boss/room (~450 boss / ~229 room per 1000). Green clamps across every realm >=3, so even a tiny raw step (<=1.17x agility/HP over blue, armor untouched) is a real difficulty increase on top of 1.4^(size-1) scaling — a ~1.2x bump cratered it below the 25% floor in testing. Sits a modest step below the ~36% blue baseline."
   }
 }
