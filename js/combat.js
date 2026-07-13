@@ -168,8 +168,16 @@ lj.hero.stats = {
   health: 100,
   updateHealth() {
     let percent;
-    const current = Math.floor(this.health);
     const max = 100 + lj.hero.stats.get().hp * 5;
+    // Re-cap health to the current max. A gear swap can LOWER max-HP (pickup
+    // auto-equips by total gScore, so it may take a higher-score item that has
+    // less hp), and heal() only caps at heal-time — so without this the stranded
+    // health renders an impossible readout (e.g. "300/100") and a #healthBar
+    // that overflows its 200px box (600px wide). This is the single choke point
+    // every heal/hurt/equip/unequip routes through, so clamping here keeps the
+    // bar and readout in range no matter how max changed.
+    if (this.health > max) this.health = max;
+    const current = Math.floor(this.health);
     percent = Math.round((current / max) * 100);
     document.getElementById("healthBar").style.width = `${2 * percent}px`;
     if (current == 0) {

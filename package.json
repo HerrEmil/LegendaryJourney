@@ -4,9 +4,13 @@
   "version": "0.0.0",
   "scripts": {
     "build": "bash scripts/build-dist.sh",
-    "size": "size-limit"
+    "size": "size-limit",
+    "test": "playwright test",
+    "test:playtest": "playwright test",
+    "selfplay": "node scripts/selfplay.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@size-limit/file": "^11.1.6",
     "size-limit": "^11.1.6",
     "stylelint": "^16.10.0",

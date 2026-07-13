@@ -4,3 +4,6 @@ test-*.png
 node_modules/
 dist/
 .lighthouseci/
+.playwright-mcp/
+test-results/
+playwright-report/
