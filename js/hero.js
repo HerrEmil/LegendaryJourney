@@ -23,6 +23,7 @@ lj.hero = (() => {
 
   const creaturesAndItemsMap = {
     B: "Enemy",
+    T: "Enemy", // The Cinderwyrm (apex enrage boss, realm 5+)
     C: "Chest",
     E: "Enemy",
     a: "Enemy",
@@ -130,7 +131,7 @@ lj.hero = (() => {
           lj.battleLog.monsterKilled(enemy.name);
           lj.realm.clearTile(tile);
           lj.scene.eraseTileItem(tile);
-          if (item === "B") {
+          if (lj.enemy.isBoss(item)) {
             setTimeout(() => {
               lj.scene.levelUp();
               isBusy = false;

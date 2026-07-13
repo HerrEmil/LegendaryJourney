@@ -14,6 +14,7 @@ const spriteMap = {
   D: floor, // Door leading Down
 
   B: [0, 9], // Boss
+  T: [0, 9], // The Cinderwyrm (apex enrage boss) — reuses the boss sprite
   a: [0, 11], // Wolf
   b: [0, 12], // Gnoll
   c: [0, 13], // Troll

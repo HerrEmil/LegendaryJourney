@@ -11,6 +11,12 @@ lj.enemy.base = function (type, mod) {
   this.armor = Math.round(type.stats[5] * mod.stats[5] * realmMod);
   this.defense = Math.round(type.stats[6] * mod.stats[6] * realmMod);
   this.name = (mod.name + " " + type.name).trim();
+  // Some monster types carry a combat mechanic (see lj.enemy.enraged). Copy the
+  // descriptor onto the instance so the fight loop can react to it. Mods never
+  // define one, so the boss's mechanic survives even when a modifier is rolled.
+  if (type.mechanic) {
+    this.mechanic = type.mechanic;
+  }
 };
 lj.enemy.get = function (type, grade) {
   var rng = lj.util.randomInterval,
@@ -29,6 +35,38 @@ lj.enemy.familyForRealm = function (size) {
   var idx = Math.max(0, Math.min(size - 1, ladder.length - 1));
   return ladder[idx];
 };
+// Which boss grade guards a realm's exit. Realms 1-4 are sealed by their
+// family's standard boss (grade "B"); from realm 5 on — always the clamped red
+// "Emberdeep" tier — the exit is instead held by the apex Cinderwyrm (grade
+// "T"), a distinct boss with the enrage mechanic. realm.js places this tile and
+// hero.js routes it, so the boss is genuinely reachable in play; the selfplay
+// harness fights the same grade so the mechanic is measured. Grade "T" is only
+// populated on red, which is exactly the family every realm >= 5 resolves to.
+lj.enemy.bossGradeForRealm = function (size) {
+  return size >= 5 ? "T" : "B";
+};
+// Both boss grades trigger the level-up on kill and the boss render sprite.
+lj.enemy.isBoss = function (grade) {
+  return grade === "B" || grade === "T";
+};
+// When a mechanic-carrying enemy is wounded past its enrage threshold it hits
+// harder: return a lightweight attack snapshot with its offensive stats scaled
+// so the extra damage flows through the normal duel math. The common no-mechanic
+// / not-yet-enraged path returns the enemy unchanged (zero allocation). Only
+// offensive stats are boosted — armor/defense are irrelevant when attacking.
+lj.enemy.enraged = function (enemy, currentHp, maxHp) {
+  var m = enemy.mechanic;
+  if (!m || m.type !== "enrage" || currentHp > maxHp * m.threshold) {
+    return enemy;
+  }
+  return {
+    strength: Math.round(enemy.strength * m.damageMult),
+    agility: Math.round(enemy.agility * m.damageMult),
+    hit: enemy.hit,
+    crit: enemy.crit,
+    name: enemy.name,
+  };
+};
 lj.enemy.types = {
   brown: {},
   blue: {},
@@ -40,9 +78,13 @@ lj.enemy.mods = [];
 //Generate monsters
 
 (function () {
-  lj.enemy.monster = function (stats, name) {
+  lj.enemy.monster = function (stats, name, mechanic) {
     this.stats = stats;
     this.name = name;
+    // Optional combat mechanic descriptor (e.g. { type:"enrage", ... }).
+    if (mechanic) {
+      this.mechanic = mechanic;
+    }
   };
   var col = lj.enemy.types,
     mon = lj.enemy.monster,
@@ -97,6 +139,30 @@ lj.enemy.mods = [];
   col["red"].c = new mon([1, 8, 36, 1, 3, 1, 4], "Cinder Sprite"); // evasive crit-critter
   col["red"].d = new mon([3, 4, 48, 1, 1, 6, 1], "Ashen Warlock"); // armored caster
   col["red"].B = new mon([7, 8, 93, 1, 3, 5, 2], "The Emberlord"); // emberdeep boss
+
+  //Red apex — "The Cinderwyrm": the first NEW boss carrying an ACTUAL combat
+  //mechanic rather than a bigger stat block. From realm 5 on (always the clamped
+  //red tier) the Emberlord gives way to a molten wyrm that ENRAGES: while healthy
+  //it fights lazily, but once its HP drops past the threshold it lashes out like
+  //a cornered dragon and its offense spikes — so the closing stretch of every
+  //deep boss fight becomes a race: burst it down through the enrage window or the
+  //back half turns lethal. The balance is a genuine risk/reward trade, not a flat
+  //bump: its BASE offense [str 5, agi 7] is GENTLER than the Emberlord's [7, 8]
+  //(the calm opening), while ENRAGED it hits ~[8, 11] — harder than the old boss
+  //ever did. HP is a touch higher (95 vs 93) for an apex-feeling bar, and
+  //armor/defense are left exactly at the Emberlord's values: the depth-compounding
+  //stats stay untouched per the tier philosophy, and the mechanic supplies the
+  //danger. The base-offense trim plus threshold/damageMult were tuned against
+  //selfplay so the NET win rate lands ~29% — essentially the pre-boss 29.4%
+  //baseline, with wide margin above the 25% floor. That the number barely moves
+  //is deliberate, not a no-op: an A/B (same boss, enrage off vs on) swings the
+  //win rate ~5pt (33.5% -> 28.4% at 8000 runs), so the mechanic is load-bearing
+  //and merely balanced against the gentler base (see scripts/balance-baseline.json).
+  col["red"].T = new mon([5, 7, 95, 1, 3, 5, 2], "The Cinderwyrm", {
+    type: "enrage",
+    threshold: 0.4, // enrages below 40% HP
+    damageMult: 1.5, // +50% strength & agility while enraged
+  });
 
   //Set up mods
   mod.push(new mon([1, 2, 1, 1, 1, -1, 1], "Angry"));

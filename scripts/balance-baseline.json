@@ -3,10 +3,10 @@
   "min": 0.25,
   "max": 0.75,
   "established": "2026-07-12",
-  "lastContent": "red-tier",
+  "lastContent": "new-boss-mechanic",
   "observed": {
-    "winRate": 0.29,
-    "runs": 3000,
-    "note": "brown r1, blue r2, green r3, red (clamped) r4+. 29.1% at 3000 runs (872/3000); ~28-29% across trials at higher N (27.9% over 12000). Deaths split boss/room (~1505 boss / ~623 room per 3000), never 0/100%. Red owns realm 4+, which selfplay shows is the whole decisive game, so its step over green had to be gentle (armor untouched everywhere; +1 HP/grade plus +1 agility on striker+boss, +1 boss crit). A full notch (flat +1 str on striker+boss) measured ~24% — under the 25% floor — so it was rejected. Sits a clean ~4pt step below the ~33% green baseline, mirroring blue->green."
+    "winRate": 0.293,
+    "runs": 12000,
+    "note": "brown r1, blue r2, green r3, red r4, Cinderwyrm (enrage apex boss) r5+. 29.3% at 12000 runs (3521/12000); deeps average ~realm 6.2 (deepest 10), deaths split ~6073 boss / ~2406 room, never 0/100%. The realm-5+ boss is now The Cinderwyrm (red grade T): base offense [str 5, agi 7] is GENTLER than the Emberlord's [7,8] but it ENRAGES below 40% HP (+50% str & agi), so the back half of every deep boss fight spikes to ~[8,11] — harder than the old boss. Net win rate is intentionally near the pre-boss ~29.4% baseline: an A/B at 8000 runs measured the SAME boss with enrage off at 33.5% vs on at 28.4% (~5pt), i.e. the gentler base alone would make it easier and the mechanic claws it back — the mechanic is load-bearing, not a stat bump. Earlier tries: [7,8,100]+enrage(0.4,1.5) cratered to 21.7% (under floor); gentle enrage on Emberlord stats saturated ~26.7% (thin margin); the shipping [5,7,95]+enrage(0.4,1.5) risk/reward trade holds ~29% with wide margin. In-browser (dist) verified: boots clean, realm-5 boss room paints the T tile w/o crash, enraged hits ~1.6x calm over 400 fights."
   }
 }

@@ -195,8 +195,16 @@ function playthrough(lj) {
       }
     }
 
-    // Boss guards the realm exit; killing it advances to the next realm.
-    const boss = lj.enemy.get(family, "B");
+    // Boss guards the realm exit; killing it advances to the next realm. Which
+    // boss (grade "B" or the realm-5+ apex Cinderwyrm "T") is depth-dependent,
+    // so the harness fights the same grade the game would place — this is what
+    // exercises the enrage mechanic in the balance numbers. Fall back to "B" on
+    // a pre-boss-mechanic codebase.
+    const bossGrade =
+      typeof lj.enemy.bossGradeForRealm === "function"
+        ? lj.enemy.bossGradeForRealm(size)
+        : "B";
+    const boss = lj.enemy.get(family, bossGrade);
     if (!resolveFight(lj, boss)) {
       return { win: false, size, cause: "died-boss" };
     }

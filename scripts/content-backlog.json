@@ -25,8 +25,9 @@
     {
       "id": "new-boss-mechanic",
       "priority": 4,
-      "status": "todo",
-      "summary": "Add a new boss with an actual mechanic (e.g. enrage, life-steal, multi-phase) wired through hero.js combat, not just a stat block."
+      "status": "done",
+      "summary": "Added The Cinderwyrm (red grade \"T\"), the first boss with a real combat mechanic: ENRAGE. lj.enemy.monster carries an optional mechanic descriptor; lj.enemy.base copies it onto instances; lj.enemy.enraged(enemy,curHp,maxHp) returns a boosted attack snapshot below threshold*maxHp and the fight loop (lj.hero.fight in combat.js) resolves the enemy's swing through it, so damage ramps mid-fight. Reachable: lj.enemy.bossGradeForRealm(size) -> \"T\" at realm 5+ (else \"B\"), placed in realm.js, routed in hero.js (creaturesAndItemsMap + lj.enemy.isBoss level-up), rendered via scene.js spriteMap (reuses boss sprite [0,9]); selfplay fights the per-realm boss grade. Tuned as a risk/reward trade: base offense [5,7] gentler than the Emberlord's [7,8], enrage (0.4 threshold, 1.5x str&agi) makes the sub-40% back half hit ~[8,11] — harder than the old boss. Net ~29.3% win rate (A/B: enrage off 33.5% vs on 28.4%, ~5pt swing => load-bearing).",
+      "built": "2026-07-13"
     },
     {
       "id": "affix-batch",

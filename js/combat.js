@@ -237,7 +237,8 @@ lj.hero.stats = {
 };
 lj.hero.fight = (enemy) => {
   //Lets meet the contenders:
-  let enemyHealth = enemy["hp"];
+  const enemyMaxHealth = enemy["hp"];
+  let enemyHealth = enemyMaxHealth;
 
   let heroHealth = Math.floor(lj.hero.stats.health);
 
@@ -257,8 +258,16 @@ lj.hero.fight = (enemy) => {
       log.push(lastAction);
       enemyHealth -= lastAction.damage;
     } else {
-      lastAction = lj.hero.duel(heroStats, enemy);
+      // A boss with the enrage mechanic swings harder once wounded past its
+      // threshold; lj.enemy.enraged returns a boosted attack snapshot (or the
+      // enemy untouched for the ordinary case) so the extra damage runs through
+      // the same duel math as any other strike.
+      const attacker = lj.enemy.enraged(enemy, enemyHealth, enemyMaxHealth);
+      lastAction = lj.hero.duel(heroStats, attacker);
       lastAction.actor = "enemy";
+      if (attacker !== enemy) {
+        lastAction.enraged = true;
+      }
       log.push(lastAction);
       heroHealth -= lastAction.damage;
       heroDamageTaken += lastAction.damage;
