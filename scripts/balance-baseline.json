@@ -3,10 +3,10 @@
   "min": 0.25,
   "max": 0.75,
   "established": "2026-07-12",
-  "lastContent": "new-boss-mechanic",
+  "lastContent": "affix-batch",
   "observed": {
-    "winRate": 0.293,
-    "runs": 12000,
-    "note": "brown r1, blue r2, green r3, red r4, Cinderwyrm (enrage apex boss) r5+. 29.3% at 12000 runs (3521/12000); deeps average ~realm 6.2 (deepest 10), deaths split ~6073 boss / ~2406 room, never 0/100%. The realm-5+ boss is now The Cinderwyrm (red grade T): base offense [str 5, agi 7] is GENTLER than the Emberlord's [7,8] but it ENRAGES below 40% HP (+50% str & agi), so the back half of every deep boss fight spikes to ~[8,11] — harder than the old boss. Net win rate is intentionally near the pre-boss ~29.4% baseline: an A/B at 8000 runs measured the SAME boss with enrage off at 33.5% vs on at 28.4% (~5pt), i.e. the gentler base alone would make it easier and the mechanic claws it back — the mechanic is load-bearing, not a stat bump. Earlier tries: [7,8,100]+enrage(0.4,1.5) cratered to 21.7% (under floor); gentle enrage on Emberlord stats saturated ~26.7% (thin margin); the shipping [5,7,95]+enrage(0.4,1.5) risk/reward trade holds ~29% with wide margin. In-browser (dist) verified: boots clean, realm-5 boss room paints the T tile w/o crash, enraged hits ~1.6x calm over 400 fights."
+    "winRate": 0.282,
+    "runs": 9000,
+    "note": "brown r1, blue r2, green r3, red r4, Cinderwyrm (enrage apex boss) r5+, PLUS the 'Spoils of the Realms' loot affix batch (8 themed prefixes/suffixes in js/stats.js, one prefix+suffix pair per family). ~28.2% pooled over 9000 worktree-isolated batch runs (887/3000 + 1653/6000); the standalone 6000-run --check read 27.6% and PASSED the [25,75] band; deeps average ~realm 6.4 (deepest 10), deaths split ~boss>room, never 0/100%. The affix batch is deliberately BALANCE-NEUTRAL, not a power bump: a clean A/B (worktree checked out at clean origin/main, node_modules symlinked, ONLY js/stats.js changed) measured baseline 29.1% (872/3000) vs batch 29.6% (887/3000) — +0.5pt, within the ~1.2pt diff-SE, i.e. indistinguishable from zero. KEY GOTCHA for future affix work: gScore (combat.js) sums all stats equally, so armor/defense-heavy affixes are auto-equipped over equal-scored offensive gear and quietly DILUTE hero damage; since ~70% of losses are to the scaling boss, offense/HP (not raw armor) is what converts to wins. An armor-tilted first draft of this batch dropped a 500-run pulse to 24.4% (under the floor); reweighting offense/HP-first (e.g. of the Cinderwyrm [3,3,0,2,0,2,0,0,0], Venomous [0,4,0,0,1,2,0,0,0]) restored neutrality. luck (index 2) is inert in combat and gScore, left 0 in every new affix. Prior (new-boss-mechanic) baseline was 29.3% at 12000 runs; the ~1pt lower figure here is sampling noise on top of a balance-neutral change, not a regression. Regenerate with: node scripts/selfplay.mjs --runs 6000 --check"
   }
 }

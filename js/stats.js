@@ -63,6 +63,33 @@ window.lj = lj || {};
   pre.push(new iStats.fix([0, 0, 0, 0, 0, 0, 2, 2, 0], "Immovable"));
   pre.push(new iStats.fix([1, 1, 0, 0, 0, 0, 0, 0, 2], "Glorious"));
 
+  //--- "Spoils of the Realms" affix batch --------------------------------
+  // A coherent set of loot affixes themed to the four enemy families the hero
+  // fights down the realms (blue Frostmarch, green Blightwood, red Emberdeep,
+  // apex Cinderwyrm). Each theme contributes ONE prefix and ONE suffix whose
+  // stat identity mirrors that realm's combat archetype: frost = sturdy
+  // bruiser (hp-led), blight = evasive crit striker, ember = raw aggression,
+  // wyrm = the elite all-rounder crown.
+  //
+  // BALANCE: the gScore auto-equip (combat.js) weights every stat equally, so
+  // an armor/defense-heavy affix is picked over an equal-scored offensive one
+  // and quietly DILUTES the hero's damage. Since ~70% of losses are to the
+  // realm boss and the enrage apex punishes slow kills, offense (str/agi/crit)
+  // and effective HP are what actually convert to wins — not raw armor. An
+  // earlier armor-tilted draft grazed the 25% floor (~24-26%; a 500-run pulse
+  // hit 24.4%); this offense/HP-weighted set is balance-neutral vs the
+  // pre-batch ~29% baseline (isolated A/B: 29.1% vs 29.6% at 3000 runs each),
+  // a comfortable margin clear of the floor (see
+  // scripts/balance-baseline.json). luck (index 2) is
+  // inert in combat and gScore, so it stays 0 here — nonzero luck would pad.
+  // No new tile symbols: affixes only ride items, never the map, so scene.js
+  // spriteMap / hero.js creaturesAndItemsMap need no changes.
+  //           [str, agi, luk, hp, hit, crt, arm, def, mf]
+  pre.push(new iStats.fix([1, 0, 0, 3, 0, 0, 1, 1, 0], "Frostforged")); // sturdy bruiser
+  pre.push(new iStats.fix([0, 4, 0, 0, 1, 2, 0, 0, 0], "Venomous")); // evasive crit striker
+  pre.push(new iStats.fix([4, 0, 0, 0, 1, 1, 0, 0, 0], "Emberforged")); // raw aggression
+  pre.push(new iStats.fix([2, 2, 0, 2, 0, 1, 0, 0, 0], "Wyrmscaled")); // apex all-rounder
+
   //Suffix creation
   suf.push(new iStats.fix([0, 1, 2, 1, 0, 0, 0, 0, 0], "of the Phoenix"));
   suf.push(new iStats.fix([5, 0, 0, 0, 0, 0, 0, 0, 0], "of Strength"));
@@ -93,6 +120,13 @@ window.lj = lj || {};
   suf.push(
     new iStats.fix([-1, 4, 0, 0, 0, 3, 0, 0, 0], "of the Praying Mantis")
   );
+
+  //--- "Spoils of the Realms" suffix half (paired with the prefixes above) ---
+  //           [str, agi, luk, hp, hit, crt, arm, def, mf]
+  suf.push(new iStats.fix([0, 0, 0, 5, 0, 0, 1, 2, 0], "of the Frostmarch")); // hp-led warding
+  suf.push(new iStats.fix([0, 4, 0, 0, 1, 3, 0, 0, 0], "of the Blightwood")); // hunter's edge
+  suf.push(new iStats.fix([5, 0, 0, 0, 1, 1, 0, 0, 0], "of the Emberdeep")); // molten fury
+  suf.push(new iStats.fix([3, 3, 0, 2, 0, 2, 0, 0, 0], "of the Cinderwyrm")); // apex crown
 
   //Getters
   pre.get = function (id, level) {

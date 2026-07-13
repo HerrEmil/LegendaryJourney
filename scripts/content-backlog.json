@@ -32,8 +32,9 @@
     {
       "id": "affix-batch",
       "priority": 5,
-      "status": "todo",
-      "summary": "Add a coherent batch of item prefixes/suffixes to js/stats.js and/or enemy mods to js/enemy.js."
+      "status": "done",
+      "summary": "Added the 'Spoils of the Realms' loot affix batch to js/stats.js: 4 prefixes (Frostforged, Venomous, Emberforged, Wyrmscaled) + 4 suffixes (of the Frostmarch, of the Blightwood, of the Emberdeep, of the Cinderwyrm), one prefix+suffix pair per enemy family (blue/green/red/apex) so the loot pool mirrors the tiers the hero fights. Auto-reachable: lj.items.makeItem picks rng(0,len-1) across the full prefixes/suffixes arrays and applies each ~30% per item, so pushing onto the arrays is the only wiring needed; affixes never render as map tiles, so scene.js spriteMap / hero.js creaturesAndItemsMap are untouched (zero symbol-crash risk). BALANCE GOTCHA: the gScore auto-equip weights every stat equally, so an armor/defense-heavy affix is picked over an equal-scored offensive one and quietly dilutes the hero's damage — an armor-tilted first draft dropped a 500-run sample to 24.4% (below the 25% floor). Reweighted the batch offense/HP-first (the stats that actually convert to boss-attrition wins) and it lands balance-neutral: isolated A/B (worktree off clean origin/main) measured baseline 29.1% vs batch 29.6% at 3000 runs each (+0.5pt, within noise), and the 6000-run --check gate passed at 27.6%; pooled ~28% over 9000 batch runs. luck (index 2) is inert in combat and gScore so it's 0 in every new affix (nonzero would pad).",
+      "built": "2026-07-13"
     },
     {
       "id": "room-template-biome",
