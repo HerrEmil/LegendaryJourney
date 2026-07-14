@@ -213,14 +213,108 @@ function playthrough(lj) {
 }
 
 // ---------------------------------------------------------------------------
+// Structural gate: every generated room must be fully traversable and contain
+// only known tile symbols. The playthrough sim above abstracts the spatial
+// layer away, so THIS is what guards the room-generation / biome layer
+// (js/realm.js) against the two failure modes that break real play but are
+// invisible to the win-rate number: a walled-off region (unreachable enemies /
+// chests / exit door => a soft-locked realm) and a stray tile symbol
+// (spriteMap[sym] undefined => paint() throws). We flood-fill every generated
+// room, across all biomes and a range of realm sizes, from the hero's fixed
+// spawn [5,9] and assert the whole walkable area is a single component.
+// ---------------------------------------------------------------------------
+const ROOM_ALLOWED = new Set(["#", " ", "L", "U", "R", "D"]);
+const HERO_SPAWN = [5, 9]; // [col,row]; odd/odd, so never a pillar or offshoot
+
+// Set of walkable cells reachable from (startCol,startRow) via 4-neighbour steps
+// over an 11x11 room. A cell is walkable iff it is not a "#".
+function floodComponent(room, startCol, startRow) {
+  const seen = new Set();
+  const key = (c, r) => c * 11 + r;
+  const stack = [[startCol, startRow]];
+  seen.add(key(startCol, startRow));
+  const steps = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ];
+  while (stack.length) {
+    const [c, r] = stack.pop();
+    for (const [dc, dr] of steps) {
+      const nc = c + dc;
+      const nr = r + dr;
+      if (nc < 0 || nc > 10 || nr < 0 || nr > 10) continue;
+      if (room[nc][nr] === "#") continue;
+      const k = key(nc, nr);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      stack.push([nc, nr]);
+    }
+  }
+  return seen;
+}
+
+export function checkRooms({ sizes = [1, 2, 3, 4, 6], samples = 400 } = {}) {
+  const lj = loadGame();
+  const problems = [];
+  const perBiome = {};
+  let roomsChecked = 0;
+
+  for (const size of sizes) {
+    for (let s = 0; s < samples && problems.length < 12; s += 1) {
+      lj.realm.makeRealm(size);
+      const biome =
+        typeof lj.realm.getBiomeName === "function"
+          ? lj.realm.getBiomeName()
+          : "n/a";
+      // Generate and inspect every room in the realm (interior rooms carry up
+      // to four doors, so they stress connectivity harder than the start room).
+      for (let roomIdx = 0; roomIdx < size * size; roomIdx += 1) {
+        lj.realm.enterRoom(roomIdx);
+        const room = lj.realm.getRoom(roomIdx);
+        roomsChecked += 1;
+        perBiome[biome] = (perBiome[biome] || 0) + 1;
+
+        const where = `biome=${biome} size=${size} room=${roomIdx}`;
+        if (room[HERO_SPAWN[0]][HERO_SPAWN[1]] === "#") {
+          problems.push(`${where}: hero spawn [5,9] is walled`);
+          continue;
+        }
+
+        let walkable = 0;
+        for (let c = 0; c <= 10; c += 1) {
+          for (let r = 0; r <= 10; r += 1) {
+            const sym = room[c][r];
+            if (!ROOM_ALLOWED.has(sym)) {
+              problems.push(`${where}: stray symbol ${JSON.stringify(sym)} at [${c},${r}]`);
+            }
+            if (sym !== "#") walkable += 1;
+          }
+        }
+
+        const reachable = floodComponent(room, HERO_SPAWN[0], HERO_SPAWN[1]);
+        if (reachable.size !== walkable) {
+          problems.push(
+            `${where}: ${walkable - reachable.size}/${walkable} walkable cells unreachable from [5,9]`
+          );
+        }
+      }
+    }
+  }
+  return { roomsChecked, perBiome, problems };
+}
+
+// ---------------------------------------------------------------------------
 // Runner
 // ---------------------------------------------------------------------------
 function parseArgs(argv) {
-  const args = { runs: DEFAULT_RUNS, check: false, json: false };
+  const args = { runs: DEFAULT_RUNS, check: false, json: false, rooms: false };
   for (let i = 2; i < argv.length; i += 1) {
     const a = argv[i];
     if (a === "--check") args.check = true;
     else if (a === "--json") args.json = true;
+    else if (a === "--rooms") args.rooms = true;
     else if (a === "--runs") args.runs = parseInt(argv[++i], 10);
   }
   return args;
@@ -249,15 +343,38 @@ function run(runs) {
   };
 }
 
+function reportRooms(rc) {
+  console.log(
+    `Room structural check — ${rc.roomsChecked} rooms across biomes ${JSON.stringify(
+      rc.perBiome
+    )}`
+  );
+  if (rc.problems.length) {
+    console.error(
+      `\nSTRUCTURAL GATE FAILED:\n  - ${rc.problems.join("\n  - ")}`
+    );
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
-  const res = run(args.runs);
 
   const baselinePath = join(ROOT, "scripts", "balance-baseline.json");
   let baseline = null;
   if (existsSync(baselinePath)) {
     baseline = JSON.parse(readFileSync(baselinePath, "utf8"));
   }
+
+  // Standalone structural check (skips the playthrough sim entirely).
+  if (args.rooms && !args.check) {
+    const rc = checkRooms();
+    reportRooms(rc);
+    if (rc.problems.length) process.exit(1);
+    console.log(`\nSTRUCTURAL GATE PASSED`);
+    return;
+  }
+
+  const res = run(args.runs);
 
   if (args.json) {
     console.log(JSON.stringify(res));
@@ -285,6 +402,13 @@ function main() {
       process.exit(1);
     }
     console.log(`\nBALANCE GATE PASSED`);
+
+    // Structural gate runs as part of --check: a room-gen regression must fail
+    // the same command that guards balance.
+    const rc = checkRooms();
+    reportRooms(rc);
+    if (rc.problems.length) process.exit(1);
+    console.log(`STRUCTURAL GATE PASSED`);
   }
 }
 

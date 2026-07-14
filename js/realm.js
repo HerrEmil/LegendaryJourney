@@ -35,6 +35,107 @@ lj.realm = (() => {
   const doors = [];
   let currentRoom = 90;
   let bossRoom;
+  let biome;
+
+  // Biomes — depth-themed dungeon architecture. Every realm's rooms share one
+  // biome, chosen to MIRROR the enemy-family ladder (brown Halls, blue
+  // Frostmarch, green Blightwood, red Emberdeep) so the ARCHITECTURE reads the
+  // same way the enemies do as you descend. Biomes only ever emit '#'/' ' — the
+  // sprite sheet is a single 16-tile row with no spare art (see js/scene.js
+  // spriteMap) — so they change how a room is SHAPED and navigated, never its
+  // combat. Each biome just RE-WEIGHTS the base "bomberman" offshoot rule
+  // (makeRoom below): every interior pillar still sprouts AT MOST ONE wall and
+  // pass-2 walls never grow back "west", which is exactly what makes the base
+  // layout provably connected, so re-weighting the direction (or skipping the
+  // sprout entirely) preserves full traversability. scripts/selfplay.mjs
+  // --rooms flood-fills thousands of rooms per biome to prove it.
+  //
+  // Direction candidates are [dCol, dRow, weight]; the west/east cell is the
+  // "escape" fallback that placeOffshoot uses if the weighted picks are blocked
+  // (that cell is never pre-walled when a pillar is processed — see makeRoom).
+  const WEST = [-1, 0];
+  const EAST = [1, 0];
+  const biomes = {
+    // The reference layout: an even pillar-grid with a random offshoot on every
+    // pillar. Uniform weights reproduce the original generator's behaviour (a
+    // uniform-random offshoot per pillar); placeOffshoot's bounded-retry +
+    // escape fallback only differs from the old retry-until-free loop by a
+    // negligible bias toward the escape cell in the rare all-blocked case.
+    halls: {
+      name: "halls",
+      sprout: 1,
+      pass1: [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1]],
+      pass2: [[1, 0, 1], [0, 1, 1], [0, -1, 1]],
+    },
+    // Frostmarch — vertical colonnades: offshoots lean up/down, carving long
+    // north-south corridors between orderly columns (a frozen-cathedral feel).
+    frost: {
+      name: "frost",
+      sprout: 1,
+      pass1: [[0, 1, 3], [0, -1, 3], [1, 0, 1], [-1, 0, 1]],
+      pass2: [[0, 1, 3], [0, -1, 3], [1, 0, 1]],
+    },
+    // Blightwood — lateral warren: offshoots lean east/west, growing twisty
+    // horizontal thickets that break the room into overgrown side-passages.
+    blight: {
+      name: "blight",
+      sprout: 1,
+      pass1: [[1, 0, 3], [-1, 0, 3], [0, 1, 1], [0, -1, 1]],
+      pass2: [[1, 0, 3], [0, 1, 1], [0, -1, 1]],
+    },
+    // Emberdeep — open caverns: only some pillars sprout at all, leaving wide
+    // molten halls with scattered lone pillars. Strictly fewer walls than the
+    // reference layout, so connectivity is guaranteed by inclusion.
+    ember: {
+      name: "ember",
+      sprout: 0.55,
+      pass1: [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1]],
+      pass2: [[1, 0, 1], [0, 1, 1], [0, -1, 1]],
+    },
+  };
+
+  // Realm-depth -> biome, clamped at the deepest biome for all deeper realms —
+  // the same shape as lj.enemy.familyForRealm, so architecture and enemies stay
+  // in lockstep (r1 halls, r2 frost, r3 blight, r4+ ember).
+  const biomeLadder = ["halls", "frost", "blight", "ember"];
+  function biomeForRealm(realmSize) {
+    const idx = Math.max(0, Math.min(realmSize - 1, biomeLadder.length - 1));
+    return biomes[biomeLadder[idx]];
+  }
+
+  // Wall off ONE cell next to the pillar at (col,row), chosen from the biome's
+  // weighted candidate directions. Retries a bounded number of times if the
+  // picked cell is already a wall, then falls back to the guaranteed-free escape
+  // cell so generation always terminates and every pillar sprouts at most one
+  // wall (preserving the base layout's connectivity).
+  function placeOffshoot(room, col, row, candidates, escape) {
+    let totalWeight = 0;
+    for (let i = 0; i < candidates.length; i += 1) {
+      totalWeight += candidates[i][2];
+    }
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      let pick = Math.random() * totalWeight;
+      let chosen = candidates[candidates.length - 1];
+      for (let i = 0; i < candidates.length; i += 1) {
+        pick -= candidates[i][2];
+        if (pick < 0) {
+          chosen = candidates[i];
+          break;
+        }
+      }
+      const tCol = col + chosen[0];
+      const tRow = row + chosen[1];
+      if (room[tCol][tRow] === " ") {
+        room[tCol][tRow] = "#";
+        return;
+      }
+    }
+    const eCol = col + escape[0];
+    const eRow = row + escape[1];
+    if (room[eCol][eRow] === " ") {
+      room[eCol][eRow] = "#";
+    }
+  }
 
   function pickRandomEnemyType() {
     const randomNumber = Math.floor(Math.random() * 4);
@@ -147,8 +248,6 @@ lj.realm = (() => {
   function makeRoom(room) {
     let x;
     let y;
-    let dx;
-    let dy;
     let height;
     let width;
 
@@ -186,61 +285,23 @@ lj.realm = (() => {
       }
     }
 
-    // Loop through the leftmost column of pillars
+    // Sprout the pillar offshoots that give the room its shape. The direction
+    // weights and sprout chance come from the realm's biome (set in makeRealm);
+    // the leftmost column may sprout WEST (its escape cell), the rest may not
+    // — pass-2 walls only grow east/vertical so they can never close a loop.
+
+    // Leftmost column of pillars — WEST is a legal (and guaranteed-free) target.
     for (y = 2; y < height - 1; y += 2) {
-      dx = 2;
-      dy = y;
-
-      // Pick a direction at random
-      switch (Math.floor(Math.random() * 4)) {
-        case 0:
-          dx += 1;
-          break;
-        case 1:
-          dx -= 1;
-          break;
-        case 2:
-          dy += 1;
-          break;
-        case 3:
-          dy -= 1;
-          break;
-      }
-
-      // If the tile in the direction chosen is empty, make wall
-      if (rooms[room][dx][dy] === " ") {
-        rooms[room][dx][dy] = "#";
-      } else {
-        // If the tile was already a wall, move iterator back and try again
-        y -= 2;
+      if (Math.random() < biome.sprout) {
+        placeOffshoot(rooms[room], 2, y, biome.pass1, WEST);
       }
     }
 
-    // Loop through all but leftmost column of pillars
+    // All other pillar columns — EAST is the guaranteed-free escape target.
     for (x = 4; x < width - 1; x += 2) {
       for (y = 2; y < height - 1; y += 2) {
-        dx = x;
-        dy = y;
-
-        // Pick a direction at random (but not to the left!)
-        switch (Math.floor(Math.random() * 3)) {
-          case 0:
-            dx += 1;
-            break;
-          case 1:
-            dy += 1;
-            break;
-          case 2:
-            dy -= 1;
-            break;
-        }
-
-        // If the tile in the direction chosen is empty, make wall
-        if (rooms[room][dx][dy] === " ") {
-          rooms[room][dx][dy] = "#";
-        } else {
-          // If the tile was already a wall, move iterator back to try again
-          y -= 2;
+        if (Math.random() < biome.sprout) {
+          placeOffshoot(rooms[room], x, y, biome.pass2, EAST);
         }
       }
     }
@@ -322,11 +383,19 @@ lj.realm = (() => {
     return size;
   }
 
+  // Name of the current realm's biome (or the biome a given realm size would
+  // use). Pure/read-only — used by the self-play room validator and for debug.
+  function getBiomeName() {
+    return biome ? biome.name : null;
+  }
+
   function makeRealm(realmSize) {
     let roomNumber;
     // Clear previous realm
     rooms.length = 0;
     size = realmSize;
+    // Lock in this realm's architecture; every room generated below shares it.
+    biome = biomeForRealm(size);
 
     // Make empty maps for rooms and monsters
     for (let x = 0; x < size; x += 1) {
@@ -379,6 +448,9 @@ lj.realm = (() => {
 
     // Get realm size (1, two, or three)
     getSize,
+
+    // Name of the current realm's depth-themed architecture (read-only)
+    getBiomeName,
 
     // Call when entering a door
     enterRoom,

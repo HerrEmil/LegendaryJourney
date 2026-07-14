@@ -39,8 +39,9 @@
     {
       "id": "room-template-biome",
       "priority": 6,
-      "status": "todo",
-      "summary": "Add a new room template / biome variation to js/realm.js gen, with matching spriteMap coverage."
+      "status": "done",
+      "summary": "Added a BIOME system to js/realm.js: every realm's rooms share one depth-themed architecture, mapped to mirror the enemy-family ladder (r1 halls, r2 frost 'Frostmarch', r3 blight 'Blightwood', r4+ ember 'Emberdeep' — biomeForRealm clamps like familyForRealm). The sprite sheet is a single 16-tile row with NO spare art (assets/sprite.png is 512x32; col15 is already the dead-hero sprite), so biomes can't have new floor/wall art — instead each biome RE-WEIGHTS the base bomberman offshoot rule via a new placeOffshoot(): halls = uniform (reproduces the original generator), frost = vertical-biased colonnades, blight = lateral-biased warren, ember = sparse sprout (0.55) open caverns. Reachable in play: makeRealm locks in the biome and every makeRoom uses it (verified in-browser via scene.reset()+levelUp() across realms 1-6 — all biomes render, zero console/thrown errors). spriteMap coverage: biomes only ever emit '#'/' ' (both already covered), so scene.js/hero.js are UNTOUCHED and there is zero symbol-crash risk. BALANCE: neutral BY CONSTRUCTION — selfplay's playthrough() abstracts the spatial layer and never calls makeRoom, so the win rate is unchanged (28.4% at 6000 runs vs 28.2% baseline, well inside [25,75]). The load-bearing NEW gate for this structural module is a room-connectivity + symbol validator added to scripts/selfplay.mjs (--rooms, and folded into --check): it flood-fills every generated room from the hero spawn [5,9] and asserts a single walkable component + only known symbols. CONNECTIVITY is preserved by construction — every pillar still sprouts AT MOST ONE wall and pass-2 walls never grow 'west' (keeps the wall-forest acyclic); placeOffshoot has a bounded retry + guaranteed-free escape cell so generation always terminates. GOTCHA for future room work: a naive denser biome that adds >1 wall/pillar or lets pass-2 sprout west CAN wall off a region — keep the ≤1-offshoot + no-west invariant, or the --rooms gate will (correctly) fail.",
+      "built": "2026-07-14"
     },
     {
       "id": "targeted-rebalance",
