@@ -23,7 +23,8 @@ lj.hero = (() => {
 
   const creaturesAndItemsMap = {
     B: "Enemy",
-    T: "Enemy", // The Cinderwyrm (apex enrage boss, realm 5+)
+    T: "Enemy", // The Cinderwyrm (apex enrage boss, odd realms 5+)
+    W: "Enemy", // The Obsidian Warden (apex ward boss, even realms 6+)
     C: "Chest",
     E: "Enemy",
     a: "Enemy",

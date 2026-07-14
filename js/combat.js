@@ -257,12 +257,26 @@ lj.hero.fight = (enemy) => {
   let lastAction;
   const log = [];
   let heroDamageTaken = 0;
+  let heroStrikes = 0; // count of the hero's LANDED blows (for the ward mechanic)
 
   while (enemyHealth > 0 && heroHealth > 0) {
     lastAction = null;
     if (herosTurn) {
       lastAction = lj.hero.duel(enemy, heroStats);
       lastAction.actor = "hero";
+      // A warding boss raises a barrier on a fixed cadence that fully absorbs an
+      // incoming blow; lj.enemy.warded reports whether THIS landed strike lands
+      // on the ward (a no-op for enemies without the mechanic). Absorbed hits
+      // deal nothing, so bursting the boss down takes extra swings — dragging
+      // the fight out and buying it more attacks. Only LANDED blows advance the
+      // cadence (a miss can't be warded), so the count tracks real progress.
+      if (lastAction.damage > 0) {
+        heroStrikes += 1;
+        if (lj.enemy.warded(enemy, heroStrikes)) {
+          lastAction.damage = 0;
+          lastAction.warded = true;
+        }
+      }
       log.push(lastAction);
       enemyHealth -= lastAction.damage;
     } else {

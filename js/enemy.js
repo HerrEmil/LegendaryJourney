@@ -49,18 +49,24 @@ lj.enemy.familyForRealm = function (size) {
   return ladder[idx];
 };
 // Which boss grade guards a realm's exit. Realms 1-4 are sealed by their
-// family's standard boss (grade "B"); from realm 5 on — always the clamped red
-// "Emberdeep" tier — the exit is instead held by the apex Cinderwyrm (grade
-// "T"), a distinct boss with the enrage mechanic. realm.js places this tile and
-// hero.js routes it, so the boss is genuinely reachable in play; the selfplay
-// harness fights the same grade so the mechanic is measured. Grade "T" is only
-// populated on red, which is exactly the family every realm >= 5 resolves to.
+// family's standard boss (grade "B"). From realm 5 on — always the clamped red
+// "Emberdeep" tier — the exit is held by one of two APEX bosses that ALTERNATE
+// by depth parity, so a single deep run faces more than one boss identity: the
+// enraging Cinderwyrm (grade "T") on odd realms (5, 7, 9…) and the warding
+// Obsidian Warden (grade "W") on even realms (6, 8, 10…). Both grades are
+// populated only on red, which is exactly the family every realm >= 5 resolves
+// to. realm.js places the tile and hero.js routes it, so each boss is genuinely
+// reachable in play; the selfplay harness fights the same grade, so BOTH
+// mechanics are measured in the decisive realm-5+ band.
 lj.enemy.bossGradeForRealm = function (size) {
-  return size >= 5 ? "T" : "B";
+  if (size < 5) {
+    return "B";
+  }
+  return size % 2 === 0 ? "W" : "T";
 };
-// Both boss grades trigger the level-up on kill and the boss render sprite.
+// All three boss grades trigger the level-up on kill and the boss render sprite.
 lj.enemy.isBoss = function (grade) {
-  return grade === "B" || grade === "T";
+  return grade === "B" || grade === "T" || grade === "W";
 };
 // When a mechanic-carrying enemy is wounded past its enrage threshold it hits
 // harder: return a lightweight attack snapshot with its offensive stats scaled
@@ -79,6 +85,21 @@ lj.enemy.enraged = function (enemy, currentHp, maxHp) {
     crit: enemy.crit,
     name: enemy.name,
   };
+};
+// A warding boss raises a barrier on a fixed cadence that fully absorbs an
+// incoming hero blow: given the running count of the hero's LANDED strikes,
+// return true when this one lands on the ward (every `interval`-th connecting
+// hit) so the fight loop can zero its damage. This is the second boss mechanic
+// (a defensive foil to enrage): it changes the fight's SHAPE — the hero must
+// land extra blows to break the boss, which drags the duel out and hands the
+// boss more swings, feeding boss-attrition (the dominant deep-realm loss mode).
+// No-mechanic / non-ward enemies always return false (zero overhead).
+lj.enemy.warded = function (enemy, strikeCount) {
+  var m = enemy.mechanic;
+  if (!m || m.type !== "ward") {
+    return false;
+  }
+  return strikeCount % m.interval === 0;
 };
 lj.enemy.types = {
   brown: {},
@@ -175,6 +196,33 @@ lj.enemy.mods = [];
     type: "enrage",
     threshold: 0.4, // enrages below 40% HP
     damageMult: 1.5, // +50% strength & agility while enraged
+  });
+
+  //Red apex #2 — "The Obsidian Warden": the SECOND boss carrying a real combat
+  //mechanic, and a deliberate DEFENSIVE foil to the Cinderwyrm's offense. Where
+  //the wyrm gets scarier as it dies, the Warden is scary because it will not die
+  //on schedule: it raises a slag WARD on a fixed cadence that fully absorbs every
+  //third blow the hero lands (see lj.enemy.warded). That changes the fight's
+  //SHAPE, not just its numbers — the hero must sink EXTRA strikes to break it, so
+  //the duel drags and the Warden banks more swings, feeding boss-attrition (the
+  //dominant deep-realm loss mode). Balanced as a genuine trade, not a flat bump:
+  //because ~1/3 of the hero's landed hits are wasted, its raw HP is set LOW (82,
+  //vs the Emberlord's 93 / Cinderwyrm's 95) so EFFECTIVE HP lands in apex range
+  //(~123 — the hero must land ~1.5 blows per point removed) WITHOUT an oversized
+  //bar; base offense [str 5, agi 7] matches the
+  //Cinderwyrm's calm phase and is held FLAT (no enrage) so the danger is purely
+  //the extra swings the ward buys it. Armor/defense stay at the tier's [5,2] per
+  //the depth-philosophy (never touch the compounding stats; let the mechanic
+  //carry the threat). The ward is LOAD-BEARING and the boss is a Cinderwyrm PEER,
+  //both measured against selfplay: an isolated A/B (all deep bosses = Warden,
+  //ward off vs on) swings the win rate ~6-9pt (49%->42% at HP 70), far beyond
+  //noise; at HP 82 the isolated Warden reads ~39%, dead level with the
+  //Cinderwyrm's ~38.5%, so alternating the two by realm parity (deep runs meet
+  //both) leaves the shipped --check ~39% — essentially the pre-Warden baseline.
+  //See scripts/balance-baseline.json.
+  col["red"].W = new mon([5, 7, 82, 1, 3, 5, 2], "The Obsidian Warden", {
+    type: "ward",
+    interval: 3, // raises a barrier that absorbs every 3rd landed hero blow
   });
 
   //Set up mods
