@@ -2,7 +2,20 @@ window.lj = lj || {};
 lj.enemy = {};
 
 lj.enemy.base = function (type, mod) {
-  var realmMod = Math.pow(1 + 0.4, lj.realm.getSize() - 1);
+  // REALM DIFFICULTY SCALING — the single most load-bearing balance knob. Every
+  // enemy stat is multiplied by (1 + this)^(size-1), so it compounds hardest at
+  // depth, exactly where the decisive fights happen (selfplay: realms 5-7 own
+  // nearly every win and death, and ~70%+ of losses are boss attrition). At
+  // size 1 the exponent is inert (x^0 = 1), so realm 1 is untouched; it only
+  // eases realm 2+. TARGETED REBALANCE (2026-07-14): the win rate had drifted to
+  // the low band edge (~28%, a thin ~3pt margin over the 25% floor) with HALF of
+  // all boss deaths landing with the boss already under 20% HP — near-misses a
+  // hair short on damage. Easing 0.40 -> 0.375 recenters the shipped --check win
+  // rate to ~38% (~37-39% across 5k-6k runs, a healthy ~13pt floor margin,
+  // still a sub-40% "hard"
+  // roguelike) while preserving every tier's RELATIVE step, since all families
+  // scale by the same factor. See scripts/balance-baseline.json.
+  var realmMod = Math.pow(1 + 0.375, lj.realm.getSize() - 1);
   this.strength = Math.round(type.stats[0] * mod.stats[0] * realmMod);
   this.agility = Math.round(type.stats[1] * mod.stats[1] * realmMod);
   this.hp = Math.round(type.stats[2] * mod.stats[2] * realmMod);
@@ -99,7 +112,7 @@ lj.enemy.mods = [];
   //Blue - "The Frostmarch": the Evil Blue Mage's frost-court of cryomancers
   //and ice constructs. Now that green fills realm 3+, blue owns realm 2 alone
   //(familyForRealm(2) -> idx 1), so it is only a slight step over brown
-  //(~1.05-1.1x); the 1.4^(size-1) realm scaling supplies the depth difficulty.
+  //(~1.05-1.1x); the 1.375^(size-1) realm scaling supplies the depth difficulty.
   //Each grade owns a distinct role that its green counterpart escalates.
   col["blue"].a = new mon([2, 6, 24, 1, 2, 1, 2], "Frost Wisp"); // glass-cannon striker
   col["blue"].b = new mon([3, 1, 30, 0, 1, 4, 1], "Rime Sentinel"); // slow ice wall
@@ -126,7 +139,7 @@ lj.enemy.mods = [];
   //now the deepest built tier, so familyForRealm CLAMPS it across every realm
   //>=4 — and selfplay shows realm 4+ is essentially the whole decisive game
   //(nearly every win and death happens there), on top of already-deep
-  //1.4^(size-1) scaling. So the step over green is deliberately gentle: armor
+  //1.375^(size-1) scaling. So the step over green is deliberately gentle: armor
   //(the % damage-reduction that compounds hardest with depth) is left UNTOUCHED
   //on every grade, and the escalation is +1 HP per grade plus ONE offensive
   //touch — +1 agility on the striker and the boss, +1 boss crit. A fuller

@@ -46,8 +46,21 @@
     {
       "id": "targeted-rebalance",
       "priority": 7,
+      "status": "done",
+      "summary": "Data-driven rebalance pass. The win rate had drifted to the LOW band edge — selfplay --check read ~28% (only ~3pt over the 25% floor), a fragile margin. Per-realm diagnostics showed realms 5-7 own nearly every win and death, ~70%+ of losses are boss attrition, and HALF of all boss deaths landed with the boss already under 20% HP (median 19.7% left): the hero loses razor-thin, a hair short on damage/effective-HP. Chose the single most load-bearing, best-behaved lever: the global realm-scaling exponent in lj.enemy.base (js/enemy.js), realmMod = (1 + exp)^(size-1). A sweep was clean and monotonic (0.40->28%, 0.39->31.5%, 0.385->34%, 0.38->37%). Eased 0.40 -> 0.375, which the shipped `node scripts/selfplay.mjs --runs 5000 --check` measured at 37.2% (1859/5000) IN-BAND, beatable+survivable, structural gate green (26,400 rooms). Why the exponent over a hero buff: hero GEAR is unscaled (items default to itemLevel 1) while enemies scale with depth, so a flat hero-base buff mostly eases realm 1-3 (where ~0 deaths happen); the exponent's effect is inherently back-loaded to the deep realms where the game is actually decided, AND it eases the compounding armor/HP the tier comments call the depth villain — while preserving every tier's RELATIVE step (all families scale by the same factor). Restrained on purpose: 37% roughly quadruples the floor margin (3->12pt) yet keeps a sub-40% 'hard' roguelike, far from the 75% ceiling; not an overshoot to 50%. At size 1 the exponent is inert (x^0=1) so realm 1 is byte-identical. Also refreshed two now-stale '1.4^(size-1)' code comments to 1.375. Independent audit confirmed: single-point knob, no degenerate enemies (min boss HP stays >=15), no loot/render/structural coupling.",
+      "built": "2026-07-14"
+    },
+    {
+      "id": "boss-mechanic-2",
+      "priority": 8,
       "status": "todo",
-      "summary": "Data-driven rebalance pass guided by scripts/selfplay.mjs output; only if the win rate has drifted toward a band edge."
+      "summary": "Add a SECOND distinct boss combat mechanic (the Cinderwyrm's enrage was the first), on a different family boss so a deep run faces more than one boss identity. Follow the enrage pattern exactly: a mechanic descriptor on lj.enemy.monster copied through lj.enemy.base, resolved inside the fight loop (js/combat.js) via a small helper like lj.enemy.enraged. Candidate: a 'Warding'/'Shield' mechanic that periodically absorbs a hit, or a 'Frost Nova' that reduces hero accuracy for a turn — something that changes the fight's SHAPE, not just its numbers. Reachability: route via lj.enemy.bossGradeForRealm (add a new grade, e.g. green apex at realm 3, or blue apex) and add the grade to lj.enemy.isBoss + hero.js creaturesAndItemsMap + scene.js spriteMap (reuse the existing boss sprite tile like grade 'T' did — the sprite sheet has no spare art). Gate: keep selfplay --check in-band; the mechanic must be load-bearing (A/B on/off should move the win rate), balanced against a gentler base like the Cinderwyrm was."
+    },
+    {
+      "id": "affix-batch-2",
+      "priority": 9,
+      "status": "todo",
+      "summary": "Add a second coherent loot-affix batch to js/stats.js (4 prefixes + 4 suffixes) with a fresh unifying theme distinct from 'Spoils of the Realms' (e.g. gladiator/arena or elemental-attunement). Auto-reachable: lj.items.makeItem draws rng across the full prefixes/suffixes arrays, so pushing onto them is the only wiring; affixes never render as tiles (no scene.js/hero.js changes, zero symbol-crash risk). BALANCE GOTCHA carried forward: gScore (combat.js) weights every stat equally, so armor/defense-heavy affixes auto-equip over equal-scored offense and DILUTE the hero's boss-attrition damage — keep the batch offense/HP-first, and luck (index 2) is inert so leave it 0. Verify balance-neutral via an isolated A/B (worktree off clean origin/main) plus the --check band."
     }
   ]
 }
