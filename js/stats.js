@@ -90,6 +90,36 @@ window.lj = lj || {};
   pre.push(new iStats.fix([4, 0, 0, 0, 1, 1, 0, 0, 0], "Emberforged")); // raw aggression
   pre.push(new iStats.fix([2, 2, 0, 2, 0, 1, 0, 0, 0], "Wyrmscaled")); // apex all-rounder
 
+  //--- "Trophies of the Arena" affix batch (batch 2) --------------------
+  // A second coherent loot set, themed to the HERO's own gladiatorial prowess
+  // rather than the enemy families the "Spoils of the Realms" batch above
+  // mirrors. Eight arena archetypes: the pit-fighter, berserker, duelist and
+  // armored murmillo (prefixes), and the arena's honours (suffixes below).
+  //
+  // BALANCE — composition-matched, NOT pure-offense. The obvious move was
+  // "offense/HP-first, zero armor/defense" (the older loot heuristic). It fails
+  // post-rebalance: an isolated 10k-run A/B of two different pure-offense drafts
+  // BOTH measured ~1.9pt LOW (z~3.9 pooled), and an equipped-gear probe showed
+  // why. With the win rate now boss-attrition-bound (~72% of losses) and armor
+  // being %-mitigation that compounds hardest at depth, the loot pool sits near
+  // an offense/defense SWEET SPOT. Pure-offense affixes out-gScore the hero's
+  // defensive items and strip ~4 pts of armor+defense off its boss-fight gear
+  // (str/crit +5-6 each, but armor -1.5 / defense -2.6), turning it glass-cannon
+  // and costing that ~1.9pt. So this batch MIRRORS the pool's own budget mix
+  // (~61% offense / ~24% hp / ~15% armor+defense): it stays offense/HP-LED (6 of
+  // 8 affixes), but two thematic defensive archetypes (Ironbound, of the
+  // Bulwark) carry the pool's ~15% armor/defense share so the batch adds "more
+  // of the same" and doesn't shift what the hero equips. Verified balance-
+  // neutral in a fresh isolated A/B (see scripts/balance-baseline.json). luck
+  // (index 2) is combat- and gScore-inert so it stays 0 (nonzero would pad).
+  // No new tile symbols — affixes only ride items, never the map, so scene.js
+  // spriteMap / hero.js creaturesAndItemsMap need no changes.
+  //           [str, agi, luk, hp, hit, crt, arm, def, mf]
+  pre.push(new iStats.fix([2, 1, 0, 2, 1, 0, 0, 0, 0], "Gladiatorial")); // balanced pit-fighter
+  pre.push(new iStats.fix([4, 1, 0, 0, 0, 2, 0, 0, 0], "Bloodthirsty")); // reckless berserker
+  pre.push(new iStats.fix([0, 2, 0, 0, 1, 3, 0, 0, 0], "Undaunted")); // fearless duelist
+  pre.push(new iStats.fix([1, 0, 0, 1, 0, 0, 2, 3, 0], "Ironbound")); // armored murmillo
+
   //Suffix creation
   suf.push(new iStats.fix([0, 1, 2, 1, 0, 0, 0, 0, 0], "of the Phoenix"));
   suf.push(new iStats.fix([5, 0, 0, 0, 0, 0, 0, 0, 0], "of Strength"));
@@ -127,6 +157,16 @@ window.lj = lj || {};
   suf.push(new iStats.fix([0, 4, 0, 0, 1, 3, 0, 0, 0], "of the Blightwood")); // hunter's edge
   suf.push(new iStats.fix([5, 0, 0, 0, 1, 1, 0, 0, 0], "of the Emberdeep")); // molten fury
   suf.push(new iStats.fix([3, 3, 0, 2, 0, 2, 0, 0, 0], "of the Cinderwyrm")); // apex crown
+
+  //--- "Trophies of the Arena" suffix half (the arena's honours) ----------
+  // of the Champion (gScore 10) holds the high-end ceiling alongside of Kings /
+  // of Defense / of the Cinderwyrm; of the Bulwark carries defense so the batch
+  // matches the pool's ~15% armor/defense share (see the prefix comment).
+  //           [str, agi, luk, hp, hit, crt, arm, def, mf]
+  suf.push(new iStats.fix([1, 1, 0, 6, 0, 0, 0, 0, 0], "of the Arena")); // endurance of the pit
+  suf.push(new iStats.fix([6, 0, 0, 0, 2, 0, 0, 0, 0], "of Conquest")); // raw dominance
+  suf.push(new iStats.fix([3, 2, 0, 2, 0, 3, 0, 0, 0], "of the Champion")); // apex crown (Cinderwyrm's peer)
+  suf.push(new iStats.fix([0, 0, 0, 3, 0, 0, 1, 3, 0], "of the Bulwark")); // the shield-wall
 
   //Getters
   pre.get = function (id, level) {
