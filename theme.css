@@ -105,6 +105,10 @@ h1 {
 	font-size: 72px;
 	color : yellow;
 	position: absolute;
+	/* Sit above #gameIntro (z-index:10) so the title shows on the splash, not
+	   just after the intro fades. The full-viewport intro cover (added to hide
+	   the pre-start canvas grey) otherwise paints over this h1. */
+	z-index: 11;
 	opacity:0.3;
 	margin-top: 25px;
 	top:0px;
