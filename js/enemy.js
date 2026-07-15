@@ -50,23 +50,31 @@ lj.enemy.familyForRealm = function (size) {
 };
 // Which boss grade guards a realm's exit. Realms 1-4 are sealed by their
 // family's standard boss (grade "B"). From realm 5 on — always the clamped red
-// "Emberdeep" tier — the exit is held by one of two APEX bosses that ALTERNATE
-// by depth parity, so a single deep run faces more than one boss identity: the
-// enraging Cinderwyrm (grade "T") on odd realms (5, 7, 9…) and the warding
-// Obsidian Warden (grade "W") on even realms (6, 8, 10…). Both grades are
-// populated only on red, which is exactly the family every realm >= 5 resolves
-// to. realm.js places the tile and hero.js routes it, so each boss is genuinely
-// reachable in play; the selfplay harness fights the same grade, so BOTH
-// mechanics are measured in the decisive realm-5+ band.
+// "Emberdeep" tier — the exit is held by one of THREE apex bosses that rotate on
+// a size % 3 cycle, so a single deep run faces every apex identity: the enraging
+// Cinderwyrm (grade "T", realms 5, 8, 11…), the warding Obsidian Warden (grade
+// "W", realms 6, 9, 12…) and the searing/retaliating Searing Colossus (grade
+// "S", realms 7, 10, 13…). All three grades are populated only on red, which is
+// exactly the family every realm >= 5 resolves to. realm.js places the tile and
+// hero.js routes it, so each boss is genuinely reachable in play; the selfplay
+// harness fights the same grade, so all three mechanics are measured in the
+// decisive realm-5+ band.
 lj.enemy.bossGradeForRealm = function (size) {
   if (size < 5) {
     return "B";
   }
-  return size % 2 === 0 ? "W" : "T";
+  switch (size % 3) {
+    case 2:
+      return "T"; // realms 5, 8, 11… — the Cinderwyrm (enrage)
+    case 0:
+      return "W"; // realms 6, 9, 12… — the Obsidian Warden (ward)
+    default:
+      return "S"; // realms 7, 10, 13… — the Searing Colossus (thorns)
+  }
 };
-// All three boss grades trigger the level-up on kill and the boss render sprite.
+// All apex boss grades trigger the level-up on kill and the boss render sprite.
 lj.enemy.isBoss = function (grade) {
-  return grade === "B" || grade === "T" || grade === "W";
+  return grade === "B" || grade === "T" || grade === "W" || grade === "S";
 };
 // When a mechanic-carrying enemy is wounded past its enrage threshold it hits
 // harder: return a lightweight attack snapshot with its offensive stats scaled
@@ -100,6 +108,24 @@ lj.enemy.warded = function (enemy, strikeCount) {
     return false;
   }
   return strikeCount % m.interval === 0;
+};
+// A searing/thorned boss reflects part of every blow the hero lands against its
+// molten hide straight back at the hero: given the damage the hero's landed
+// strike just dealt, return how much is seared back (0 for enemies without the
+// mechanic, or a whiffed strike). This is the THIRD boss mechanic and a
+// RETALIATION threat — distinct from enrage (an offense ramp) and ward (hit
+// negation on a cadence): it does NOT touch the boss's own bar, so it never
+// drags the duel out; instead the hero's OWN offense becomes the liability,
+// punishing the very burst that beats the wyrm and the warden. The reflected
+// damage scales with the hero's hit, so it stays a threat at every gear level.
+// The fight loop skips it on the killing blow (a dead boss can't retaliate).
+// Non-thorns / whiffed cases return 0 (zero overhead).
+lj.enemy.thorns = function (enemy, heroDamage) {
+  var m = enemy.mechanic;
+  if (!m || m.type !== "thorns" || heroDamage <= 0) {
+    return 0;
+  }
+  return Math.round(heroDamage * m.fraction);
 };
 lj.enemy.types = {
   brown: {},
@@ -223,6 +249,38 @@ lj.enemy.mods = [];
   col["red"].W = new mon([5, 7, 82, 1, 3, 5, 2], "The Obsidian Warden", {
     type: "ward",
     interval: 3, // raises a barrier that absorbs every 3rd landed hero blow
+  });
+
+  //Red apex #3 — "The Searing Colossus": the THIRD boss mechanic and a
+  //RETALIATION foil to both predecessors. The Cinderwyrm gets scarier as it
+  //dies (offense ramp); the Warden refuses to die on schedule (it eats every
+  //third blow); the Colossus makes the hero PAY for killing it — its white-hot
+  //slag hide SEARS back a fraction of every blow the hero lands (see
+  //lj.enemy.thorns), so the hero's own offense becomes the danger: the harder it
+  //hits, the harder it is hit back. It is the deliberate OPPOSITE lever from the
+  //other two — where enrage/ward make the boss survive LONGER (more boss swings,
+  //feeding boss-attrition), thorns never touches the boss's bar and never drags
+  //the duel out; it converts the hero's burst into self-damage, so bursting it
+  //down FAST (the answer to the wyrm) is exactly what stings most, while a
+  //patient, armored, chip-damage hero is punished least. The recoil SCALES with
+  //the hero's hit, so it stays a threat at every gear level (a self-scaling
+  //mechanic, unlike a flat stat bump). Balanced as a genuine trade and per the
+  //tier's depth-philosophy: it reuses the Warden's exact modest defensive block
+  //[str 5, agi 7, hp 82, hit 1, crit 3, armor 5, def 2] — a clean "third sibling"
+  //differing ONLY in its mechanic — with HP held LOW (82, the Warden's bar, not
+  //an oversized one) and offense FLAT, so the retaliation, not raw stats, carries
+  //the danger (armor/defense untouched: never touch the depth-compounding stats).
+  //The thorns are LOAD-BEARING and the boss is a Cinderwyrm/Warden PEER, both
+  //measured against selfplay: an isolated A/B (all deep bosses = Colossus, thorns
+  //off vs on) swings the win rate ~7pt far beyond noise (OFF 45.4% -> ON 38.4%
+  //at 4000 runs), and at HP 82 / fraction 0.20 the isolated Colossus reads ~38.4%,
+  //dead level with the Cinderwyrm's ~38.5% and the Warden's ~39%, so rotating all
+  //three by size % 3 (deep runs meet every apex) leaves the shipped --check ~38%
+  //(37.7% at 6000 runs) — essentially the pre-Colossus baseline. See
+  //scripts/balance-baseline.json.
+  col["red"].S = new mon([5, 7, 82, 1, 3, 5, 2], "The Searing Colossus", {
+    type: "thorns",
+    fraction: 0.2, // sears back 20% of every blow the hero lands (min-blow safe)
   });
 
   //Set up mods

@@ -279,6 +279,23 @@ lj.hero.fight = (enemy) => {
       }
       log.push(lastAction);
       enemyHealth -= lastAction.damage;
+      // A searing/thorned boss reflects part of every landed hero blow straight
+      // back at the hero — but a dead boss can't retaliate, so only when it
+      // survived this strike. lj.enemy.thorns is 0 for enemies without the
+      // mechanic or a whiffed/warded swing (damage 0). The recoil is folded into
+      // the hero's OWN log entry (lastAction.reflected) so showFightStat applies
+      // it during the hero's strike, and into heroHealth/heroDamageTaken so the
+      // outcome and the self-play harness both see it. Unlike enrage/ward it
+      // never touches the boss's bar, so it makes the hero's own offense the
+      // liability without dragging the duel out.
+      if (enemyHealth > 0) {
+        const reflected = lj.enemy.thorns(enemy, lastAction.damage);
+        if (reflected > 0) {
+          heroHealth -= reflected;
+          heroDamageTaken += reflected;
+          lastAction.reflected = reflected;
+        }
+      }
     } else {
       // A boss with the enrage mechanic swings harder once wounded past its
       // threshold; lj.enemy.enraged returns a boosted attack snapshot (or the
@@ -297,9 +314,16 @@ lj.hero.fight = (enemy) => {
     herosTurn = !herosTurn;
   }
   //this.stats.hurt(heroDamageTaken); (Handled by the combat)
+  // Winner is read from the surviving side, not "who struck last". These are
+  // equivalent for a plain duel (the boss only loses HP on the hero's turn and
+  // the hero only on the boss's), but the Searing Colossus's thorns can drop the
+  // hero on the hero's OWN turn — so keying off lastAction.actor would miscredit
+  // that as a win. thorns is skipped on the killing blow, so heroHealth <= 0 here
+  // always means a live boss finished the hero: heroHealth > 0 <=> the boss is
+  // the one that died.
   return {
     outcome: {
-      actor: lastAction.actor,
+      actor: heroHealth > 0 ? "hero" : "enemy",
       damage: heroDamageTaken,
       type: "victory",
     },

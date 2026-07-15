@@ -23,8 +23,9 @@ lj.hero = (() => {
 
   const creaturesAndItemsMap = {
     B: "Enemy",
-    T: "Enemy", // The Cinderwyrm (apex enrage boss, odd realms 5+)
-    W: "Enemy", // The Obsidian Warden (apex ward boss, even realms 6+)
+    T: "Enemy", // The Cinderwyrm (apex enrage boss, realms 5, 8…)
+    W: "Enemy", // The Obsidian Warden (apex ward boss, realms 6, 9…)
+    S: "Enemy", // The Searing Colossus (apex thorns boss, realms 7, 10…)
     C: "Chest",
     E: "Enemy",
     a: "Enemy",
@@ -179,11 +180,14 @@ lj.hero = (() => {
     isBusy = true;
   }
 
-  function showFightStat({ actor, damage }, timeout) {
+  function showFightStat({ actor, damage, reflected }, timeout) {
     setTimeout(() => {
       if (actor === "hero") {
         hitEl.innerHTML = damage;
         fightEl.setAttribute("class", "dealing");
+        // A searing boss reflects part of this blow back; apply the recoil during
+        // the hero's own strike so the health bar tracks the fight's outcome.
+        if (reflected) lj.hero.stats.hurt(reflected);
       } else {
         lj.hero.stats.hurt(damage);
         damageEl.innerHTML = damage;
