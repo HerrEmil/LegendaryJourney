@@ -50,31 +50,40 @@ lj.enemy.familyForRealm = function (size) {
 };
 // Which boss grade guards a realm's exit. Realms 1-4 are sealed by their
 // family's standard boss (grade "B"). From realm 5 on — always the clamped red
-// "Emberdeep" tier — the exit is held by one of THREE apex bosses that rotate on
-// a size % 3 cycle, so a single deep run faces every apex identity: the enraging
-// Cinderwyrm (grade "T", realms 5, 8, 11…), the warding Obsidian Warden (grade
-// "W", realms 6, 9, 12…) and the searing/retaliating Searing Colossus (grade
-// "S", realms 7, 10, 13…). All three grades are populated only on red, which is
-// exactly the family every realm >= 5 resolves to. realm.js places the tile and
-// hero.js routes it, so each boss is genuinely reachable in play; the selfplay
-// harness fights the same grade, so all three mechanics are measured in the
-// decisive realm-5+ band.
+// "Emberdeep" tier — the exit is held by one of FOUR apex bosses that rotate on
+// a size % 4 cycle, so a single deep run faces every apex identity: the enraging
+// Cinderwyrm (grade "T", realms 5, 9, 13…), the warding Obsidian Warden (grade
+// "W", realms 6, 10, 14…), the searing/retaliating Searing Colossus (grade "S",
+// realms 7, 11, 15…) and the armor-sundering Molten Reaver (grade "M", realms 8,
+// 12, 16…). All four grades are populated only on red, which is exactly the
+// family every realm >= 5 resolves to. realm.js places the tile and hero.js
+// routes it, so each boss is genuinely reachable in play; the selfplay harness
+// fights the same grade, so all four mechanics are measured in the decisive
+// realm-5+ band.
 lj.enemy.bossGradeForRealm = function (size) {
   if (size < 5) {
     return "B";
   }
-  switch (size % 3) {
+  switch (size % 4) {
+    case 1:
+      return "T"; // realms 5, 9, 13… — the Cinderwyrm (enrage)
     case 2:
-      return "T"; // realms 5, 8, 11… — the Cinderwyrm (enrage)
-    case 0:
-      return "W"; // realms 6, 9, 12… — the Obsidian Warden (ward)
+      return "W"; // realms 6, 10, 14… — the Obsidian Warden (ward)
+    case 3:
+      return "S"; // realms 7, 11, 15… — the Searing Colossus (thorns)
     default:
-      return "S"; // realms 7, 10, 13… — the Searing Colossus (thorns)
+      return "M"; // realms 8, 12, 16… — the Molten Reaver (sunder)
   }
 };
 // All apex boss grades trigger the level-up on kill and the boss render sprite.
 lj.enemy.isBoss = function (grade) {
-  return grade === "B" || grade === "T" || grade === "W" || grade === "S";
+  return (
+    grade === "B" ||
+    grade === "T" ||
+    grade === "W" ||
+    grade === "S" ||
+    grade === "M"
+  );
 };
 // When a mechanic-carrying enemy is wounded past its enrage threshold it hits
 // harder: return a lightweight attack snapshot with its offensive stats scaled
@@ -126,6 +135,26 @@ lj.enemy.thorns = function (enemy, heroDamage) {
     return 0;
   }
   return Math.round(heroDamage * m.fraction);
+};
+// A sundering boss's white-hot cleaves melt through the hero's plate, ignoring a
+// fraction of its armor on the boss's own swing. Armor is %-damage-mitigation
+// that compounds hardest at depth (the deep game is attrition/mitigation-
+// limited), so stripping part of it makes each boss blow land harder — the
+// FOURTH boss mechanic and a deliberate foil to the patient, armored hero (where
+// thorns punishes the burst hero, sunder punishes the turtle). Return the hero's
+// stat snapshot with reduced EFFECTIVE armor for this swing — a shallow copy, so
+// the shared per-fight snapshot the other strikes read is untouched — or the
+// snapshot unchanged for enemies without the mechanic (zero allocation on the
+// common path). The reduced armor can never go negative (fraction in [0,1],
+// armor >= 0), so it only lowers mitigation, never flips into a damage amplifier.
+lj.enemy.sundered = function (enemy, heroStats) {
+  var m = enemy.mechanic;
+  if (!m || m.type !== "sunder") {
+    return heroStats;
+  }
+  var reduced = Object.assign({}, heroStats);
+  reduced.armor = Math.round(heroStats.armor * (1 - m.fraction));
+  return reduced;
 };
 lj.enemy.types = {
   brown: {},
@@ -281,6 +310,40 @@ lj.enemy.mods = [];
   col["red"].S = new mon([5, 7, 82, 1, 3, 5, 2], "The Searing Colossus", {
     type: "thorns",
     fraction: 0.2, // sears back 20% of every blow the hero lands (min-blow safe)
+  });
+
+  //Red apex #4 — "The Molten Reaver": the FOURTH boss mechanic and a foil to the
+  //patient, armored hero. The Cinderwyrm ramps its offense as it dies; the Warden
+  //eats every third blow; the Colossus reflects the hero's burst; the Reaver
+  //instead SUNDERS the hero's defense — its white-hot cleaves melt through plate,
+  //ignoring a fraction of the hero's armor on every swing (see lj.enemy.sundered).
+  //That attacks the exact stat the deep game is decided on: armor is
+  //%-damage-mitigation that compounds hardest at depth (the game is now
+  //attrition/mitigation-limited, ~70%+ of losses are boss attrition), so a boss
+  //that claws part of it back makes each of its blows land harder. It is the
+  //OPPOSITE target from the Colossus: thorns punishes the hero who hits HARD,
+  //sunder punishes the hero who turtles behind armor — the more mitigation the
+  //hero stacked, the more the Reaver melts. Unlike enrage/ward it neither ramps
+  //nor lengthens the duel (it never adds boss HP or eats hero blows), so fights
+  //stay SHORT (kind to the 400ms/step animation); and it touches only the boss's
+  //OWN swing, so the hero can still die only on the boss's turn — the shared
+  //outcome.actor health-check stays valid with no killing-blow special-case
+  //(unlike thorns). Balanced as a clean fourth sibling by the established method:
+  //it REUSES the Warden/Colossus modest defensive block [str 5, agi 7, hp 82,
+  //hit 1, crit 3, armor 5, def 2] EXACTLY, differing only in its mechanic — no HP
+  //trim was needed because sunder's amplification self-limits (once most of the
+  //hero's armor is stripped there is little left to melt), so the sibling HP lands
+  //the isolated Reaver squarely at the siblings' ~38-39% with the fraction as the
+  //single tuning knob (0.70 = melts through ~70% of the hero's plate). The sunder
+  //is LOAD-BEARING and the boss a PEER, both sim-measured (isolated A/B, all deep
+  //bosses = Reaver, sunder off vs on): OFF 45.7% -> ON 38.97% at 10000 runs
+  //(-6.7pt swing, ~9.6 sigma, far beyond noise), and the isolated ON rate 38.97%
+  //is dead level with the Cinderwyrm 38.9% / Warden 38.5% / Colossus 38.2%, so
+  //rotating all four by size % 4 (deep runs meet every apex) leaves the shipped
+  //--check ~38%. See scripts/balance-baseline.json.
+  col["red"].M = new mon([5, 7, 82, 1, 3, 5, 2], "The Molten Reaver", {
+    type: "sunder",
+    fraction: 0.7, // ignores 70% of the hero's armor on each of its swings
   });
 
   //Set up mods

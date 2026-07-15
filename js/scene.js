@@ -17,6 +17,7 @@ const spriteMap = {
   T: [0, 9], // The Cinderwyrm (apex enrage boss) — reuses the boss sprite
   W: [0, 9], // The Obsidian Warden (apex ward boss) — reuses the boss sprite
   S: [0, 9], // The Searing Colossus (apex thorns boss) — reuses the boss sprite
+  M: [0, 9], // The Molten Reaver (apex sunder boss) — reuses the boss sprite
   a: [0, 11], // Wolf
   b: [0, 12], // Gnoll
   c: [0, 13], // Troll

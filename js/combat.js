@@ -302,7 +302,13 @@ lj.hero.fight = (enemy) => {
       // enemy untouched for the ordinary case) so the extra damage runs through
       // the same duel math as any other strike.
       const attacker = lj.enemy.enraged(enemy, enemyHealth, enemyMaxHealth);
-      lastAction = lj.hero.duel(heroStats, attacker);
+      // A SUNDERING boss melts through part of the hero's armor on its own swing;
+      // lj.enemy.sundered returns the hero's stat snapshot with reduced effective
+      // armor (or the snapshot untouched for enemies without the mechanic), so the
+      // harder-landing blow flows through the same duel math. Only the boss's
+      // swing sees the reduced armor — the hero's real gear is never changed.
+      const defender = lj.enemy.sundered(enemy, heroStats);
+      lastAction = lj.hero.duel(defender, attacker);
       lastAction.actor = "enemy";
       if (attacker !== enemy) {
         lastAction.enraged = true;
