@@ -120,6 +120,49 @@ window.lj = lj || {};
   pre.push(new iStats.fix([0, 2, 0, 0, 1, 3, 0, 0, 0], "Undaunted")); // fearless duelist
   pre.push(new iStats.fix([1, 0, 0, 1, 0, 0, 2, 3, 0], "Ironbound")); // armored murmillo
 
+  //--- "Relics of the Apex" affix batch (batch 3) ----------------------
+  // A third coherent loot set, themed to the three APEX MECHANICS the deep
+  // hero now faces on the red-family bosses — enrage (the Cinderwyrm's growing
+  // fury), ward (the Obsidian Warden's absorbing barrier) and thorns (the
+  // Searing Colossus's searing recoil) — plus an apex CROWN archetype. This is
+  // a fresh motif distinct from "Spoils of the Realms" (the enemy families) and
+  // "Trophies of the Arena" (the hero's own prowess): each relic echoes the
+  // combat identity of the titan it was torn from. Fury = raw reckless power
+  // (str-led), Barbed/Recoil = the agile burst-striker who lives by the very
+  // burst that thorns punishes (agi/crit), Ward/Aegis = the barrier turned to
+  // worn armor+defense, Titan = the all-rounder crown.
+  //
+  // BALANCE — this batch discovered that composition-matching (the batch-2 rule)
+  // is NECESSARY BUT NOT SUFFICIENT for a neutral loot batch. A first draft that
+  // matched the pool's ~60/25/15 offense/hp/armor+def mix EXACTLY still eased the
+  // win rate +1.46pt (z=3.3 over a 24k-run isolated A/B) — a real stealth-
+  // rebalance in the "too easy" direction. Root cause, found via an equipped-
+  // gear probe: at realms 6-7 the draft inflated the hero's equipped HP by ~+3.7
+  // (=+18 max HP, pure survivability in the boss-attrition-bound deep game). The
+  // ENABLER is that CRIT is nearly inert in combat (only ~10% of hits crit, for a
+  // small multiplier bump) yet FULL-WEIGHT in gScore (combat.js weights every
+  // stat equally for auto-equip). So affixes that pair crit WITH hp get over-
+  // equipped on gScore and quietly smuggle survivability HP onto the hero. The
+  // neutral sibling "Trophies of the Arena" avoids this: it caps crit at 8 and
+  // pairs its hp with str/agi (honest combat stats), and re-measured at 24k it is
+  // dead neutral (0.00pt, z=-0.01). So this batch copies that proven profile:
+  // crit total 8 (not 11), hp paired with str/agi or the defensive block (never
+  // crit-heavy), def >= armor, and hp kept lean/unconcentrated. Two thematic
+  // defensive archetypes (Bastioned, of the Aegis — the Warden's ward made into
+  // worn plate) carry the ~15% armor+defense share so it stays offense/HP-LED,
+  // not pure-offense (pure-offense drifts ~2pt LOW — see batch 2). RESULT:
+  // balance-NEUTRAL — isolated 24k A/B baseline 38.58% vs batch 38.79% (+0.21pt,
+  // z=0.48, within noise); see scripts/balance-baseline.json. luck (index 2) is
+  // combat- and gScore-inert so it stays 0 (nonzero would pad); magicFind (idx 8)
+  // stays 0 to match the two prior batches. No new tile symbols — affixes only
+  // ride items, never the map, so scene.js spriteMap / hero.js
+  // creaturesAndItemsMap need no changes.
+  //           [str, agi, luk, hp, hit, crt, arm, def, mf]
+  pre.push(new iStats.fix([5, 0, 0, 1, 1, 1, 0, 0, 0], "Furious")); // enrage: reckless fury
+  pre.push(new iStats.fix([0, 2, 0, 0, 1, 3, 0, 0, 0], "Barbed")); // thorns: the burst striker
+  pre.push(new iStats.fix([0, 0, 0, 2, 0, 0, 1, 3, 0], "Bastioned")); // ward: worn barrier
+  pre.push(new iStats.fix([3, 2, 0, 2, 0, 0, 0, 0, 0], "Titanic")); // apex crown
+
   //Suffix creation
   suf.push(new iStats.fix([0, 1, 2, 1, 0, 0, 0, 0, 0], "of the Phoenix"));
   suf.push(new iStats.fix([5, 0, 0, 0, 0, 0, 0, 0, 0], "of Strength"));
@@ -167,6 +210,18 @@ window.lj = lj || {};
   suf.push(new iStats.fix([6, 0, 0, 0, 2, 0, 0, 0, 0], "of Conquest")); // raw dominance
   suf.push(new iStats.fix([3, 2, 0, 2, 0, 3, 0, 0, 0], "of the Champion")); // apex crown (Cinderwyrm's peer)
   suf.push(new iStats.fix([0, 0, 0, 3, 0, 0, 1, 3, 0], "of the Bulwark")); // the shield-wall
+
+  //--- "Relics of the Apex" suffix half (the titans' echoes) --------------
+  // of the Titan is the crown all-rounder (str/agi/hp, gScore 8 — sits below the
+  // pool's gScore-10 ceiling held by of the Cinderwyrm / of the Champion); its hp
+  // rides str/agi, not crit, per the neutrality lesson in the prefix comment. of
+  // the Aegis carries the second armor+defense share (def >= armor) so the batch
+  // matches the pool's ~15% armor/def composition.
+  //           [str, agi, luk, hp, hit, crt, arm, def, mf]
+  suf.push(new iStats.fix([4, 0, 0, 1, 1, 2, 0, 0, 0], "of Fury")); // enrage: molten wrath
+  suf.push(new iStats.fix([2, 2, 0, 0, 0, 2, 0, 0, 0], "of Recoil")); // thorns: the counter-strike
+  suf.push(new iStats.fix([0, 0, 0, 3, 0, 0, 2, 3, 0], "of the Aegis")); // ward: the raised barrier
+  suf.push(new iStats.fix([3, 2, 0, 3, 0, 0, 0, 0, 0], "of the Titan")); // apex crown
 
   //Getters
   pre.get = function (id, level) {
