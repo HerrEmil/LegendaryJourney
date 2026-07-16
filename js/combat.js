@@ -168,7 +168,13 @@ lj.hero.stats = {
   health: 100,
   updateHealth() {
     let percent;
-    const max = 100 + lj.hero.stats.get().hp * 5;
+    // Floor effective max-HP at 1. Gear can carry negative `hp` and auto-equips
+    // by gScore, so an unlucky streak can drive the summed hp to <= -20, i.e.
+    // `100 + hp*5 <= 0`. An unfloored max then divides by zero here ("NaNpx"
+    // width, which the browser drops so the bar freezes) and clamps health to 0
+    // for a false "DEAD" readout, or goes negative ("-50/-50"). Flooring keeps a
+    // gear-collapsed hero at a sane "1/1" instead of a broken HUD.
+    const max = Math.max(1, 100 + lj.hero.stats.get().hp * 5);
     // Re-cap health to the current max. A gear swap can LOWER max-HP (pickup
     // auto-equips by total gScore, so it may take a higher-score item that has
     // less hp), and heal() only caps at heal-time — so without this the stranded
@@ -187,7 +193,10 @@ lj.hero.stats = {
     }
   },
   heal(amount) {
-    const maxHP = 100 + lj.hero.stats.get().hp * 5;
+    // Same lower-bound floor as updateHealth() — negative-hp gear can drive
+    // `100 + hp*5` non-positive; without the floor a heal would cap health at a
+    // <= 0 value.
+    const maxHP = Math.max(1, 100 + lj.hero.stats.get().hp * 5);
     //Number based heal
     this.health += amount;
     if (this.health > maxHP) {
