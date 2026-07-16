@@ -271,15 +271,32 @@ lj.realm = (() => {
     width = rooms[room].length;
     height = rooms[room][0].length;
 
+    // The realm's BOSS ROOM is a distinct ARENA: it keeps the outer bomberman
+    // colonnade but clears its four central pillars into an open plaza and skips
+    // the biome offshoots entirely, so you step from the cluttered warren of the
+    // realm into a wide, deliberate lair. The arena is PURELY SUBTRACTIVE from
+    // the reference grid (strictly fewer walls than any biome room), so it is
+    // fully traversable by inclusion — connectivity can only IMPROVE when walls
+    // are removed. scripts/selfplay.mjs --rooms flood-fills it to prove it and
+    // asserts the plaza was actually carved. It emits only '#'/' ' (no new tile
+    // symbol => no paint risk), and playthrough() never calls makeRoom, so the
+    // win rate is untouched by construction — a pure structure/UX change.
+    const isBossRoom = room === bossRoom;
+
     // Draw wall at edge of room and a grid (making a "bomberman" wall layout)
     for (y = 0; y < height; y += 1) {
       for (x = 0; x < width; x += 1) {
+        const isPillar = y % 2 === 0 && x % 2 === 0;
+        // Boss arena: the four central pillars (cols/rows 4 & 6) are left open,
+        // framing the fight in the middle of the ring of remaining pillars.
+        const isCentralPillar =
+          isBossRoom && (x === 4 || x === 6) && (y === 4 || y === 6);
         if (
           y === 0 ||
           x === 0 ||
           y === height - 1 ||
           x === width - 1 ||
-          (y % 2 === 0 && x % 2 === 0)
+          (isPillar && !isCentralPillar)
         ) {
           rooms[room][x][y] = "#";
         }
@@ -290,19 +307,21 @@ lj.realm = (() => {
     // weights and sprout chance come from the realm's biome (set in makeRealm);
     // the leftmost column may sprout WEST (its escape cell), the rest may not
     // — pass-2 walls only grow east/vertical so they can never close a loop.
-
-    // Leftmost column of pillars — WEST is a legal (and guaranteed-free) target.
-    for (y = 2; y < height - 1; y += 2) {
-      if (Math.random() < biome.sprout) {
-        placeOffshoot(rooms[room], 2, y, biome.pass1, WEST);
-      }
-    }
-
-    // All other pillar columns — EAST is the guaranteed-free escape target.
-    for (x = 4; x < width - 1; x += 2) {
+    // The boss arena above skips this entirely: its lair stays an open plaza.
+    if (!isBossRoom) {
+      // Leftmost column of pillars — WEST is a legal (and guaranteed-free) target.
       for (y = 2; y < height - 1; y += 2) {
         if (Math.random() < biome.sprout) {
-          placeOffshoot(rooms[room], x, y, biome.pass2, EAST);
+          placeOffshoot(rooms[room], 2, y, biome.pass1, WEST);
+        }
+      }
+
+      // All other pillar columns — EAST is the guaranteed-free escape target.
+      for (x = 4; x < width - 1; x += 2) {
+        for (y = 2; y < height - 1; y += 2) {
+          if (Math.random() < biome.sprout) {
+            placeOffshoot(rooms[room], x, y, biome.pass2, EAST);
+          }
         }
       }
     }
@@ -390,6 +409,13 @@ lj.realm = (() => {
     return biome ? biome.name : null;
   }
 
+  // Room number of the current realm's boss room (the one makeRoom lays out as
+  // the open-plaza arena). Pure/read-only — the self-play room validator uses it
+  // to confirm boss rooms were sampled and their arena actually carved.
+  function getBossRoom() {
+    return bossRoom;
+  }
+
   function makeRealm(realmSize) {
     let roomNumber;
     // Clear previous realm
@@ -452,6 +478,9 @@ lj.realm = (() => {
 
     // Name of the current realm's depth-themed architecture (read-only)
     getBiomeName,
+
+    // Room number of the current realm's boss room (read-only)
+    getBossRoom,
 
     // Call when entering a door
     enterRoom,

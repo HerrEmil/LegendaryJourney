@@ -225,6 +225,16 @@ function playthrough(lj) {
 // ---------------------------------------------------------------------------
 const ROOM_ALLOWED = new Set(["#", " ", "L", "U", "R", "D"]);
 const HERO_SPAWN = [5, 9]; // [col,row]; odd/odd, so never a pillar or offshoot
+// The boss room is laid out as an open-plaza ARENA (js/realm.js makeRoom): the
+// four central grid pillars are cleared. These [col,row] cells are '#' in every
+// normal room, so their being open is the arena's signature — the validator
+// asserts it to prove the arena was actually carved (and stays connected).
+const BOSS_ARENA_PLAZA = [
+  [4, 4],
+  [6, 4],
+  [4, 6],
+  [6, 6],
+];
 
 // Set of walkable cells reachable from (startCol,startRow) via 4-neighbour steps
 // over an 11x11 room. A cell is walkable iff it is not a "#".
@@ -260,6 +270,7 @@ export function checkRooms({ sizes = [1, 2, 3, 4, 6], samples = 400 } = {}) {
   const problems = [];
   const perBiome = {};
   let roomsChecked = 0;
+  let bossRoomsChecked = 0;
 
   for (const size of sizes) {
     for (let s = 0; s < samples && problems.length < 12; s += 1) {
@@ -268,6 +279,10 @@ export function checkRooms({ sizes = [1, 2, 3, 4, 6], samples = 400 } = {}) {
         typeof lj.realm.getBiomeName === "function"
           ? lj.realm.getBiomeName()
           : "n/a";
+      const bossRoomIdx =
+        typeof lj.realm.getBossRoom === "function"
+          ? lj.realm.getBossRoom()
+          : -1;
       // Generate and inspect every room in the realm (interior rooms carry up
       // to four doors, so they stress connectivity harder than the start room).
       for (let roomIdx = 0; roomIdx < size * size; roomIdx += 1) {
@@ -277,6 +292,21 @@ export function checkRooms({ sizes = [1, 2, 3, 4, 6], samples = 400 } = {}) {
         perBiome[biome] = (perBiome[biome] || 0) + 1;
 
         const where = `biome=${biome} size=${size} room=${roomIdx}`;
+
+        // Boss room: assert its distinct open-plaza arena was actually carved
+        // (the four central pillars are open). The connectivity flood-fill below
+        // then proves the arena stays fully traversable like any other room.
+        if (roomIdx === bossRoomIdx) {
+          bossRoomsChecked += 1;
+          for (const [c, r] of BOSS_ARENA_PLAZA) {
+            if (room[c][r] === "#") {
+              problems.push(
+                `${where}: boss arena not carved — central pillar [${c},${r}] still walled`
+              );
+            }
+          }
+        }
+
         if (room[HERO_SPAWN[0]][HERO_SPAWN[1]] === "#") {
           problems.push(`${where}: hero spawn [5,9] is walled`);
           continue;
@@ -302,7 +332,13 @@ export function checkRooms({ sizes = [1, 2, 3, 4, 6], samples = 400 } = {}) {
       }
     }
   }
-  return { roomsChecked, perBiome, problems };
+  // The boss arena is selfplay-blind (playthrough never calls makeRoom), so this
+  // is the only automated proof it is wired: if we never saw a boss room, the
+  // getter is missing or the arena is unreachable.
+  if (bossRoomsChecked === 0) {
+    problems.push("no boss rooms were sampled (getBossRoom missing?)");
+  }
+  return { roomsChecked, bossRoomsChecked, perBiome, problems };
 }
 
 // ---------------------------------------------------------------------------
@@ -345,7 +381,7 @@ function run(runs) {
 
 function reportRooms(rc) {
   console.log(
-    `Room structural check — ${rc.roomsChecked} rooms across biomes ${JSON.stringify(
+    `Room structural check — ${rc.roomsChecked} rooms (${rc.bossRoomsChecked} boss arenas) across biomes ${JSON.stringify(
       rc.perBiome
     )}`
   );
