@@ -23,10 +23,11 @@ lj.hero = (() => {
 
   const creaturesAndItemsMap = {
     B: "Enemy",
-    T: "Enemy", // The Cinderwyrm (apex enrage boss, realms 5, 9…)
-    W: "Enemy", // The Obsidian Warden (apex ward boss, realms 6, 10…)
-    S: "Enemy", // The Searing Colossus (apex thorns boss, realms 7, 11…)
-    M: "Enemy", // The Molten Reaver (apex sunder boss, realms 8, 12…)
+    T: "Enemy", // The Cinderwyrm (apex enrage boss, realms 5, 10…)
+    W: "Enemy", // The Obsidian Warden (apex ward boss, realms 6, 11…)
+    S: "Enemy", // The Searing Colossus (apex thorns boss, realms 7, 12…)
+    M: "Enemy", // The Molten Reaver (apex sunder boss, realms 8, 13…)
+    H: "Enemy", // The Pyre Headsman (apex execute boss, realms 9, 14…)
     C: "Chest",
     E: "Enemy",
     a: "Enemy",

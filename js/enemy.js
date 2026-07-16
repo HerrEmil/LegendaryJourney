@@ -50,29 +50,31 @@ lj.enemy.familyForRealm = function (size) {
 };
 // Which boss grade guards a realm's exit. Realms 1-4 are sealed by their
 // family's standard boss (grade "B"). From realm 5 on — always the clamped red
-// "Emberdeep" tier — the exit is held by one of FOUR apex bosses that rotate on
-// a size % 4 cycle, so a single deep run faces every apex identity: the enraging
-// Cinderwyrm (grade "T", realms 5, 9, 13…), the warding Obsidian Warden (grade
-// "W", realms 6, 10, 14…), the searing/retaliating Searing Colossus (grade "S",
-// realms 7, 11, 15…) and the armor-sundering Molten Reaver (grade "M", realms 8,
-// 12, 16…). All four grades are populated only on red, which is exactly the
-// family every realm >= 5 resolves to. realm.js places the tile and hero.js
-// routes it, so each boss is genuinely reachable in play; the selfplay harness
-// fights the same grade, so all four mechanics are measured in the decisive
-// realm-5+ band.
+// "Emberdeep" tier — the exit is held by one of FIVE apex bosses that rotate on
+// a size % 5 cycle, so a single deep run faces every apex identity: the enraging
+// Cinderwyrm (grade "T", realms 5, 10, 15…), the warding Obsidian Warden (grade
+// "W", realms 6, 11, 16…), the searing/retaliating Searing Colossus (grade "S",
+// realms 7, 12, 17…), the armor-sundering Molten Reaver (grade "M", realms 8,
+// 13, 18…) and the executing Pyre Headsman (grade "H", realms 9, 14, 19…). All
+// five grades are populated only on red, which is exactly the family every realm
+// >= 5 resolves to. realm.js places the tile and hero.js routes it, so each boss
+// is genuinely reachable in play; the selfplay harness fights the same grade, so
+// all five mechanics are measured in the decisive realm-5+ band.
 lj.enemy.bossGradeForRealm = function (size) {
   if (size < 5) {
     return "B";
   }
-  switch (size % 4) {
+  switch (size % 5) {
+    case 0:
+      return "T"; // realms 5, 10, 15… — the Cinderwyrm (enrage)
     case 1:
-      return "T"; // realms 5, 9, 13… — the Cinderwyrm (enrage)
+      return "W"; // realms 6, 11, 16… — the Obsidian Warden (ward)
     case 2:
-      return "W"; // realms 6, 10, 14… — the Obsidian Warden (ward)
+      return "S"; // realms 7, 12, 17… — the Searing Colossus (thorns)
     case 3:
-      return "S"; // realms 7, 11, 15… — the Searing Colossus (thorns)
+      return "M"; // realms 8, 13, 18… — the Molten Reaver (sunder)
     default:
-      return "M"; // realms 8, 12, 16… — the Molten Reaver (sunder)
+      return "H"; // realms 9, 14, 19… — the Pyre Headsman (execute)
   }
 };
 // All apex boss grades trigger the level-up on kill and the boss render sprite.
@@ -82,7 +84,8 @@ lj.enemy.isBoss = function (grade) {
     grade === "T" ||
     grade === "W" ||
     grade === "S" ||
-    grade === "M"
+    grade === "M" ||
+    grade === "H"
   );
 };
 // When a mechanic-carrying enemy is wounded past its enrage threshold it hits
@@ -155,6 +158,33 @@ lj.enemy.sundered = function (enemy, heroStats) {
   var reduced = Object.assign({}, heroStats);
   reduced.armor = Math.round(heroStats.armor * (1 - m.fraction));
   return reduced;
+};
+// An EXECUTING boss smells blood: once the HERO is wounded past a threshold of
+// its max HP the boss's swings spike, racing to finish a bloodied hero before it
+// can recover on cleared floor. This is the FIFTH boss mechanic and the deliberate
+// MIRROR of enrage — enrage keys its offense ramp to the BOSS's own dwindling HP
+// (scarier as it dies), execute keys the same ramp to the HERO's (scarier as the
+// hero dies). Return a lightweight boosted attack snapshot (only offensive stats
+// matter when swinging) once currentHp <= maxHp * threshold, or the enemy
+// unchanged on the common path (no mechanic / hero still healthy), so the extra
+// damage flows through the normal duel math with zero allocation. Like sunder it
+// fires ONLY on the boss's own swing, so the hero still dies only on the boss's
+// turn and the shared outcome.actor health-check needs no killing-blow special
+// case (unlike thorns). It never adds boss HP nor eats hero blows, so fights stay
+// SHORT — it just ends a losing fight faster, punishing the razor-thin boss-
+// attrition near-miss (half of all boss deaths already land with the hero low).
+lj.enemy.executes = function (enemy, currentHp, maxHp) {
+  var m = enemy.mechanic;
+  if (!m || m.type !== "execute" || currentHp > maxHp * m.threshold) {
+    return enemy;
+  }
+  return {
+    strength: Math.round(enemy.strength * m.damageMult),
+    agility: Math.round(enemy.agility * m.damageMult),
+    hit: enemy.hit,
+    crit: enemy.crit,
+    name: enemy.name,
+  };
 };
 lj.enemy.types = {
   brown: {},
@@ -344,6 +374,54 @@ lj.enemy.mods = [];
   col["red"].M = new mon([5, 7, 82, 1, 3, 5, 2], "The Molten Reaver", {
     type: "sunder",
     fraction: 0.7, // ignores 70% of the hero's armor on each of its swings
+  });
+
+  //Red apex #5 — "The Pyre Headsman": the FIFTH boss mechanic and the deliberate
+  //MIRROR of the very first one. The Cinderwyrm ENRAGES — it hits harder once its
+  //OWN HP falls past a threshold (scarier as it dies). The Headsman EXECUTES — it
+  //hits harder once the HERO's HP falls past a threshold (scarier as the hero
+  //dies). It is a genuinely 5th combat AXIS distinct from the four before it:
+  //enrage (offense ramp keyed to the boss), ward (hit negation), thorns (reflect)
+  //and sunder (armor penetration) — execute is an offense ramp keyed to the HERO,
+  //a conditional lethality that turns the closing stretch of a losing fight into a
+  //death sentence. It targets EXACTLY the loss mode selfplay keeps surfacing: the
+  //deep game is boss-attrition-bound and HALF of all boss deaths already land with
+  //the hero under ~20% HP, a hair short — the Headsman makes that bloodied back
+  //half far deadlier, so a hero who cannot burst it down before dropping low is
+  //finished. Distinct SHAPE from enrage even though both are ramps: enrage's
+  //trigger (the boss's bar) is something the hero DRIVES DOWN by attacking, so
+  //racing the boss down is the counter; the Headsman's trigger (the hero's own
+  //bar) is something the boss drives down, so there is no "burst through the
+  //window" — the only counter is to win the fight outright while still healthy, or
+  //to bring enough effective-HP that the boosted swings still don't finish you.
+  //Like sunder it fires only on the boss's OWN swing (never the hero's), so the
+  //hero still dies only on the boss's turn and the shared outcome.actor
+  //health-check stays valid with NO killing-blow special-case; and it never adds
+  //boss HP nor eats hero blows, so fights stay SHORT (kind to the 400ms/step
+  //animation) — it merely ends a losing fight sooner. Balanced as a clean fifth
+  //SIBLING by the established method: it REUSES the Warden/Colossus/Reaver modest
+  //defensive block [str 5, agi 7, hp 82, hit 1, crit 3, armor 5, def 2] EXACTLY
+  //(armor/defense untouched per the depth-philosophy — never touch the compounding
+  //stats; the mechanic carries the threat), differing only in its mechanic, with
+  //the threshold (how low the hero must drop to trigger, 0.55) and damageMult
+  //(how much harder the boss then swings, 2.0 = double str+agi) as the two tuning
+  //knobs. The execute is LOAD-BEARING and the boss a Cinderwyrm/Warden/Colossus/
+  //Reaver PEER, both sim-measured against selfplay: an isolated A/B (all deep
+  //bosses = Headsman, execute off vs on) swings the win rate OFF 45.24% -> ON
+  //38.88% (-6.36pt, ~10 sigma => load-bearing), and the isolated ON rate 38.88%
+  //(12000 runs) is dead level with the Cinderwyrm 38.9% / Warden 38.5% / Colossus
+  //38.2% / Reaver 38.97% (an all-Reaver control on this same codebase read 38.35%)
+  //=> PEER. An easy first draft (threshold 0.35, damageMult 1.6) read 42.5%
+  //isolated (only -2.8pt swing, ~4pt too soft): execute firing only below 35% HP
+  //barely bit, since by then the hero was usually dead anyway — raising the window
+  //to the bottom HALF of the bar (0.55) and doubling the boosted blows (2.0) is
+  //what makes the back half genuinely lethal. Rotating all five by size % 5 (deep
+  //runs meet every apex) leaves the shipped --check ~37% (essentially the
+  //pre-Headsman baseline ~37.15%, within noise). See scripts/balance-baseline.json.
+  col["red"].H = new mon([5, 7, 82, 1, 3, 5, 2], "The Pyre Headsman", {
+    type: "execute",
+    threshold: 0.55, // executes while the hero is below 55% of its max HP
+    damageMult: 2.0, // doubles strength & agility while executing (the kill blow)
   });
 
   //Set up mods

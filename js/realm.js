@@ -236,7 +236,7 @@ lj.realm = (() => {
       chestsAndMonsters[room][roomX][roomY] = pickRandomEnemyType();
       // If boss room, replace last placed enemy with the realm's boss. Which
       // boss guards the exit is depth-dependent (grade "B" normally; from realm 5
-      // on one of the four apex bosses T/W/S/M rotating on size % 4) — see
+      // on one of the five apex bosses T/W/S/M/H rotating on size % 5) — see
       // lj.enemy.bossGradeForRealm.
       if (room === bossRoom && i === enemies - 1) {
         chestsAndMonsters[room][roomX][roomY] =

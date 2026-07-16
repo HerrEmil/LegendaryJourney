@@ -252,6 +252,9 @@ lj.hero.fight = (enemy) => {
 
   const // Snap shotting hero's stats so changing gear between strikes won't work
     heroStats = lj.hero.stats.get();
+  // The hero's max HP (same formula as lj.hero.stats.updateHealth) — the reference
+  // the EXECUTE mechanic measures the hero's dwindling health against.
+  const heroMaxHealth = 100 + heroStats.hp * 5;
 
   let herosTurn = true;
   let lastAction;
@@ -297,11 +300,19 @@ lj.hero.fight = (enemy) => {
         }
       }
     } else {
-      // A boss with the enrage mechanic swings harder once wounded past its
-      // threshold; lj.enemy.enraged returns a boosted attack snapshot (or the
-      // enemy untouched for the ordinary case) so the extra damage runs through
-      // the same duel math as any other strike.
-      const attacker = lj.enemy.enraged(enemy, enemyHealth, enemyMaxHealth);
+      // A boss with the enrage mechanic swings harder once IT is wounded past its
+      // threshold; a boss with the EXECUTE mechanic swings harder once the HERO is
+      // wounded past its threshold (the mirror of enrage). Both return a boosted
+      // attack snapshot (or the enemy untouched for the ordinary case) so the extra
+      // damage runs through the same duel math as any other strike. A boss carries
+      // at most one mechanic, so chaining is safe: the inapplicable helper returns
+      // its argument unchanged — execute reads .mechanic, which the enrage snapshot
+      // lacks, making it a strict no-op on an enraged boss, and vice versa.
+      const attacker = lj.enemy.executes(
+        lj.enemy.enraged(enemy, enemyHealth, enemyMaxHealth),
+        heroHealth,
+        heroMaxHealth
+      );
       // A SUNDERING boss melts through part of the hero's armor on its own swing;
       // lj.enemy.sundered returns the hero's stat snapshot with reduced effective
       // armor (or the snapshot untouched for enemies without the mechanic), so the
@@ -310,8 +321,15 @@ lj.hero.fight = (enemy) => {
       const defender = lj.enemy.sundered(enemy, heroStats);
       lastAction = lj.hero.duel(defender, attacker);
       lastAction.actor = "enemy";
+      // Flag which offensive ramp boosted this swing so the battle log can surface
+      // it. attacker !== enemy means one fired; a boss carries a single mechanic,
+      // so its descriptor tells us which (execute vs enrage).
       if (attacker !== enemy) {
-        lastAction.enraged = true;
+        if (enemy.mechanic && enemy.mechanic.type === "execute") {
+          lastAction.executed = true;
+        } else {
+          lastAction.enraged = true;
+        }
       }
       log.push(lastAction);
       heroHealth -= lastAction.damage;
