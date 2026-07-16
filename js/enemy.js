@@ -433,6 +433,44 @@ lj.enemy.mods = [];
   mod.push(new mon([1, 1, 1, 0, 1, 1, 1], "Blind"));
   mod.push(new mon([0.1, 0.1, 1, 1, 1, 1, 1], "Pacified"));
   mod.push(new mon([1, 1, 1, -50, 10, 1, 1], "Wildly Flailing"));
+
+  //ELITE MODIFIERS — "depth-themed" batch (elite-mods-batch, ladder id 15). A mod
+  //is a 7-stat MULTIPLIER array [str, agi, hp, hit, crit, armor, defense] that
+  //lj.enemy.get rolls onto ~1-in-5 enemies (name prepends), INCLUDING apex bosses
+  //(the boss's own .mechanic survives — lj.enemy.base only copies type.mechanic,
+  //never a mod's). So a mod that leans offensive can land on an ENRAGING or
+  //EXECUTING apex and stack with its damage ramp — the worst case the A/B must
+  //cover. Two rules the whole batch honors: (1) ARMOR mult <= 1 ALWAYS — armor is
+  //%-mitigation that compounds hardest at depth (base * mult * realmMod), so an
+  //armor buff would balloon into a near-unkillable deep enemy; every entry keeps
+  //armor at 1 or below. (2) mods MULTIPLY the realm-scaled stats, so each is a
+  //genuine risk/reward TRADE (a real upside paid for with a real downside), never
+  //a flat power-add — mirroring the legacy pool above (Angry/Strong buff, Pacified/
+  //Sturdy nerf) and keeping the batch AVERAGE near the legacy average so the 1-in-5
+  //overlay barely shifts the win rate (measured neutral by the isolated A/B; see
+  //scripts/balance-baseline.json). The load-bearing levers for an ENEMY are just
+  //str/agi (offense: avg swing ~= str + agi) and hp (durability); armor is capped
+  //<=1 per the rule above. The other three barely move an enemy: hit is base 0-1 so
+  //a x1.4/x0.7 rounds back to 1; crit only ADDS to a fixed 150-base multiplier on a
+  //10% proc over a tiny base crit (1-3), worth well under ~1% average damage; and
+  //defense only nudges the hero's miss chance (~0.1%/point). So crit/defense here
+  //ride along as THEME/flavor, not power — every glass-cannon's real bite is its
+  //str/agi, and each survivability buff is paid for in str/agi.
+  //Three family/depth THEMES pair a survivability buff with an offense cut; three
+  //glass-cannons/jokers pair an offense buff with a fragility cut — a balanced
+  //spread of trade-offs, not six buffs.
+  //Frost tank ("The Frostmarch"): glacier-clad — far tougher, but slowed.
+  mod.push(new mon([1, 0.6, 1.5, 1, 1, 1, 1], "Glacial"));
+  //Depth bulwark (apex/ancient): a weathered wall — high HP + guard, weak blows.
+  mod.push(new mon([0.7, 1, 1.3, 1, 1, 1, 1.5], "Adamantine"));
+  //Blight glass-cannon ("The Blightwood"): venom-mad offense that rots itself.
+  mod.push(new mon([1.4, 1, 0.65, 1, 1.5, 1, 1], "Plagueridden"));
+  //Ember frenzy ("The Emberdeep"): all molten fury, no guard — fast, critty, frail.
+  mod.push(new mon([1, 1.5, 0.7, 1, 1.4, 0.5, 1], "Volcanic"));
+  //Bruiser joker: huge and ponderous — a big slow bag of HP with a heavy, wild arm.
+  mod.push(new mon([1.25, 0.5, 1.6, 1, 1, 1, 1], "Colossal"));
+  //Swarm joker: skittering and reckless — blinding speed on paper-thin, unarmored HP.
+  mod.push(new mon([1, 1.6, 0.5, 1, 1, 0, 1], "Skittering"));
 })();
 
 // Ordered family ladder for realm depth, kept to only the POPULATED families so

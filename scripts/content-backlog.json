@@ -98,6 +98,79 @@
       "status": "done",
       "built": "2026-07-16",
       "summary": "Added 'The Pyre Headsman' (red grade 'H'), the FIFTH boss mechanic: EXECUTE — the deliberate MIRROR of the very first mechanic. The Cinderwyrm ENRAGES (its offense ramps once ITS own HP drops past a threshold, scarier as it dies); the Headsman EXECUTES (its offense ramps once the HERO's HP drops past a threshold, scarier as the hero dies). It is a genuinely 5th combat AXIS beyond the four taken (enrage=offense-ramp-on-boss, ward=hit-negation, thorns=reflect, sunder=armor-pen): a conditional lethality keyed to the HERO, turning the closing stretch of a losing fight into a death sentence — it targets EXACTLY the dominant loss mode (boss-attrition; half of all boss deaths already land with the hero low). New helper lj.enemy.executes(enemy,currentHp,maxHp) mirrors enraged: returns a boosted attack snapshot {strength*mult,agility*mult,hit,crit,name} once currentHp<=maxHp*threshold, else the enemy unchanged (zero-alloc common path). js/combat.js threads heroMaxHealth=100+heroStats.hp*5 (the real max-HP formula) and computes the boss's attacker as executes(enraged(enemy,enemyHealth,enemyMaxHealth),heroHealth,heroMaxHealth) — a boss carries ONE mechanic so chaining is safe: the enrage snapshot has no .mechanic, so executes passes it through (strict no-op), and enraged is a no-op on an execute boss; a '.executed' flag (parallel to '.enraged') is set for the future telegraphs module (nothing reads it yet). Like sunder it fires only on the boss's OWN swing, so the hero still dies only on the boss's turn and the shared outcome.actor health-check needs NO killing-blow special-case (unlike thorns); it never adds boss HP nor eats hero blows, so fights stay SHORT. Reachable: bossGradeForRealm rotates size%4 -> size%5 = T Cinderwyrm(5,10,15) / W Warden(6,11,16) / S Colossus(7,12,17) / M Reaver(8,13,18) / H Headsman(9,14,19), all red; wired via types.red.H, isBoss('H'), hero.js creaturesAndItemsMap.H, scene.js spriteMap.H=[0,9] (reuses the boss sprite B/T/W/S/M already use — zero new render risk), realm.js places it through the existing generic bossGradeForRealm path; selfplay/harness fight bossGradeForRealm so all five are auto-measured. Also refreshed the now-stale size%4 comments in realm.js (boss-placement line) and hero.js (T/W/S realm numbers). BALANCE: clean fifth SIBLING — REUSES the Warden/Colossus/Reaver defensive block [5,7,82,1,3,5,2] EXACTLY (armor/defense untouched per the depth-philosophy; the mechanic carries the threat), with threshold + damageMult the only knobs. A 5-combo isolated sweep (all-deep=Headsman, 8k each) picked (threshold 0.55, damageMult 2.0)=38.95%, confirmed at 12k=38.88% — a dead-on PEER (Cinderwyrm 38.9/Warden 38.5/Colossus 38.2/Reaver 38.97; an all-Reaver control on this same codebase read 38.35). LOAD-BEARING: isolated OFF (mechanic disabled) 45.24% -> ON 38.88% = -6.36pt (~10 sigma), matching the siblings' 6-7pt swings. A first draft (0.35,1.6) was ~4pt too soft (42.5%, only -2.8pt swing): firing only below 35% HP barely bit because the hero was usually dead by then — widening to the bottom HALF of the bar (0.55) and doubling the boosted blows (2.0=the kill move) made the back half genuinely lethal. Shipped size%5 rotation measured NEUTRAL vs the pre-Headsman baseline (isolated-tree 36.65% / live 37.43% at 12k, pooled ~37.0% vs baseline 37.15% clean origin/main 10k). Shipped `node scripts/selfplay.mjs --runs 6000 --check` read 36.9% (2215/6000) IN-BAND [25,75], beatable+survivable, structural green (26,400 rooms, all biomes). JS-all 28.48KB brotli (<=55KB). Headless browser-verified on dist/: rotation 5-14 = T,W,S,M,H,T,W,S,M,H, an 'H' boss tile places+generates crash-free on a realm-5 board, 300 in-browser Headsman fights fire execute with 0 console errors. GOTCHA for a future 6th mechanic (boss-mechanic-6, ladder id 19): the remaining {execute} sibling axes are tempo/double-strike and turn-escalation; keep fights SHORT and honor the outcome.actor contract (a mechanic that can kill the hero on the hero's OWN turn must skip the killing blow like thorns, or re-derive attribution). Execute is 'closing-window' by nature so it's strongly load-bearing per point of damageMult — tune the WINDOW (threshold) first, the multiplier second."
+    },
+    {
+      "id": "elite-mods-batch",
+      "priority": 15,
+      "status": "done",
+      "built": "2026-07-16",
+      "summary": "LADDER 2 #15 [A/B]. Added 6 depth-themed ELITE MODIFIERS to lj.enemy.mods (js/enemy.js), growing the pool 8 -> 14: Glacial (frost tank: hp x1.5, agi x0.6), Adamantine (depth bulwark: hp x1.3, def x1.5, str x0.7), Plagueridden (blight glass-cannon: str x1.4, crit x1.5, hp x0.65), Volcanic (ember frenzy: agi x1.5, crit x1.4, hp x0.7, armor x0.5), Colossal (bruiser joker: hp x1.6, str x1.25, agi x0.5), Skittering (swarm joker: agi x1.6, hp x0.5, armor x0). Each is a 7-stat MULTIPLIER array [str,agi,hp,hit,crit,armor,defense] that lj.enemy.get rolls onto ~1-in-5 enemies INCLUDING apex bosses (name prepends; the boss's own .mechanic survives because lj.enemy.base copies type.mechanic, never a mod's). AUTO-REACHABLE: the only wiring is mod.push — get() draws rng(0,len-1) across the pool and applies it 1-in-5. ZERO SYMBOL-CRASH RISK: a mod only prepends to the name and multiplies stats; the enemy still renders by its grade tile (a/b/c/d/B/T/W/S/M/H), so scene.js spriteMap and hero.js creaturesAndItemsMap are UNTOUCHED (browser-verified). RULES honored: armor mult <= 1 on every entry (Glacial/Adamantine/Plagueridden/Colossal 1, Volcanic 0.5, Skittering 0 — armor is %-mitigation that compounds at depth); mods multiply the realm-scaled stats; each is a genuine risk/reward TRADE (a real upside paid in a real downside), mirroring the legacy pool (Angry/Strong buff, Pacified/Sturdy nerf). DESIGN: 3 family/depth themes pair a survivability buff with an offense cut; 3 glass-cannons/jokers pair an offense buff with a fragility cut — a balanced spread, not 6 buffs. KEY FINDING — the spec's feared worst case (offensive mod on an ENRAGED apex) is a NON-ISSUE: an offensive mod that also cuts hp/armor is SELF-LIMITING because the boss dies faster than its spiked swings can matter. Saturated stress (EVERY realm-5+ apex FORCED to carry one mod, 2500 runs each): the offensive mods are all EASIER than the 37.6% unmodded control — Skittering 47.1% / Volcanic 42.8% / Plagueridden 42.0% — while the DURABILITY mods are the real (mild) threat: Adamantine 31.7%, Colossal 26.4%. Even the pathological all-Colossal-boss case (hp x1.6 sponge on EVERY apex, an all-attrition worst case that never occurs in play) holds 26.4% > 25% floor; in real play each mod is only ~1.4% of bosses. ENEMY-LEVER REALITY (confirmed via combat.js): hit is near-inert (base 0-1, a mult rounds back to 1) and crit is near-inert for enemies (additive to a fixed 150 base on a 10% proc over tiny base crit 1-3, < ~1% avg dmg); str/agi (offense, avg swing ~= str+agi) and hp (durability) are the load-bearing levers, armor the capped mitigation — so crit/defense on the glass-cannons ride as THEME/flavor. BALANCE: NEUTRAL, measured. Isolated A/B (baseline worktree off origin/main vs batch, 24k runs each): baseline 37.84% (9082/24000) vs batch 37.70% (9047/24000) = -0.15pt, z=-0.33 (dead neutral, |z|<0.5). Shipped `node scripts/selfplay.mjs --runs 6000 --check` = 37.3% (2240/6000) IN-BAND [25,75], beatable+survivable, structural green (26,400 rooms: halls 400, frost 1600, blight 3600, ember 20800). JS-all 29.95KB brotli (<=55KB). Headless browser-verified on dist/: all 14 mods spawn with prepended names (e.g. 'Glacial Magma Golem', 'Plagueridden Ember Imp'), mod rate ~18-20%, and a 'Colossal The Cinderwyrm' fights through lj.hero.fight + updateCharPane/battleLog with 0 console errors. Renamed the frost mod from 'Rimebound' to 'Glacial' (avoids the redundant 'Rimebound Rime Sentinel' prepend). GOTCHA for future mod/enemy runs: for the MOD pool, DURABILITY (hp/armor) is the win-rate lever, not offense — an 'elite' offensive mod that also cuts hp/armor nets EASIER (dies faster); to make a mod genuinely threatening, buff hp (attrition) not str/agi. crit/hit multipliers on enemies are ~inert — spend mod budget on str/agi/hp."
+    },
+    {
+      "id": "boss-lair-arena",
+      "priority": 16,
+      "status": "todo",
+      "summary": "LADDER 2 #16 [ROOMS]. makeRoom (js/realm.js) treats the boss room like any other. Branch on room === bossRoom to give it a distinct arena layout (sprout=0 open floor or a pillar ring); fewer walls = connected by inclusion, anything additive keeps the <=1-offshoot + pass-2-never-west invariant. Extend checkRooms() to assert boss rooms were sampled. SELFPLAY-BLIND: playthrough() never calls makeRoom — verify via --rooms + browser sweep to realm 6+."
+    },
+    {
+      "id": "mechanic-telegraphs",
+      "priority": 17,
+      "status": "todo",
+      "summary": "LADDER 2 #17 [UI]. combat.js log entries already carry .enraged/.warded/.reflected (sunder needs a flag added) but battle-log.js never surfaces them. Add one-line battleLog callouts per mechanic, fired from the fight log in hero.js, + a realm-arrival banner using lj.realm.getBiomeName() in scene.levelUp. Zero combat-math change. SELFPLAY-BLIND: verify in browser by forcing each apex and seeing each callout; --check unchanged by construction."
+    },
+    {
+      "id": "base-item-batch",
+      "priority": 18,
+      "status": "todo",
+      "summary": "LADDER 2 #18 [A/B]. lj.items.types (js/items.js) slot arrays are thin (cloak/gloves 3, shoulder/chest/ring 4) and uniform-drawn by types.get, so new base items shift pool composition EXACTLY like affixes: all loot rules apply (comp-match ~15% armor/def, crit <= 8 never with hp, luck/mf 0, equipped-gear probe). One themed item per thin slot (+1 weapon); names are player-visible on every drop."
+    },
+    {
+      "id": "boss-mechanic-6",
+      "priority": 19,
+      "status": "todo",
+      "summary": "LADDER 2 #19 [A/B]. Take the axis of {execute, tempo/double-strike, turn-escalation} that mechanic-5 did NOT use (execute is taken -> pick tempo/double-strike or turn-escalation). Extend bossGradeForRealm size%5 -> size%6; free letter from A/F/G/H/K/N/P/Q/V/X/Y/Z minus 5's pick (never D/U/L/R/E/C); same helper pattern ({type} on monster -> lj.enemy.base -> helper in the combat.js loop); reuse peer block [5,7,82,1,3,5,2] + boss sprite [0,9] + isBoss + both symbol maps. Keep fights SHORT; honor the outcome.actor contract (hero dies only on the boss's turn, or skip the killing blow like thorns). Gate: isolated all-deep A/B peer ~38-39% + load-bearing on/off swing >> noise, then --check."
+    },
+    {
+      "id": "boss-trophy-drop",
+      "priority": 20,
+      "status": "todo",
+      "summary": "LADDER 2 #20 [A/B]. Bosses award nothing but the levelUp. In hero.js interact's isBoss victory branch, grant lj.hero.gear.pickup(lj.items.makeItem(null, null, \"rare\")) + a battleLog line. HARNESS MIRROR: selfplay.mjs playthrough() re-implements the boss loop — add the drop there in the SAME commit or the A/B measures nothing. Expect small upward lift; quality floor is the knob (rare -> normal if > ~+3pt)."
+    },
+    {
+      "id": "affix-batch-6",
+      "priority": 21,
+      "status": "todo",
+      "summary": "LADDER 2 #21 [A/B]. Sixth batch, fresh motif (taken: families/prowess/apex-mechanics/forging; e.g. the Journey itself — 'Wayfarer's / of the Long Road'). Copy the proven-neutral profile: comp ~59/25/16, crit total 8 on no-hp offense affixes, def >= armor, crown carries real hp (never inert crit), gScore <= 10; probe the crown specifically."
+    },
+    {
+      "id": "deep-biome",
+      "priority": 22,
+      "status": "todo",
+      "summary": "LADDER 2 #22 [ROOMS]. biomeLadder (js/realm.js) clamps ember over every realm >= 5, so the decisive apex band has no architecture of its own. Add a 5th biome for realm 5+ as a new weights entry + ladder slot, re-weighting pass1/pass2/sprout only, within the invariants. SELFPLAY-BLIND: gate is --rooms with sizes extended to include 5 and 8, + browser render sweep realms 4-8."
+    },
+    {
+      "id": "hall-of-legends",
+      "priority": 23,
+      "status": "todo",
+      "summary": "LADDER 2 #23 [UI]. Nothing persists across runs. localStorage best-run panel (deepest realm, slays, wins/deaths) hooked where events already flow — battle-log.js heroKilled/levelComplete/gameComplete — plus a small DOM panel. Guard storage access (typeof localStorage) so the vm-shimmed harness still loads. SELFPLAY-BLIND: browser verify play/die/reload persistence; watch the 5KB CSS budget if styling."
+    },
+    {
+      "id": "fifth-family",
+      "priority": 24,
+      "status": "todo",
+      "summary": "LADDER 2 #24 [A/B, big]. Populate lj.enemy.types with a realm-5+ family (void/hollow theme) + extend familyLadder so realm 5 stops clamping to red. CRASH TRAP: hero.js draws the boss from the SAME family, so the new family MUST carry every apex grade (alias red's: col.void.T = col.red.T, or retune) or realm-5+ bosses are undefined. Escalation per the red lessons: armor UNTOUCHED, <= +1 hp/grade + one offensive touch; expect ~4pt drop — retune the family itself, never the exponent, one lever per commit."
+    },
+    {
+      "id": "fortunes-favor",
+      "priority": 25,
+      "status": "todo",
+      "summary": "LADDER 2 #25 [A/B, rebalance-class]. magicFind is LIVE but near-absent: items.js qualities.get floors the quality roll at mf * 2^(realmSize-1) of ~1000, so tiny mf compounds exponentially and directly accelerates the legendary-set WIN. Ship a measured micro-dose (1-2 total mf on 1-2 affixes or a trinket) with a dose-response sweep like the exponent run; the one item allowed to move the number on purpose — target <= +3pt, document it."
+    },
+    {
+      "id": "rebalance-checkpoint-2",
+      "priority": 26,
+      "status": "todo",
+      "summary": "LADDER 2 #26 [A/B]. Repeat the 2026-07-14 method after ~10 modules of drift: per-realm win/death diagnostics; if shipped rate left the 33-45 comfort band, sweep-then-nudge the 0.375 exponent (primary global lever); if in-band, spend the run re-tuning the worst-measuring earlier module (e.g. apex peers to 38+-1). Ship diagnostics into balance-baseline.json either way."
     }
   ]
 }
