@@ -163,6 +163,55 @@ window.lj = lj || {};
   pre.push(new iStats.fix([0, 0, 0, 2, 0, 0, 1, 3, 0], "Bastioned")); // ward: worn barrier
   pre.push(new iStats.fix([3, 2, 0, 2, 0, 0, 0, 0, 0], "Titanic")); // apex crown
 
+  //--- "Craft of the Forgemasters" affix batch (batch 5) ----------------
+  // A fifth coherent loot set, themed to the legendary SMITHS and FORGES that
+  // craft the greatest gear — a fresh motif distinct from "Spoils of the
+  // Realms" (the enemy families), "Trophies of the Arena" (the hero's own
+  // prowess) and "Relics of the Apex" (the boss mechanics). Where those name
+  // WHO the loot was torn from or WHO wields it, this names HOW a legendary
+  // artifact is MADE — fitting for a game whose win is a full legendary set.
+  // Each prefix is a smithing technique (runework, a whetted edge, a resilience
+  // temper, a flawless masterwork) and each suffix a legendary forge/smith.
+  //
+  // BALANCE — this copies the proven-neutral profile of "Relics of the Apex"
+  // (batch 3, re-measured dead-neutral) rather than re-deriving it, because the
+  // two batch-3 findings are load-bearing: (1) COMPOSITION-MATCH the loot pool's
+  // ~60/25/15 offense/hp/armor+def budget mix — a pure-offense batch drifts ~2pt
+  // LOW because the deep game is mitigation-limited (~70% of losses are boss
+  // attrition and armor is %-mitigation that compounds at depth); (2) matching
+  // the mix is NECESSARY BUT NOT SUFFICIENT — CRIT is nearly inert in combat
+  // (~10% of hits, small multiplier bump) yet FULL-WEIGHT in the gScore auto-
+  // equip, so an affix pairing crit WITH concentrated hp gets over-equipped and
+  // quietly smuggles survivability HP onto the hero (~+1.5pt easy). So this batch
+  // holds crit total to 8 (spread across offense affixes only), never co-locates
+  // crit with concentrated hp (only Runeworked carries a token hp1), keeps
+  // def >= armor, and pairs its hp with str/agi or the defensive block. Two
+  // defensive archetypes (Tempered, of the Quenching) carry the pool's ~15%
+  // armor+def share so the set stays offense/HP-LED, not pure-offense. Category
+  // totals str16/agi7/hp15/hit3/crit8/armor3/def6 (comp 59/26/16) mirror the
+  // neutral "Trophies of the Arena" profile (59/25/16); gScore peaks at 9
+  // (Runeworked), below the pool's 10 ceiling.
+  // luck (index 2) is combat- and gScore-inert so it stays 0 (nonzero would
+  // pad); magicFind (index 8) stays 0 to match the four prior batches.
+  // A NOTE ON THE CROWN: a first draft gave the crown suffix (of the Grand Smith)
+  // an inert crit2 where the proven-neutral Relics crown (of the Titan) carries a
+  // real hp3 — an isolated 24k A/B measured that draft -1.05pt / z=-2.39 (mildly
+  // HARDER, just outside neutral) because the frequently-equipped gScore-8 crown
+  // delivered ~hp3 less survivability per equip. Swapping the crown's crit2 -> hp3
+  // (and relocating the 2 crit onto no-hp offense affixes to keep crit total 8)
+  // recentred it: the shipped design measures base 37.31% vs batch 37.57%
+  // (+0.27pt, z=0.60 at 24k runs/arm) — NEUTRAL. VERIFIED in that isolated A/B off
+  // a clean origin/main worktree + an equipped-gear probe at realms 6-7 (which
+  // showed the crown fix restored ~+2.6 equipped HP with a neutral win rate) — see
+  // scripts/balance-baseline.json. No new tile symbols — affixes only ride items,
+  // never the map, so scene.js spriteMap / hero.js creaturesAndItemsMap need no
+  // changes (zero symbol-crash risk).
+  //           [str, agi, luk, hp, hit, crt, arm, def, mf]
+  pre.push(new iStats.fix([5, 0, 0, 1, 1, 2, 0, 0, 0], "Runeworked")); // etched power runes
+  pre.push(new iStats.fix([0, 2, 0, 0, 1, 3, 0, 0, 0], "Keen-Edged")); // whetted crit edge
+  pre.push(new iStats.fix([0, 0, 0, 2, 0, 0, 1, 3, 0], "Tempered")); // heat-treated plate
+  pre.push(new iStats.fix([3, 2, 0, 2, 0, 0, 0, 0, 0], "Masterforged")); // flawless all-rounder
+
   //Suffix creation
   suf.push(new iStats.fix([0, 1, 2, 1, 0, 0, 0, 0, 0], "of the Phoenix"));
   suf.push(new iStats.fix([5, 0, 0, 0, 0, 0, 0, 0, 0], "of Strength"));
@@ -222,6 +271,21 @@ window.lj = lj || {};
   suf.push(new iStats.fix([2, 2, 0, 0, 0, 2, 0, 0, 0], "of Recoil")); // thorns: the counter-strike
   suf.push(new iStats.fix([0, 0, 0, 3, 0, 0, 2, 3, 0], "of the Aegis")); // ward: the raised barrier
   suf.push(new iStats.fix([3, 2, 0, 3, 0, 0, 0, 0, 0], "of the Titan")); // apex crown
+
+  //--- "Craft of the Forgemasters" suffix half (the legendary forges) -----
+  // of the Grand Smith is the crown all-rounder (str3/agi2/hp3, gScore 8 — sits
+  // below the pool's gScore-10 ceiling); it mirrors the proven-neutral Relics
+  // crown "of the Titan" exactly, carrying honest hp on str/agi with NO crit (an
+  // earlier crit-bearing crown drifted the batch mildly harder — see the prefix
+  // comment). of the Forge is the crit-bearing offense suffix (str4/hit1/crit3, no
+  // hp). of the Quenching carries the second armor+def share (def >= armor) so the
+  // batch matches the pool's ~15% armor/def composition; of the Anvil is the hp-led
+  // endurance suffix (hp paired with str/agi, never crit).
+  //           [str, agi, luk, hp, hit, crt, arm, def, mf]
+  suf.push(new iStats.fix([4, 0, 0, 0, 1, 3, 0, 0, 0], "of the Forge")); // raw forged might
+  suf.push(new iStats.fix([1, 1, 0, 5, 0, 0, 0, 0, 0], "of the Anvil")); // endurance of the anvil
+  suf.push(new iStats.fix([0, 0, 0, 2, 0, 0, 2, 3, 0], "of the Quenching")); // hardened in the quench
+  suf.push(new iStats.fix([3, 2, 0, 3, 0, 0, 0, 0, 0], "of the Grand Smith")); // mastersmith's crown
 
   //Getters
   pre.get = function (id, level) {
