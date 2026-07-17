@@ -63,6 +63,7 @@ lj.battleLog = (() => {
     warded: (monster) => `A ward flares — the ${monster} absorbs your blow!`,
     reflected: (monster) => `The ${monster}'s searing hide sears your blow back!`,
     sundered: (monster) => `The ${monster} cleaves through your armor!`,
+    flurried: (monster) => `The ${monster} blurs into a flurry of blows!`,
   };
 
   // hasOwnProperty, not a truthiness check: a plain `telegraphs[kind]` reaches

@@ -309,47 +309,64 @@ lj.hero.fight = (enemy) => {
         }
       }
     } else {
-      // A boss with the enrage mechanic swings harder once IT is wounded past its
-      // threshold; a boss with the EXECUTE mechanic swings harder once the HERO is
-      // wounded past its threshold (the mirror of enrage). Both return a boosted
-      // attack snapshot (or the enemy untouched for the ordinary case) so the extra
-      // damage runs through the same duel math as any other strike. A boss carries
-      // at most one mechanic, so chaining is safe: the inapplicable helper returns
-      // its argument unchanged — execute reads .mechanic, which the enrage snapshot
-      // lacks, making it a strict no-op on an enraged boss, and vice versa.
-      const attacker = lj.enemy.executes(
-        lj.enemy.enraged(enemy, enemyHealth, enemyMaxHealth),
-        heroHealth,
-        heroMaxHealth
-      );
-      // A SUNDERING boss melts through part of the hero's armor on its own swing;
-      // lj.enemy.sundered returns the hero's stat snapshot with reduced effective
-      // armor (or the snapshot untouched for enemies without the mechanic), so the
-      // harder-landing blow flows through the same duel math. Only the boss's
-      // swing sees the reduced armor — the hero's real gear is never changed.
-      const defender = lj.enemy.sundered(enemy, heroStats);
-      lastAction = lj.hero.duel(defender, attacker);
-      lastAction.actor = "enemy";
-      // Flag which offensive ramp boosted this swing so the battle log can surface
-      // it. attacker !== enemy means one fired; a boss carries a single mechanic,
-      // so its descriptor tells us which (execute vs enrage).
-      if (attacker !== enemy) {
-        if (enemy.mechanic && enemy.mechanic.type === "execute") {
-          lastAction.executed = true;
-        } else {
-          lastAction.enraged = true;
+      // A TEMPO boss fights at a blistering cadence — it may FOLLOW its blow with a
+      // second strike on the SAME turn (see lj.enemy.flurries). Roll the flurry ONCE
+      // per boss turn, then resolve 1 or 2 swings through the identical math below.
+      // Each swing is guarded by heroHealth > 0, so a lethal first blow skips the
+      // follow-up: a dead hero takes no further hits, the boss still kills only on
+      // its own turn, and the shared outcome.actor health-check stays valid with no
+      // killing-blow special case. A non-tempo boss never flurries (flurries returns
+      // false before any rng roll), so this loops exactly once and is byte-identical
+      // to the old single swing — no extra RNG is consumed for existing content.
+      const swings = lj.enemy.flurries(enemy) ? 2 : 1;
+      for (let swing = 0; swing < swings && heroHealth > 0; swing += 1) {
+        // A boss with the enrage mechanic swings harder once IT is wounded past its
+        // threshold; a boss with the EXECUTE mechanic swings harder once the HERO is
+        // wounded past its threshold (the mirror of enrage). Both return a boosted
+        // attack snapshot (or the enemy untouched for the ordinary case) so the extra
+        // damage runs through the same duel math as any other strike. A boss carries
+        // at most one mechanic, so chaining is safe: the inapplicable helper returns
+        // its argument unchanged — execute reads .mechanic, which the enrage snapshot
+        // lacks, making it a strict no-op on an enraged boss, and vice versa.
+        const attacker = lj.enemy.executes(
+          lj.enemy.enraged(enemy, enemyHealth, enemyMaxHealth),
+          heroHealth,
+          heroMaxHealth
+        );
+        // A SUNDERING boss melts through part of the hero's armor on its own swing;
+        // lj.enemy.sundered returns the hero's stat snapshot with reduced effective
+        // armor (or the snapshot untouched for enemies without the mechanic), so the
+        // harder-landing blow flows through the same duel math. Only the boss's
+        // swing sees the reduced armor — the hero's real gear is never changed.
+        const defender = lj.enemy.sundered(enemy, heroStats);
+        lastAction = lj.hero.duel(defender, attacker);
+        lastAction.actor = "enemy";
+        // Flag which offensive ramp boosted this swing so the battle log can surface
+        // it. attacker !== enemy means one fired; a boss carries a single mechanic,
+        // so its descriptor tells us which (execute vs enrage).
+        if (attacker !== enemy) {
+          if (enemy.mechanic && enemy.mechanic.type === "execute") {
+            lastAction.executed = true;
+          } else {
+            lastAction.enraged = true;
+          }
         }
+        // Same identity idiom on the defensive side: sundered() hands the snapshot
+        // straight back unless the mechanic fired, so a fresh object means this
+        // swing melted the hero's armor. Flag only — the damage above already
+        // accounts for it.
+        if (defender !== heroStats) {
+          lastAction.sundered = true;
+        }
+        // The flurry's follow-up (the second swing) telegraphs itself; the first
+        // swing is the boss's ordinary blow.
+        if (swing === 1) {
+          lastAction.flurried = true;
+        }
+        log.push(lastAction);
+        heroHealth -= lastAction.damage;
+        heroDamageTaken += lastAction.damage;
       }
-      // Same identity idiom on the defensive side: sundered() hands the snapshot
-      // straight back unless the mechanic fired, so a fresh object means this
-      // swing melted the hero's armor. Flag only — the damage above already
-      // accounts for it.
-      if (defender !== heroStats) {
-        lastAction.sundered = true;
-      }
-      log.push(lastAction);
-      heroHealth -= lastAction.damage;
-      heroDamageTaken += lastAction.damage;
     }
     herosTurn = !herosTurn;
   }

@@ -19,6 +19,7 @@ const spriteMap = {
   S: [0, 9], // The Searing Colossus (apex thorns boss) — reuses the boss sprite
   M: [0, 9], // The Molten Reaver (apex sunder boss) — reuses the boss sprite
   H: [0, 9], // The Pyre Headsman (apex execute boss) — reuses the boss sprite
+  F: [0, 9], // The Flarebrand Duelist (apex tempo boss) — reuses the boss sprite
   a: [0, 11], // Wolf
   b: [0, 12], // Gnoll
   c: [0, 13], // Troll

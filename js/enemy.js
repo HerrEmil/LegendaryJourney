@@ -50,31 +50,34 @@ lj.enemy.familyForRealm = function (size) {
 };
 // Which boss grade guards a realm's exit. Realms 1-4 are sealed by their
 // family's standard boss (grade "B"). From realm 5 on — always the clamped red
-// "Emberdeep" tier — the exit is held by one of FIVE apex bosses that rotate on
-// a size % 5 cycle, so a single deep run faces every apex identity: the enraging
-// Cinderwyrm (grade "T", realms 5, 10, 15…), the warding Obsidian Warden (grade
-// "W", realms 6, 11, 16…), the searing/retaliating Searing Colossus (grade "S",
-// realms 7, 12, 17…), the armor-sundering Molten Reaver (grade "M", realms 8,
-// 13, 18…) and the executing Pyre Headsman (grade "H", realms 9, 14, 19…). All
-// five grades are populated only on red, which is exactly the family every realm
-// >= 5 resolves to. realm.js places the tile and hero.js routes it, so each boss
-// is genuinely reachable in play; the selfplay harness fights the same grade, so
-// all five mechanics are measured in the decisive realm-5+ band.
+// "Emberdeep" tier — the exit is held by one of SIX apex bosses that rotate on
+// a size % 6 cycle, so a single deep run faces every apex identity: the enraging
+// Cinderwyrm (grade "T", realms 5, 11, 17…), the warding Obsidian Warden (grade
+// "W", realms 6, 12, 18…), the searing/retaliating Searing Colossus (grade "S",
+// realms 7, 13, 19…), the armor-sundering Molten Reaver (grade "M", realms 8,
+// 14, 20…), the executing Pyre Headsman (grade "H", realms 9, 15, 21…) and the
+// flurrying Flarebrand Duelist (grade "F", realms 10, 16, 22…). All six grades
+// are populated only on red, which is exactly the family every realm >= 5
+// resolves to. realm.js places the tile and hero.js routes it, so each boss is
+// genuinely reachable in play; the selfplay harness fights the same grade, so
+// all six mechanics are measured in the decisive realm-5+ band.
 lj.enemy.bossGradeForRealm = function (size) {
   if (size < 5) {
     return "B";
   }
-  switch (size % 5) {
+  switch (size % 6) {
+    case 5:
+      return "T"; // realms 5, 11, 17… — the Cinderwyrm (enrage)
     case 0:
-      return "T"; // realms 5, 10, 15… — the Cinderwyrm (enrage)
+      return "W"; // realms 6, 12, 18… — the Obsidian Warden (ward)
     case 1:
-      return "W"; // realms 6, 11, 16… — the Obsidian Warden (ward)
+      return "S"; // realms 7, 13, 19… — the Searing Colossus (thorns)
     case 2:
-      return "S"; // realms 7, 12, 17… — the Searing Colossus (thorns)
+      return "M"; // realms 8, 14, 20… — the Molten Reaver (sunder)
     case 3:
-      return "M"; // realms 8, 13, 18… — the Molten Reaver (sunder)
+      return "H"; // realms 9, 15, 21… — the Pyre Headsman (execute)
     default:
-      return "H"; // realms 9, 14, 19… — the Pyre Headsman (execute)
+      return "F"; // realms 10, 16, 22… — the Flarebrand Duelist (tempo)
   }
 };
 // All apex boss grades trigger the level-up on kill and the boss render sprite.
@@ -85,7 +88,8 @@ lj.enemy.isBoss = function (grade) {
     grade === "W" ||
     grade === "S" ||
     grade === "M" ||
-    grade === "H"
+    grade === "H" ||
+    grade === "F"
   );
 };
 // When a mechanic-carrying enemy is wounded past its enrage threshold it hits
@@ -185,6 +189,28 @@ lj.enemy.executes = function (enemy, currentHp, maxHp) {
     crit: enemy.crit,
     name: enemy.name,
   };
+};
+// A boss with the TEMPO mechanic fights at a blistering cadence: it sometimes
+// FOLLOWS its blow with a second strike on the same turn (a flurry). Return true
+// when this turn's follow-up connects — a per-mille chance roll (m.chance out of
+// 1000). This is the SIXTH boss mechanic and the offensive MIRROR of the ward:
+// the ward DENIES the hero every Nth landed blow, tempo GRANTS the boss an extra
+// blow — a genuinely new AXIS (swing FREQUENCY), where the five before it each
+// altered a single swing's magnitude (enrage/execute), negation (ward),
+// reflection (thorns) or the hero's mitigation (sunder). The follow-up runs
+// through the normal duel math and fires only on the boss's OWN turn, so the
+// hero still dies only on the boss's turn and the shared outcome.actor
+// health-check needs no killing-blow special case (like sunder/execute, unlike
+// thorns); it adds no boss HP and eats no hero blows, so fights stay SHORT — the
+// boss just lands more, faster. Non-tempo / no-mechanic enemies return false
+// BEFORE the rng roll, so they consume no randomness and their fights stay
+// byte-identical to a pre-tempo codebase.
+lj.enemy.flurries = function (enemy) {
+  var m = enemy.mechanic;
+  if (!m || m.type !== "tempo") {
+    return false;
+  }
+  return lj.util.randomInterval(1, 1000) <= m.chance;
 };
 lj.enemy.types = {
   brown: {},
@@ -422,6 +448,41 @@ lj.enemy.mods = [];
     type: "execute",
     threshold: 0.55, // executes while the hero is below 55% of its max HP
     damageMult: 2.0, // doubles strength & agility while executing (the kill blow)
+  });
+
+  //Red apex #6 — "The Flarebrand Duelist": the SIXTH boss mechanic, TEMPO, and a
+  //genuinely new combat AXIS. The five before it each reshaped a SINGLE swing —
+  //enrage/execute ramp its magnitude, ward negates it, thorns reflects it, sunder
+  //strips the hero's mitigation against it — while every boss still swung exactly
+  //ONCE per turn. The Duelist attacks that last constant: it fights at a blistering
+  //cadence and sometimes FOLLOWS its blow with a second strike on the same turn (a
+  //flurry, see lj.enemy.flurries), so the axis it moves is swing FREQUENCY, not a
+  //swing's damage. It is the deliberate offensive MIRROR of the Obsidian Warden —
+  //the ward DENIES the hero every Nth landed blow (fewer hero swings land); tempo
+  //GRANTS the boss an extra blow (more boss swings land). Each follow-up is a full,
+  //independent duel roll (its own hit/crit/armor mitigation), so it is not the same
+  //as a bigger single hit: it is a second chance to crit and a second armor-checked
+  //blow, and it stacks flat across the whole fight rather than gating on an HP
+  //window. Like sunder/execute it fires only on the boss's OWN turn, so the hero
+  //still dies only on the boss's turn and the shared outcome.actor health-check
+  //needs NO killing-blow special case (the flurry's second swing is skipped once
+  //the hero is down); and it adds no boss HP and eats no hero blows, so fights stay
+  //SHORT (kind to the 400ms/step animation) — the boss just lands more, faster.
+  //Balanced as a clean sixth SIBLING by the established method: it REUSES the
+  //Warden/Colossus/Reaver/Headsman modest defensive block [str 5, agi 7, hp 82,
+  //hit 1, crit 3, armor 5, def 2] EXACTLY (armor/defense untouched per the
+  //depth-philosophy — never touch the compounding stats; the mechanic carries the
+  //threat), differing only in its mechanic, with the per-mille flurry CHANCE the
+  //single tuning knob. A finely-tunable probability (not a coarse fixed cadence) is
+  //what lets the isolated all-Duelist rate land dead on the siblings' ~38-39% peer.
+  //The tempo is LOAD-BEARING and the boss a peer, both sim-measured against
+  //selfplay (isolated A/B, all deep bosses = Duelist, flurry off vs on): see
+  //scripts/balance-baseline.json / scripts/content-backlog.json for the numbers.
+  //Rotating all six by size % 6 (deep runs meet every apex) leaves the shipped
+  //--check ~37% (essentially the pre-Duelist baseline, within noise).
+  col["red"].F = new mon([5, 7, 82, 1, 3, 5, 2], "The Flarebrand Duelist", {
+    type: "tempo",
+    chance: 300, // per-mille (of 1000) chance to follow a blow with a 2nd strike
   });
 
   //Set up mods

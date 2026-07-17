@@ -15,6 +15,7 @@ const TELEGRAPHS = [
   { kind: "warded", match: /A ward flares/ },
   { kind: "reflected", match: /searing hide sears your blow back!/ },
   { kind: "sundered", match: /cleaves through your armor!/ },
+  { kind: "flurried", match: /blurs into a flurry of blows!/ },
 ];
 
 // Realm -> biome title, mirroring realm.js's biomeLadder (r1 halls, r2 frost,
@@ -173,6 +174,78 @@ test("a real boss fight telegraphs its mechanic exactly once", async ({
   );
   expect(text, "the telegraph should name the boss").toContain(
     "The Molten Reaver"
+  );
+
+  expect(errors, `unexpected errors: ${errors.join(" | ")}`).toEqual([]);
+});
+
+test("a real flurry fight telegraphs tempo exactly once", async ({ page }) => {
+  test.setTimeout(90_000); // the fight animates one log entry per 400ms
+  const errors = collectErrors(page);
+  page.on("dialog", (d) => d.dismiss());
+  await boot(page);
+
+  // The Flarebrand Duelist (grade "F", realm 10) flurries on a per-mille CHANCE,
+  // so a real fight might not flurry within a short duel. Force chance to 1000
+  // (always) — lj.enemy.base shares the type's mechanic by reference, so every
+  // planted "F" flurries on its FIRST swinging turn — then prove the .flurried
+  // flag drives the callout end-to-end AND is deduped to once per fight (the boss
+  // flurries every turn at chance 1000). CRUCIAL: the flurry's telegraph lives on
+  // the SECOND swing, which the fight loop only reaches if the hero SURVIVES the
+  // first — and a gearless hero is one-shot by a realm-10 boss, so we buff the hp
+  // STAT (raising real max HP; NOT stats.health = 1e9, which caps at max and would
+  // be a no-op) so the hero outlives several boss turns. 400 -> max 2100 HP clears
+  // even the worst-case first swing (an "Angry" agi-doubling mod + crit at realm
+  // 10 tops out ~1.5k), and surviving multiple flurrying turns is what stresses
+  // the once-per-fight dedupe below.
+  const dir = await page.evaluate(() => {
+    const lj: any = (window as any).lj;
+    while (lj.realm.getSize() < 10) lj.scene.levelUp();
+    lj.enemy.types.red.F.mechanic.chance = 1000;
+    lj.hero.stats.buff("hp", 400); // real max HP -> 100 + 400*5 = 2100, outlasts several boss turns
+    lj.hero.stats.heal(1e9);
+    lj.battleLog.clear();
+
+    const roomNo = lj.realm.getCurrentRoom();
+    const room = lj.realm.getRoom(roomNo);
+    const items = lj.realm.getChestsAndMonsters(roomNo);
+    const candidates: Array<[string, number, number]> = [
+      ["up", 5, 8],
+      ["down", 5, 10],
+      ["left", 4, 9],
+      ["right", 6, 9],
+    ];
+    for (const [d, col, row] of candidates) {
+      if (room[col] && room[col][row] === " ") {
+        items[col][row] = "F";
+        return d;
+      }
+    }
+    return null;
+  });
+  expect(dir, "hero should have a walkable neighbouring tile").not.toBeNull();
+
+  await page.evaluate((d) => (window as any).lj.hero.step(d), dir);
+
+  // The flurry callout lands on the boss's first (always-flurrying) turn...
+  await expect(page.locator("#battleLog")).toContainText(
+    "blurs into a flurry of blows!",
+    { timeout: 30_000 }
+  );
+  // ...and the duel then runs to its end (kill or death) with no second line.
+  await expect
+    .poll(async () => /Slayed the|You were killed by/.test(await logText(page)), {
+      timeout: 60_000,
+    })
+    .toBe(true);
+
+  const text = await logText(page);
+  const lines = text.match(/blurs into a flurry of blows!/g) ?? [];
+  expect(lines, `tempo should telegraph once, not once per flurry`).toHaveLength(
+    1
+  );
+  expect(text, "the telegraph should name the boss").toContain(
+    "The Flarebrand Duelist"
   );
 
   expect(errors, `unexpected errors: ${errors.join(" | ")}`).toEqual([]);

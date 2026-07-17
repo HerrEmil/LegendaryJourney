@@ -26,8 +26,9 @@ lj.hero = (() => {
     T: "Enemy", // The Cinderwyrm (apex enrage boss, realms 5, 10…)
     W: "Enemy", // The Obsidian Warden (apex ward boss, realms 6, 11…)
     S: "Enemy", // The Searing Colossus (apex thorns boss, realms 7, 12…)
-    M: "Enemy", // The Molten Reaver (apex sunder boss, realms 8, 13…)
-    H: "Enemy", // The Pyre Headsman (apex execute boss, realms 9, 14…)
+    M: "Enemy", // The Molten Reaver (apex sunder boss, realms 8, 14…)
+    H: "Enemy", // The Pyre Headsman (apex execute boss, realms 9, 15…)
+    F: "Enemy", // The Flarebrand Duelist (apex tempo boss, realms 10, 16…)
     C: "Chest",
     E: "Enemy",
     a: "Enemy",
@@ -46,6 +47,7 @@ lj.hero = (() => {
     "warded",
     "reflected",
     "sundered",
+    "flurried",
   ];
 
   setupListeners();
