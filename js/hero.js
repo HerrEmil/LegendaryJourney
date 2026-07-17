@@ -36,6 +36,18 @@ lj.hero = (() => {
     d: "Enemy",
   };
 
+  // Flags lj.hero.fight stamps on a fight-log entry when an apex mechanic fired.
+  // A boss carries at most one mechanic, so an entry never really carries two;
+  // taking the first keeps this honest if that ever stops being true (a flag
+  // passed over stays untold, so it still telegraphs on a later entry).
+  const telegraphFlags = [
+    "enraged",
+    "executed",
+    "warded",
+    "reflected",
+    "sundered",
+  ];
+
   setupListeners();
 
   function reset() {
@@ -169,8 +181,18 @@ lj.hero = (() => {
       fightEl.style.top = `${position[1] + 150}px`;
       fightEl.style.left = `${position[0] + 50}px`;
 
+      // Telegraph each apex mechanic the FIRST time it fires in this fight, in
+      // step with the strike that fired it. Once per fight, not once per swing:
+      // sunder fires on EVERY boss swing and enrage on every one past the
+      // threshold, so a callout per occurrence would bury the log.
+      const told = {};
       fight.log.forEach((log, index) => {
+        const kind = telegraphFlags.find((flag) => log[flag] && !told[flag]);
         showFightStat(log, index * 400);
+        if (kind) {
+          told[kind] = true;
+          telegraph(kind, enemy.name, index * 400);
+        }
       });
 
       outcome((fight.log.length + 0.3) * 400);
@@ -180,6 +202,12 @@ lj.hero = (() => {
   // Our Hero is Legendary
   function ascend() {
     isBusy = true;
+  }
+
+  function telegraph(kind, monster, timeout) {
+    setTimeout(() => {
+      lj.battleLog.mechanic(kind, monster);
+    }, timeout);
   }
 
   function showFightStat({ actor, damage, reflected }, timeout) {

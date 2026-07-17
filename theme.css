@@ -197,6 +197,15 @@ h1 {
 .legendary {
 	color : orange;
 }
+
+.telegraph {
+	color : #e2725b;
+}
+
+.banner {
+	color : #7fb2d9;
+}
+
 #healthBarBox {
 	position : absolute;
 	top : 150px;

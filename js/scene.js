@@ -64,6 +64,9 @@ lj.scene = (() => {
     creaturesAndItems = null;
     enter("D");
     lj.battleLog.levelComplete(currentLevel);
+    // makeRealm above already locked in the new realm's architecture, so this
+    // names the biome the hero just walked into, not the one it left.
+    lj.battleLog.realmArrival(currentLevel + 1, lj.realm.getBiomeName());
   }
 
   // Get the opposite door (for when entering and exiting)

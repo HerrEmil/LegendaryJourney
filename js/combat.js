@@ -340,6 +340,13 @@ lj.hero.fight = (enemy) => {
           lastAction.enraged = true;
         }
       }
+      // Same identity idiom on the defensive side: sundered() hands the snapshot
+      // straight back unless the mechanic fired, so a fresh object means this
+      // swing melted the hero's armor. Flag only — the damage above already
+      // accounts for it.
+      if (defender !== heroStats) {
+        lastAction.sundered = true;
+      }
       log.push(lastAction);
       heroHealth -= lastAction.damage;
       heroDamageTaken += lastAction.damage;
