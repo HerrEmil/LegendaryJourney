@@ -321,3 +321,112 @@ batches and the open-plaza boss arena):
 > Note: this run edited **only** `tests/playtest/LEDGER.md`. `js/` was not
 > touched, no spec was added, and the two temp probe spec batches were deleted.
 > The working tree was clean at start and end.
+
+---
+
+## 2026-07-17 (run 2) — RECON ONLY (no code fix) — affix id-0 falsy re-roll
+
+**Not this run's fix target.** 2014-7DFPS won selection (fewest regression specs:
+2 vs this repo's 7) and was fixed/gated/pushed instead. This run touched **only
+this ledger** — no source, no spec; all probes were throwaway specs inside the
+repo tree, deleted afterwards. Shared checkout: no `git add -A`, no stash; only
+`tests/playtest/LEDGER.md` staged by explicit path.
+
+> Subagent-safety note: the classifier (`claude-opus-4-8[1m]`) was unavailable
+> when this run's playtest subagent finished, so the lead **independently
+> re-verified** the headline finding against source before recording it (see the
+> code cites below). Do not treat the numbers as trusted without that re-read;
+> they were confirmed.
+
+**Seeds this run:** `77174000` (boot/assets/CLS), `77174010` (items/NaN/equip),
+`77174020`+`77174021` (organic full runs), `77174030` (deep descent + death),
+`77174050` (affix bias), `77174101`-`77174104` (fuzz, timers/10),
+`77174105`-`77174106` (fuzz, real time). Range 77174000-77174106; prior runs used
+7704xxxx.
+
+---
+
+### DEFECT (LOW, confirmed — lead re-verified against source) — affix pool entry 0 is ~33-39x rarer than every peer. **LEADING CANDIDATE FOR THE NEXT FIX RUN.**
+
+**Root cause.** `js/stats.js:300` (`pre.get`) and `js/stats.js:329` (`suf.get`)
+both do `if (!id) { this.prefix = rng(0, len-1) } else { this.prefix = id }`.
+**id `0` is falsy**, so an explicit request for pool entry 0 is discarded and
+re-rolled uniformly. `makeItem` (`js/items.js:172-178`) passes
+`rng(0, prefixes.length - 1)` as the id — so whenever 0 is rolled, it re-rolls,
+leaving entry 0 at probability **(1/n)²** instead of **1/n**. (Lead confirmed both
+call sites and the `rng` range by reading the source, 2026-07-17.)
+
+**Measured** (agent, 60,000 samples of the exact call `makeItem` uses):
+- `lj.stats.prefixes.get(0)` returned **"Furious" (id 25)**, not "Burning" — the
+  re-roll in action.
+- **"Burning" 51 vs ~1818 expected**; **"of the Phoenix" 50 vs ~1538 expected** —
+  both match the (1/n)² prediction (~55 / ~39), while peer affixes sat at
+  1787-1942.
+
+Entry 0 of each pool ("Burning" prefix, "of the Phoenix" suffix) is therefore a
+near-unobtainable affix. Pure loot-distribution correctness; no crash, no NaN.
+
+**Fix shape.** Change both guards to `id == null` (or `id === undefined`) so an
+explicit 0 is honoured. Self-contained to `js/stats.js`, uncontended by the
+concurrent content/playtest tasks (they work in `content-backlog.json` and
+affix-batch modules, not the `get` dispatch). **Regression test design:** call
+`lj.stats.prefixes.get(0)` and assert `.id === 0` / name === pool[0].name; plus a
+distribution smoke test (a few thousand `makeItem` samples) asserting entry 0's
+frequency is within a tolerance band of 1/n, not 1/n².
+
+---
+
+### items.js:139 `let itemLevel;` — runtime repro produced, but NO player-facing symptom (do not over-file)
+
+The prior entry asked for a runtime repro of the unassigned `let itemLevel;`.
+**CONFIRMED at the API level:** `lj.items.makeItem(10, "weapon", "normal")` yields
+mean weapon strength **6.34** vs a level-1 baseline **6.63** (statistically
+identical — the level is dropped at `js/items.js:169`), while a correctly-plumbed
+`lj.items.types.get(10, "weapon")` yields mean **51.5** (~8x). Smoking gun: after
+`makeItem(10,…)`, `lj.items.itemLevel === 10` (the stray `this.itemLevel` write at
+`:143`) while the produced item is level-1.
+
+**Reachability caveat — this is the important part.** **No shipped call site passes
+a level** — `js/hero.js:168` calls `makeItem()` bare — so there is **no
+player-facing symptom**. Item-level scaling is a **confirmed-dead parameter**, not
+a live bug: items scale only via the quality mod, and depth difficulty comes
+entirely from the enemy `1.375^(n-1)` curve plus the magicFind quality escalator.
+File it as "wire it up **if** you ever want item-level scaling", not as a bug.
+
+### Minor observations (measured, not filed as defects)
+
+- `js/items.js:37-39`: negative total magicFind yields `baseMF = 1`, *better* than
+  magicFind 0 (`baseMF = 0`). Measured realm 1: legendary 45/4000 (mf 0) vs
+  39/4000 (mf -5) — negligible; the branch only matters at depth where mf is
+  multiplied by `2^(size-1)`. Logic quirk, no meaningful impact.
+- `hero.js` `creaturesAndItemsMap` maps `'E'` but `scene.js` `spriteMap` has no
+  `'E'` — currently unreachable (`pickRandomEnemyType` only returns a-d), latent
+  paint-hardening note only.
+
+### Verified CLEAN this run
+
+- **Build/boot/assets:** dist builds (19 files); 17 requests all **200, exact-case**;
+  **CLS 0**; canvas painted (122,495 non-blank px); **zero console errors /
+  pageerrors / unhandled rejections across all 11 probe sessions**.
+- **Real full-game runs** (BFS-driven arrow-key play): seed `77174020` descended
+  realms **1→8**, 49 fights, 56 equips, organic **WIN** (full legendary set); seed
+  `77174021` realms **1→9**, 65 fights, WIN. Apex telegraphs fired en route (3-4x).
+  **0 NaN** in enemy stats and fight-log damage, **0** health>max, **0** malformed
+  HUD, **max fight-log length 9** even at realms 8-9 with geared heroes.
+- **Depth + death/restart:** seed `77174030` chest-geared to realm 6 (200/200, 16
+  equips), fought at depth, died organically; "Try again!" verified: realm 1,
+  100/100, gear + legendary slots cleared, hero movable (isBusy cleared). Two more
+  organic real-time deaths recovered identically.
+- **Item system:** 6,000 `makeItem` items — 0 NaN across all 9 stats, 0 malformed
+  names, 0 non-finite gScore; 26 negative-hp items handled (both prior HUD fixes
+  hold). Equip/unequip/pickup edge cases all clean; inventory confirmed vestigial
+  (always empty) by design.
+- **Fuzz:** 6 seeds x 640 presses incl. Space/Tab/Escape/Enter/letters/digits/
+  Backspace/PageDown/Home/End, viewport flips 375x812<->1280x800 every 160 presses,
+  24 canvas spam-clicks/seed — **0 violations, 0 errors**, gameplay provably
+  exercised.
+- **No save/load surface exists** (no localStorage/sessionStorage/indexedDB
+  anywhere). **No softlocks** in any run.
+
+Known ledger items (escapable win, stale paintGameOver, checkTile hardening,
+extreme-depth log explosion) were not re-tested and are not re-reported.
