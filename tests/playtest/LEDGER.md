@@ -181,3 +181,143 @@ HUD render path, no combat/loot math changed; `js/combat.js` edited only inside
 - **Sandpiper** (Defold WASM, `76100000`): clean — boots headless
   (`game-started`, live WebGL), off-thread Wasm compile path taken, 11 assets
   exact-case 200, no white band on resize.
+
+## 2026-07-17 — RECON ONLY, no code fix (seeds `77040001`–`77040073`)
+
+Sandpiper won this run's fewest-specs / oldest-ledger fix selection, so
+LegendaryJourney was **recon only this run — nothing in `js/` was changed.**
+Three defects were found and *reproduced headlessly*; all are logged below for a
+future LJ fix run, ordered by severity. Seeds `77040001`–`77040073` (a fresh
+range; a mulberry32 override of `Math.random` installed via `addInitScript`
+before any page script, so every run is deterministic and re-runnable).
+
+> **HEAD moved mid-run.** Recon started at `04e8762`; the concurrent burn task
+> committed **`a543e2a`** (`mechanic-telegraphs`, Ladder 2 #17) underneath it —
+> purely ADDITIVE battle-log telegraphs touching `js/battle-log.js`,
+> `js/combat.js`, `js/hero.js`, `js/scene.js`, `theme.css`,
+> `scripts/balance-baseline.json`, `scripts/content-backlog.json` +
+> `tests/playtest/telegraphs.spec.ts`. It touches **none** of the code paths
+> below. **Every finding here was RE-VERIFIED against `a543e2a`, and all line
+> numbers cited are `a543e2a`'s.** Suite is **10/10** including the concurrent
+> task's new `telegraphs.spec.ts`.
+
+### Defect 1 — the terminal WIN state is escapable; the game silently un-wins itself (MEDIUM) — **the leading candidate for the next LJ fix run**
+
+`lj.hero.gear.legendary.add()` (`js/combat.js:146-151`) defers `paintWin()` +
+`lj.hero.ascend()` by `setTimeout(…, 300)` — but `hero.interact()`'s **Chest**
+branch clears `isBusy = false` **synchronously** at `js/hero.js:171`. So for
+300 ms after completing the legendary set the hero is alive, unlocked, and
+free to walk. A fight started inside that window has an `outcome()` that sets
+`isBusy = false` (`js/hero.js:153`/`:156`) **AFTER** `ascend()`
+(`js/hero.js:203-205`) already set it true, and its `lj.scene.eraseTileItem()`
+repaints the board straight over the win screen. Net effect: the player gets
+"You completed the game!" plus a "Play again!" button in the log, the win screen
+flashes and is then **painted over**, and the game just keeps running.
+
+*Repro (OBSERVED, seed `77040070`):* plant a monster at `[5,8]`, equip 8/9
+legendary slots, `pickup` the 9th, press `ArrowUp` inside the 300 ms window,
+wait 6 s, then drive arrows. "You win!" orange pixels **1159 → 2** (screen
+destroyed); hero health **41.5 → 61** (moving and healing, i.e. unlocked).
+*Clean control (seed `77040071`):* identical win with **no** fight in the window
+→ winPx **1159 stable**, health **40 → 40**, hero locked. A clean A/B.
+
+***The fix is self-contained to `js/hero.js` and does NOT need to touch
+`js/combat.js` — the CONTENDED file.*** Give `ascend()` a persistent
+`hasAscended` flag that `step()` honours and `outcome()` will not clear, and
+have `reset()` clear it. **The 300 ms defer in `combat.js` can stay exactly as
+is.** That is what makes this both the highest-value and the cheapest next fix.
+*Regression test asserts:* after the escape sequence, `lj.hero.stats.health` is
+unchanged across 25 arrow presses. **Proven FAIL pre-fix** (41.5 → 61) against
+the passing control.
+
+### Defect 2 — stale `paintGameOver()` paints a corpse over the restarted realm (LOW)
+
+`scene.eraseTileItem(tile, true)` (`js/scene.js:263-270`) schedules
+`paintGameOver(tile)` at +1000 ms and **nothing ever cancels it**, while
+`scene.reset()` (`js/scene.js:49`) is reachable *immediately* via the
+"Try again!" button — `checkRestartButton` has no `isBusy` / pending-timer
+check. Restart inside that window and the stale callback repaints: the player
+sees the fresh realm-1 room with a **corpse sprite and no live hero** until the
+next keypress.
+
+*Repro (OBSERVED, seed `77040072`, real organic death):* monster planted at
+`[5,8]`, hero dropped to 1 HP via `hurt()`, walk into it → a **real lost fight
+through the shipped Enemy branch** → click "Try again!" → snapshot the canvas →
+wait 1.5 s → snapshot again. Canvas repaints with **zero input**.
+*Fix self-contained to `js/scene.js`* (store the timer id, `clearTimeout` it in
+`reset()`) — **not contended**. *Regression test asserts:* after a real death +
+restart, the canvas `ImageData` is byte-identical across the following 1.5 s.
+**Proven FAIL pre-fix.**
+
+### Defect 3 — unguarded `checkTile` row read (LOW / latent) — **file as HARDENING, not a player-facing bug**
+
+`js/hero.js:131` — `const item = creaturesAndItems[tile[0]][tile[1]];` has no
+guard. `interact()`'s deferred `outcome()` re-reads
+`creaturesAndItems = lj.realm.getChestsAndMonsters(currentRoom)`
+(`js/hero.js:163`/`:172`) using the room number **captured at fight start**, and
+`realm.makeRealm()` resets `chestsAndMonsters[n] = []` for every room of the new
+realm — so a stale `outcome()` landing *after* a level-up assigns `[]`, and the
+next step throws `TypeError: Cannot read properties of undefined`.
+
+**HONEST REACHABILITY — no organic trigger was found, and this should not be
+sold as one:**
+- The **shipped boss path is SAFE**: `outcome()`'s `:163`/`:172` re-read runs
+  **BEFORE** the boss path's deferred `levelUp()` (which is scheduled +1000 ms
+  *inside* that same callback), so the ordering saves it.
+- A **3.4-minute fully-organic run** (seed `77040033`, zero scripted calls)
+  cleared **realm 1 → 2 by a real arrow-key boss kill with ZERO errors**.
+- The **restart-button race is harmless**: `makeRealm` does not truncate
+  `chestsAndMonsters`, so the stale room index still holds a real 11×11 array
+  (desynced ghost monsters, but no crash).
+- The trigger that DOES reproduce it (seed `77040073`: call `lj.scene.levelUp()`
+  mid-fight, 10 uncaught pageerrors at `js/hero.js:131:44`) is **exactly what
+  this repo's OWN suite does at `playtest.spec.ts:44`**.
+
+*Fix self-contained to `js/hero.js`* (guard the row read, or have `outcome()`
+re-read the LIVE room instead of the captured one) — **not contended**.
+
+**Clean/verified this run** — this matters because it covers the concurrent
+task's newest surface (the five apex mechanics, the 14 elite mods, the affix
+batches and the open-plaza boss arena):
+- **Health invariants HOLD.** 6000 real items across every slot × quality driven
+  through the real `pickup`/`equip`/`heal` path (seed `77040052`): **0**
+  `health > max`, **0** NaN, **0** malformed/overflowing `#healthBar`, **0**
+  false `DEAD`. **BOTH prior fixes (`regression-health-overflow`,
+  `regression-maxhp-floor`) survive the concurrent task's new affixes and
+  bosses**; both specs still pass.
+- **Boss mechanics + all 14 elite mods are NaN-free.** ~950 fights across every
+  apex grade (B/T/W/S/M/H) × all 14 mods × realms 1–14 with randomized real gear
+  (seed `77040012`): **0** non-finite enemy stats, **0** NaN in any fight-log
+  damage or outcome, **0** non-terminating fights (guarded at 40 k `duel()`
+  calls — the real loop untouched, only a counter wrapped around `lj.hero.duel`).
+- **Connectivity solid — and playtest IS the gate here**, since room modules are
+  invisible to the selfplay win-rate. 1200 real boss rooms incl. the NEW
+  open-plaza arena, sizes 1–10, all five apex grades sampled (seed `77040013`):
+  0 unreachable tiles/doors, 0 un-carved arenas, 0 missing bosses. 420 whole
+  realms flood-filled at the **room-graph** level (seed `77040015`): **0 realms
+  where the boss room is unwalkable from spawn**, 0 isolated rooms. No softlocks.
+  (Note: `makeRealm` only builds the bottom-row START room, so a boss-room probe
+  MUST call `lj.realm.enterRoom(getBossRoom())` — sampling `getCurrentRoom()`
+  silently only ever sees grade "B" at size 1.)
+- **Input/resize/click fuzz clean.** 600 seeded presses incl. non-arrow keys
+  (Tab/Esc/F5/Space/…), 3 viewport flips (375×812 ↔ 1280×800), spam-clicks
+  (seed `77040051`): 0 violations, 0 console/page errors.
+- **Assets + CLS clean.** All 17 requests **200**, exact-case; **CLS 0** (seed
+  `77040004`).
+
+**Noted, not filed:**
+- **Fight-log length explodes at depth.** `maxLog` **13209 at realm 14** (6505 at
+  r12, 4631 at r11) — `hero.js` schedules `log.length × 400 ms` of animation, so
+  a deep hp-stacked hero can sit through a **~88-minute `isBusy` freeze**.
+  Extreme-depth only, but it is the same "kind to the 400 ms/step animation"
+  constraint the boss-mechanic comments already reason about.
+- **`js/items.js:139` declares `let itemLevel;` and never assigns it**, then
+  passes it to `lj.items.types.get(itemLevel, …)` at `:169` — so `level` falls
+  back to 1 and `makeItem(level, …)`'s parameter is effectively dead. **STATIC
+  READ ONLY — no runtime symptom was observed** (nothing currently calls
+  `makeItem` with a level, so nothing visibly breaks). Worth a deliberate look
+  rather than a claim: *if* real it would silently disable item-level scaling.
+
+> Note: this run edited **only** `tests/playtest/LEDGER.md`. `js/` was not
+> touched, no spec was added, and the two temp probe spec batches were deleted.
+> The working tree was clean at start and end.
