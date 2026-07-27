@@ -23,12 +23,14 @@ lj.hero = (() => {
 
   const creaturesAndItemsMap = {
     B: "Enemy",
-    T: "Enemy", // The Cinderwyrm (apex enrage boss, realms 5, 10…)
-    W: "Enemy", // The Obsidian Warden (apex ward boss, realms 6, 11…)
-    S: "Enemy", // The Searing Colossus (apex thorns boss, realms 7, 12…)
-    M: "Enemy", // The Molten Reaver (apex sunder boss, realms 8, 14…)
-    H: "Enemy", // The Pyre Headsman (apex execute boss, realms 9, 15…)
-    F: "Enemy", // The Flarebrand Duelist (apex tempo boss, realms 10, 16…)
+    // The apex bosses. Which realms each guards is NOT written down here — it is
+    // derived from lj.enemy.apexGrades, the single source for the rotation.
+    T: "Enemy", // The Cinderwyrm (apex enrage boss)
+    W: "Enemy", // The Obsidian Warden (apex ward boss)
+    S: "Enemy", // The Searing Colossus (apex thorns boss)
+    M: "Enemy", // The Molten Reaver (apex sunder boss)
+    H: "Enemy", // The Pyre Headsman (apex execute boss)
+    F: "Enemy", // The Flarebrand Duelist (apex tempo boss)
     C: "Chest",
     E: "Enemy",
     a: "Enemy",

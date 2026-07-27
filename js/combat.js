@@ -309,16 +309,24 @@ lj.hero.fight = (enemy) => {
         }
       }
     } else {
-      // A TEMPO boss fights at a blistering cadence — it may FOLLOW its blow with a
-      // second strike on the SAME turn (see lj.enemy.flurries). Roll the flurry ONCE
-      // per boss turn, then resolve 1 or 2 swings through the identical math below.
-      // Each swing is guarded by heroHealth > 0, so a lethal first blow skips the
-      // follow-up: a dead hero takes no further hits, the boss still kills only on
-      // its own turn, and the shared outcome.actor health-check stays valid with no
-      // killing-blow special case. A non-tempo boss never flurries (flurries returns
-      // false before any rng roll), so this loops exactly once and is byte-identical
-      // to the old single swing — no extra RNG is consumed for existing content.
+      // A TEMPO boss may FOLLOW its blow with a second strike on the SAME turn
+      // (see lj.enemy.flurries for the mechanic and why it costs non-tempo enemies
+      // no RNG). Roll it ONCE per boss turn — re-rolling inside the loop condition
+      // would consume extra randomness — then resolve 1 or 2 swings through the
+      // identical math below. The heroHealth > 0 guard is what skips the follow-up
+      // after a lethal first blow, so the hero still dies only on the boss's turn
+      // and the shared outcome.actor health-check needs no killing-blow case.
       const swings = lj.enemy.flurries(enemy) ? 2 : 1;
+      // A SUNDERING boss melts through part of the hero's armor on its own swing;
+      // lj.enemy.sundered returns the hero's stat snapshot with reduced effective
+      // armor (or the snapshot untouched for enemies without the mechanic), so the
+      // harder-landing blow flows through the same duel math. Only the boss's
+      // swing sees the reduced armor — the hero's real gear is never changed. Both
+      // inputs are fixed for the whole fight, so compute it once and let every
+      // swing share it. The identity idiom: sundered() hands the snapshot straight
+      // back unless the mechanic fired, so a fresh object means armor was melted.
+      const defender = lj.enemy.sundered(enemy, heroStats);
+      const sunders = defender !== heroStats;
       for (let swing = 0; swing < swings && heroHealth > 0; swing += 1) {
         // A boss with the enrage mechanic swings harder once IT is wounded past its
         // threshold; a boss with the EXECUTE mechanic swings harder once the HERO is
@@ -333,12 +341,6 @@ lj.hero.fight = (enemy) => {
           heroHealth,
           heroMaxHealth
         );
-        // A SUNDERING boss melts through part of the hero's armor on its own swing;
-        // lj.enemy.sundered returns the hero's stat snapshot with reduced effective
-        // armor (or the snapshot untouched for enemies without the mechanic), so the
-        // harder-landing blow flows through the same duel math. Only the boss's
-        // swing sees the reduced armor — the hero's real gear is never changed.
-        const defender = lj.enemy.sundered(enemy, heroStats);
         lastAction = lj.hero.duel(defender, attacker);
         lastAction.actor = "enemy";
         // Flag which offensive ramp boosted this swing so the battle log can surface
@@ -351,16 +353,13 @@ lj.hero.fight = (enemy) => {
             lastAction.enraged = true;
           }
         }
-        // Same identity idiom on the defensive side: sundered() hands the snapshot
-        // straight back unless the mechanic fired, so a fresh object means this
-        // swing melted the hero's armor. Flag only — the damage above already
-        // accounts for it.
-        if (defender !== heroStats) {
+        // Flag only — the damage above already accounts for the melted armor.
+        if (sunders) {
           lastAction.sundered = true;
         }
-        // The flurry's follow-up (the second swing) telegraphs itself; the first
-        // swing is the boss's ordinary blow.
-        if (swing === 1) {
+        // The flurry's follow-up telegraphs itself; the first swing is the boss's
+        // ordinary blow.
+        if (swing > 0) {
           lastAction.flurried = true;
         }
         log.push(lastAction);

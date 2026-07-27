@@ -48,49 +48,37 @@ lj.enemy.familyForRealm = function (size) {
   var idx = Math.max(0, Math.min(size - 1, ladder.length - 1));
   return ladder[idx];
 };
-// Which boss grade guards a realm's exit. Realms 1-4 are sealed by their
-// family's standard boss (grade "B"). From realm 5 on — always the clamped red
-// "Emberdeep" tier — the exit is held by one of SIX apex bosses that rotate on
-// a size % 6 cycle, so a single deep run faces every apex identity: the enraging
-// Cinderwyrm (grade "T", realms 5, 11, 17…), the warding Obsidian Warden (grade
-// "W", realms 6, 12, 18…), the searing/retaliating Searing Colossus (grade "S",
-// realms 7, 13, 19…), the armor-sundering Molten Reaver (grade "M", realms 8,
-// 14, 20…), the executing Pyre Headsman (grade "H", realms 9, 15, 21…) and the
-// flurrying Flarebrand Duelist (grade "F", realms 10, 16, 22…). All six grades
+// The apex boss rotation, in realm order: realm 5 meets the first entry, realm 6
+// the next, and so on, wrapping round — so a single deep run faces every apex
+// identity. This array is the ONE place the roster lives; bossGradeForRealm and
+// isBoss both derive from it, so ADDING an apex boss is appending its grade here
+// and nothing else moves. (It used to be a hand-rolled switch over `size % N`
+// plus an or-chain plus realm numbers copied into three files' comments: every
+// addition rewrote all of it, and the copies went stale twice.) All these grades
 // are populated only on red, which is exactly the family every realm >= 5
 // resolves to. realm.js places the tile and hero.js routes it, so each boss is
 // genuinely reachable in play; the selfplay harness fights the same grade, so
-// all six mechanics are measured in the decisive realm-5+ band.
+// every mechanic is measured in the decisive realm-5+ band.
+lj.enemy.apexGrades = [
+  "T", // the Cinderwyrm (enrage)
+  "W", // the Obsidian Warden (ward)
+  "S", // the Searing Colossus (thorns)
+  "M", // the Molten Reaver (sunder)
+  "H", // the Pyre Headsman (execute)
+  "F", // the Flarebrand Duelist (tempo)
+];
+// Which boss grade guards a realm's exit. Realms 1-4 are sealed by their
+// family's standard boss (grade "B"); from realm 5 on — always the clamped red
+// "Emberdeep" tier — it is the apex whose turn it is in the rotation above.
 lj.enemy.bossGradeForRealm = function (size) {
   if (size < 5) {
     return "B";
   }
-  switch (size % 6) {
-    case 5:
-      return "T"; // realms 5, 11, 17… — the Cinderwyrm (enrage)
-    case 0:
-      return "W"; // realms 6, 12, 18… — the Obsidian Warden (ward)
-    case 1:
-      return "S"; // realms 7, 13, 19… — the Searing Colossus (thorns)
-    case 2:
-      return "M"; // realms 8, 14, 20… — the Molten Reaver (sunder)
-    case 3:
-      return "H"; // realms 9, 15, 21… — the Pyre Headsman (execute)
-    default:
-      return "F"; // realms 10, 16, 22… — the Flarebrand Duelist (tempo)
-  }
+  return lj.enemy.apexGrades[(size - 5) % lj.enemy.apexGrades.length];
 };
 // All apex boss grades trigger the level-up on kill and the boss render sprite.
 lj.enemy.isBoss = function (grade) {
-  return (
-    grade === "B" ||
-    grade === "T" ||
-    grade === "W" ||
-    grade === "S" ||
-    grade === "M" ||
-    grade === "H" ||
-    grade === "F"
-  );
+  return grade === "B" || lj.enemy.apexGrades.indexOf(grade) !== -1;
 };
 // When a mechanic-carrying enemy is wounded past its enrage threshold it hits
 // harder: return a lightweight attack snapshot with its offensive stats scaled
